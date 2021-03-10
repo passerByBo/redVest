@@ -140,7 +140,7 @@ export default [
             name: '公告管理',
             icon: 'table',
             component: './Welcome',
-          },
+          }
         ],
       },
       {
@@ -161,6 +161,12 @@ export default [
             component: './Welcome',
           },
         ],
+      },
+      {
+        path: 'marketing/sharing-rules',
+        name: '分享规则管理',
+        icon: 'table',
+        component: './Welcome',
       },
     ],
   },

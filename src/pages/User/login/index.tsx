@@ -1,17 +1,13 @@
 import {
-  AlipayCircleOutlined,
   LockOutlined,
-  MobileOutlined,
-  TaobaoCircleOutlined,
   UserOutlined,
-  WeiboCircleOutlined,
 } from '@ant-design/icons';
-import { Alert, Space, message, Tabs } from 'antd';
+import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
-import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
+import ProForm, {ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
+import { Link, history, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login, getFakeCaptcha } from '@/services/ant-design-pro/login';
+import { login } from '@/services/ant-design-pro/login';
 import styles from './index.less';
 
 const LoginMessage: React.FC<{
@@ -44,7 +40,6 @@ const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
-  const intl = useIntl();
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
@@ -98,10 +93,7 @@ const Login: React.FC = () => {
             }}
             submitter={{
               searchConfig: {
-                submitText: intl.formatMessage({
-                  id: 'pages.login.submit',
-                  defaultMessage: '登录',
-                }),
+                submitText: '登录',
               },
               render: (_, dom) => dom.pop(),
               submitButtonProps: {
@@ -119,10 +111,7 @@ const Login: React.FC = () => {
             <Tabs activeKey={type} onChange={setType}>
               <Tabs.TabPane
                 key="account"
-                tab={intl.formatMessage({
-                  id: 'pages.login.accountLogin.tab',
-                  defaultMessage: '账户密码登录',
-                })}
+                tab='账户密码登录'
               />
               {/* <Tabs.TabPane
                 key="mobile"
@@ -135,10 +124,7 @@ const Login: React.FC = () => {
 
             {status === 'error' && loginType === 'account' && (
               <LoginMessage
-                content={intl.formatMessage({
-                  id: 'pages.login.accountLogin.errorMessage',
-                  defaultMessage: '账户或密码错误！',
-                })}
+                content='账户或密码错误！'
               />
             )}
             {type === 'account' && (
