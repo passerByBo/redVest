@@ -18,14 +18,14 @@ export default [
   {
     path: '/home',
     name: '我的店铺',
-    icon: 'crown',
+    icon: 'shop',
     // access: 'canAdmin',
     component: './Home',
   }, //商品管理
   {
     path: '/merchandise',
     name: '商品管理',
-    icon: 'crown',
+    icon: 'shopping',
     access: 'canAdmin',
     // component: './Merchandise',
     routes: [
@@ -64,13 +64,13 @@ export default [
   {
     path: '/order',
     name: '订单管理',
-    icon: 'smile',
+    icon: 'orderedList',
     component: './Welcome',
   },
   {
     path: '/customer',
     name: '客户管理',
-    icon: 'crown',
+    icon: 'user',
     access: 'canAdmin',
     routes: [
       {
@@ -122,7 +122,7 @@ export default [
   {
     path: '/marketing',
     name: '营销管理',
-    icon: 'table',
+    icon: 'fund',
     routes: [
       {
         path: 'marketing/announcement-info',
@@ -173,7 +173,7 @@ export default [
   {
     path: '/operation',
     name: '运营管理',
-    icon: 'table',
+    icon: 'robot',
     routes: [
       {
         path: '/operation/area',
@@ -194,13 +194,13 @@ export default [
   },
   {
     path: 'log',
-    icon: 'crown',
+    icon: 'container',
     name: '操作日志',
     component: './Welcome',
   },
   {
     path: 'help',
-    icon: 'crown',
+    icon: 'questionCircle',
     name: '帮助中心',
     component: './Home',
   },
