@@ -1,4 +1,4 @@
-﻿export default [
+export default [
   {
     path: '/user',
     layout: false,
@@ -14,37 +14,193 @@
         ],
       },
     ],
-  },
+  }, //我的店铺
   {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
-  },
+    path: '/home',
+    name: '我的店铺',
+    icon: 'crown',
+    // access: 'canAdmin',
+    component: './Home',
+  }, //商品管理
   {
-    path: '/admin',
-    name: 'admin',
+    path: '/merchandise',
+    name: '商品管理',
     icon: 'crown',
     access: 'canAdmin',
-    component: './Admin',
+    // component: './Merchandise',
     routes: [
       {
-        path: '/admin/sub-page',
-        name: 'sub-page',
+        path: '/merchandise/thematic-group',
+        name: '专题组管理',
+        icon: 'smile',
+        component: './TableList',
+      },
+      {
+        path: '/merchandise/thematic',
+        name: '专题管理',
+        icon: 'smile',
+        component: './Welcome',
+      },
+      {
+        path: '/merchandise/brand',
+        name: '品牌管理',
+        icon: 'smile',
+        component: './Welcome',
+      },
+      {
+        path: '/merchandise/type',
+        name: '类型管理',
+        icon: 'smile',
+        component: './Welcome',
+      },
+      {
+        path: '/merchandise/product-list',
+        name: '商品列表',
         icon: 'smile',
         component: './Welcome',
       },
     ],
   },
   {
-    name: 'list.table-list',
+    path: '/order',
+    name: '订单管理',
+    icon: 'smile',
+    component: './Welcome',
+  },
+  {
+    path: '/customer',
+    name: '客户管理',
+    icon: 'crown',
+    access: 'canAdmin',
+    routes: [
+      {
+        path: '/customer/certification',
+        name: '认证信息',
+        icon: 'smile',
+        routes: [
+          {
+            path: '/customer/certification/enterprise-certification',
+            name: '企业认证申请',
+            icon: 'smile',
+            component: './Welcome',
+          },
+          {
+            path: '/customer/certification/merchant-certification',
+            name: '商家认证申请',
+            icon: 'smile',
+            component: './Welcome',
+          },
+        ],
+      },
+      {
+        path: '/customer/archive',
+        name: '归档信息管理',
+        icon: 'smile',
+        routes: [
+          {
+            path: '/customer/archive/enterprise-info',
+            name: '企业信息管理',
+            icon: 'smile',
+            component: './Welcome',
+          },
+          {
+            path: '/customer/archive/business-info',
+            name: '商家信息管理',
+            icon: 'smile',
+            component: './Welcome',
+          },
+          {
+            path: '/customer/archive/member-info',
+            name: '会员信息管理',
+            icon: 'smile',
+            component: './Welcome',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/marketing',
+    name: '营销管理',
     icon: 'table',
-    path: '/list',
-    component: './TableList',
+    routes: [
+      {
+        path: 'marketing/announcement-info',
+        name: '公告资讯管理',
+        icon: 'table',
+        routes: [
+          {
+            path: 'marketing/announcement-info/classification',
+            name: '分类管理',
+            icon: 'table',
+            component: './Welcome',
+          },
+          {
+            path: 'marketing/announcement-info/announcement',
+            name: '公告管理',
+            icon: 'table',
+            component: './Welcome',
+          },
+        ],
+      },
+      {
+        path: 'marketing/coupon',
+        name: '卡券管理',
+        icon: 'table',
+        routes: [
+          {
+            path: 'marketing/coupon/package-maintenance',
+            name: '分类管理',
+            icon: 'table',
+            component: './Welcome',
+          },
+          {
+            path: 'marketing/coupon/coupon-production',
+            name: '公告管理',
+            icon: 'table',
+            component: './Welcome',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/operation',
+    name: '运营管理',
+    icon: 'table',
+    routes: [
+      {
+        path: '/operation/area',
+        name: '省市区管理',
+        component: './Welcome',
+      },
+      {
+        path: '/operation/withdrawal',
+        name: '提现管理',
+        component: './Welcome',
+      },
+      {
+        path: '/operation/operational-analysis',
+        name: '运营分析',
+        component: './Welcome',
+      },
+    ],
+  },
+  {
+    path: 'log',
+    icon: 'crown',
+    name: '操作日志',
+    component: './Welcome',
+  },
+  {
+    path: 'help',
+    icon: 'crown',
+    name: '帮助中心',
+    component: './Home',
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/home',
   },
   {
     component: './404',
