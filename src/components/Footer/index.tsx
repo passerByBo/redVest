@@ -4,7 +4,7 @@ import { DefaultFooter } from '@ant-design/pro-layout';
 
 export default () => (
   <DefaultFooter
-    copyright="2021 轩宇信息技术有限公司信息化出品"
+    copyright="2021 轩宇信息技术有限公司信息化"
     links={
       [
         // {

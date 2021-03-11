@@ -8,7 +8,7 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { ResponseError } from 'umi-request';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-import logo from '../public/logo_white.svg';
+import logo from '../public/logo_white.png';
 
 // const isDev = process.env.NODE_ENV === 'development';
 

@@ -65,7 +65,7 @@ export default [
     path: '/order',
     name: '订单管理',
     icon: 'orderedList',
-    component: './Welcome',
+    component: './Order',
   },
   {
     path: '/customer',
@@ -82,7 +82,7 @@ export default [
             path: '/customer/certification/enterprise-certification',
             name: '企业认证申请',
             icon: 'smile',
-            component: './Welcome',
+            component: './Customer/Certification/EnterpriseCertification',
           },
           {
             path: '/customer/certification/merchant-certification',
