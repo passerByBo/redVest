@@ -33,13 +33,13 @@ export default [
         path: '/merchandise/thematic-group',
         name: '专题组管理',
         icon: 'smile',
-        component: './TableList',
+        component: './Merchandise/ThematicGroup',
       },
       {
         path: '/merchandise/thematic',
         name: '专题管理',
         icon: 'smile',
-        component: './Welcome',
+        component: './TableList',
       },
       {
         path: '/merchandise/brand',
