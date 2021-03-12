@@ -77,7 +77,7 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
         return false;
     }
 };
-const Brand: React.FC = () => {
+const MerchandiseList: React.FC = () => {
     /** 新建窗口的弹窗 */
     const [createModalVisible, handleModalVisible] = useState<boolean>(false);
     /** 分布更新窗口的弹窗 */
@@ -89,7 +89,7 @@ const Brand: React.FC = () => {
 
     const columns: ProColumns<API.RuleListItem>[] = [
         {
-            title: '商品品牌',
+            title: '商品名称',
             dataIndex: 'name',
             render: (dom, entity) => {
                 return (
@@ -105,18 +105,18 @@ const Brand: React.FC = () => {
             },
         },
         {
-            title: '品牌编号',
+            title: '商铺名称',
             dataIndex: 'status',
             valueType: 'textarea',
         },
         {
-            title: '品牌logo',
+            title: '专题名称',
             dataIndex: 'status',
             valueType: 'textarea',
             search: false,
         },
         {
-            title: '品牌专区大图',
+            title: '商品货号',
             dataIndex: 'name',
             search: false,
             render: (dom, entity) => {
@@ -132,27 +132,27 @@ const Brand: React.FC = () => {
             },
         },
         {
-            title: '排序',
+            title: '商品分类',
             sorter: true,
             search: false,
             dataIndex: 'updatedAt',
             valueType: 'dateTime',
         },
         {
-            title: '是否推荐',
+            title: '商品规格',
             sorter: true,
             search: false,
             dataIndex: 'updatedAt',
             valueType: 'dateTime',
         },
         {
-            title: '是否展示',
+            title: '商品品牌',
             search: false,
             dataIndex: 'desc',
             valueType: 'textarea',
         },
         {
-            title: '是否有效',
+            title: '上架日期',
             dataIndex: 'option',
             valueType: 'option',
             render: (_, record) => [
@@ -166,7 +166,12 @@ const Brand: React.FC = () => {
             ],
         },
         {
-            title: '是否审核通过',
+            title: '销售价格',
+            dataIndex: 'desc',
+            valueType: 'textarea',
+        },
+        {
+            title: '返现率',
             dataIndex: 'desc',
             valueType: 'textarea',
         }
@@ -302,4 +307,4 @@ const Brand: React.FC = () => {
     )
 }
 
-export default Brand;
+export default MerchandiseList;
