@@ -13,24 +13,32 @@ const EnterpriseCertification: React.FC = () => {
 
   const columns: ProColumns<API.RuleListItem>[] = [
     {
+      title: '序号',
+      dataIndex: 'index',
+      valueType: 'index',
+    },
+    {
       title: '来自',
       dataIndex: 'desc',
-      valueType: 'textarea'
+      valueType: 'textarea',
+      search: false,
     },
     {
       title: '标题',
       dataIndex: 'name',
-      valueType: 'textarea'
+      valueType: 'textarea',
     },
     {
       title: '接收时间',
       dataIndex: 'updatedAt',
-      valueType: 'textarea'
+      valueType: 'textarea',
+      search: false,
     },
     {
       title: '期限',
       dataIndex: 'updatedAt',
-      valueType: 'textarea'
+      valueType: 'textarea',
+      search: false,
     }
   ]
   return (
