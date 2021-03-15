@@ -1,12 +1,14 @@
 import React, { useRef, useState } from 'react';
-import { ImportOutlined, ExportOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Button, Drawer, Progress, Tag, Table } from 'antd';
+import { ImportOutlined, ExportOutlined, EllipsisOutlined, InboxOutlined } from '@ant-design/icons';
+import { Button, Drawer, Progress, Tag, Table, Modal, Upload } from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { orderList } from '@/services/order';
 import ProCard from '@ant-design/pro-card';
 import ProDescriptions from '@ant-design/pro-descriptions';
+
+const { Dragger } = Upload;
 //订单数据类型
 interface OrderListItem {
   id: string,
@@ -24,6 +26,17 @@ interface OrderListItem {
   totalAmount: string,
   amountsPayable: string,
   status: string,
+}
+
+const orderStatusEnum = {
+  '全部': { text: '全部' },
+  '待付款': { text: '待付款' },
+  '待发货': { text: '待发货' },
+  '待收货': { text: '待收货' },
+  '已完成': { text: '已完成' },
+  '已关闭': { text: '已关闭' },
+  '已取消': { text: '已取消' },
+
 }
 
 const data = [
@@ -66,6 +79,12 @@ const data = [
 }));
 
 const Order: React.FC = () => {
+
+
+  //导入快递单号状态
+  const [importVisible, setImportVisible] = useState(false);
+
+
   //查看订单详情
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [selectedRowsState, setSelectedRows] = useState<OrderListItem[]>([]);
@@ -85,12 +104,13 @@ const Order: React.FC = () => {
     {
       title: '下单时间',
       dataIndex: 'orderTime',
-      valueType: 'textarea',
+      valueType: 'dateTimeRange',
     },
     {
       title: '用户名',
       dataIndex: 'userName',
       valueType: 'textarea',
+      search: false,
     },
     {
       title: '收货人',
@@ -152,7 +172,10 @@ const Order: React.FC = () => {
     {
       title: '订单状态',
       dataIndex: 'status',
-      valueType: 'textarea',
+      valueType: 'select',
+      initialValue: ['全部'],
+      valueEnum: orderStatusEnum
+
     },
     {
       title: '操作',
@@ -225,6 +248,31 @@ const Order: React.FC = () => {
       subtotal: 109.00
     }
   ]
+
+  const importDraggerProps = {
+    name: 'file',
+    multiple: false,
+    action: '',
+    onChange(info) {
+      console.log('info', info)
+    }
+  }
+
+  //导入快递单号状态控制
+  const showImportModal = () => {
+    setImportVisible(true)
+  }
+
+  const handleImportOk = () => {
+    setImportVisible(false)
+  }
+
+  const handleImportCancel = () => {
+    setImportVisible(false)
+  }
+
+
+
   return (
     <PageContainer>
       <ProTable
@@ -239,6 +287,7 @@ const Order: React.FC = () => {
             type="primary"
             key="primary"
             onClick={() => {
+
             }}
           >
             <ExportOutlined /> 待发货订单导出
@@ -247,6 +296,7 @@ const Order: React.FC = () => {
             type="primary"
             key="primary"
             onClick={() => {
+              showImportModal();
             }}
           >
             <ImportOutlined /> 快递单号批量导入
@@ -304,7 +354,7 @@ const Order: React.FC = () => {
               textAlign: 'right',
             }}
           >
-            <Button onClick={() => {}} type="primary">
+            <Button onClick={() => { }} type="primary">
               发货
             </Button>
           </div>
@@ -421,6 +471,32 @@ const Order: React.FC = () => {
 
         </ProCard>
       </Drawer >
+
+      <Modal
+        title="快递单号批量导入"
+        visible={importVisible}
+        onOk={handleImportOk}
+        onCancel={handleImportCancel}
+      >
+        <Dragger {...importDraggerProps}>
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">点击或者将文件拖拽到这里进行上传！</p>
+          <p className="ant-upload-hint">
+            您导入的数据必须符合模板（<span style={{ color: 'red' }}>模板为点击"待发货订单导出" 按钮导出的Excel</span>）格式，否则数据不能正常导入。
+          <br />
+          (请上传Excle(*.xls/*.xlsx)文件)
+          </p>
+        </Dragger>
+        <div style={{textAlign: 'left', marginTop: 8}}>
+            说明：<br/>
+            1、模板中的标题行（即第一行）不允许删除或者修改；<br/>
+            2、必填字段必须填写，不能为空；<br/>
+            3、需要修改收货地址信息时，请保持同一订单号下所有的收货地址相同，且只需要修改标题行中带"(可修改)"的字段；<br/>
+            4、填写"配送单号"前，请设置该列的单元格格式为文本<br/>
+          </div>
+      </Modal>
     </PageContainer >
   )
 }

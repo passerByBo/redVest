@@ -199,7 +199,7 @@ export default [
     component: './Welcome',
   },
   {
-    path: 'help',
+    path: '/help',
     icon: 'questionCircle',
     name: '帮助中心',
     component: './Home',

@@ -1,7 +1,24 @@
 import { Request, Response } from 'express';
 import moment from 'moment';
 import { parse } from 'url';
-
+//订单数据类型
+interface OrderListItem {
+  id: string,
+  orderNumber: string,
+  orderTime: string,
+  userName: string,
+  receiver: string,
+  consigneePhone: string,
+  province: string,
+  city: string,
+  area: string,
+  address: string,
+  paymentMethod: string,
+  ownedBusiness: string,
+  totalAmount: string,
+  amountsPayable: string,
+  status: string,
+}
 const genOrderList = (current: number, pageSize: number) => {
   const orderListSource = [];
   let statusList = ['待付款', '待发货', '待收货', '已完成', '已关闭', '已取消'];
@@ -37,8 +54,7 @@ function getOrderList(req: Request, res: Response, u: string) {
     realUrl = req.url;
   }
   const { current = 1, pageSize = 10 } = req.query;
-  const params = (parse(realUrl, true).query as unknown) as API.PageParams &
-    API.RuleListItem & {
+  const params = (parse(realUrl, true).query as unknown) as OrderListItem &  {
       sorter: any;
       filter: any;
     };
@@ -88,8 +104,8 @@ function getOrderList(req: Request, res: Response, u: string) {
     }
   }
 
-  if (params.name) {
-    dataSource = dataSource.filter((data) => data?.name?.includes(params.name || ''));
+  if (params.orderNumber) {
+    dataSource = dataSource.filter((data) => data?.orderNumber?.includes(params.orderNumber || ''));
   }
   const result = {
     data: dataSource,
