@@ -57,7 +57,7 @@ export default [
         path: '/merchandise/product-list',
         name: '商品列表',
         icon: 'smile',
-        component: './Merchandise/MerchandiseList',
+        component: './Merchandise/ProductList',
       },
     ],
   },
