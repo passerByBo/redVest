@@ -4,19 +4,27 @@ import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Input, Drawer } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 import UpdateForm from './components/UpdateForm';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
+import { getProductList } from '@/services/merchandise/product';
+import ProForm, {
+  ModalForm,
+  ProFormText,
+  ProFormDateRangePicker,
+  ProFormSelect,
+  ProFormUploadButton,
+  ProFormTextArea,
+  DrawerForm
+} from '@ant-design/pro-form';
 /**
  * 添加节点
  *
  * @param fields
  */
 
-type productListItem = {
+type ProductListItem = {
   id: string,
   productName: string,
   shopId: string,
@@ -32,8 +40,15 @@ type productListItem = {
   shareRatio: string,
   [key: string]: string,
 }
+const waitTime = (time: number = 100) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
+};
 
-const handleAdd = async (fields: productListItem) => {
+const handleAdd = async (fields: ProductListItem) => {
   const hide = message.loading('正在添加');
 
   try {
@@ -77,7 +92,7 @@ const handleUpdate = async (fields: FormValueType) => {
  * @param selectedRows
  */
 
-const handleRemove = async (selectedRows: productListItem[]) => {
+const handleRemove = async (selectedRows: ProductListItem[]) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
 
@@ -99,13 +114,18 @@ const ProductList: React.FC = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-  const [showDetail, setShowDetail] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<ProductListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<ProductListItem[]>([]);
 
   //tab切换state
   const [productTab, setProductTab] = useState('added')
+
+  //商品表单
+  const [productFormVisible, setProductFormVisible] = useState(false);
+
+  //编辑商品
+  const [editProduct, setEditProduct] = useState<ProductListItem>()
 
   //操作按钮state
   const [toolBarRenderList, setToolBarRenderList] = useState([[
@@ -114,11 +134,16 @@ const ProductList: React.FC = () => {
     </Button>)
   ]]);
 
-  const columns: ProColumns<productListItem>[] = [
+  const columns: ProColumns<ProductListItem>[] = [
     {
       title: '商品名称',
       dataIndex: 'productName',
       valueType: 'textarea',
+      render: ((_, item) => {
+        return (
+          <a onClick={() => { setEditProduct(item); setProductFormVisible(true) }}>{_}</a>
+        )
+      })
     },
     {
       title: '商铺名称',
@@ -212,12 +237,13 @@ const ProductList: React.FC = () => {
         ]
       }
     >
-      <ProTable<API.RuleListItem, API.PageParams>
+      <ProTable<ProductListItem, API.PageParams>
+        headerTitle="商品列表"
         actionRef={actionRef}
         rowKey="key"
         search={{ labelWidth: 120 }}
         toolbar={{ actions: toolBarRenderList }}
-        request={rule}
+        request={getProductList}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -240,7 +266,7 @@ const ProductList: React.FC = () => {
                 </a>
                                     项 &nbsp;&nbsp;
                                     <span>
-                  这里可以统计已选项的一些参数{selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)} 万
+                  这里可以统计已选项的一些参数
                                     </span>
               </div>
             }
@@ -258,79 +284,37 @@ const ProductList: React.FC = () => {
           </FooterToolbar>
         )
       }
-      <ModalForm
-        title='新建专题组'
-        width="400px"
-        visible={createModalVisible}
-        onVisibleChange={handleModalVisible}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
-
-          if (success) {
-            handleModalVisible(false);
-
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
+      <DrawerForm
+        // width={1000}
+        visible={productFormVisible}
+        title={editProduct ? editProduct.productName : '商品基础信息'}
+        onVisibleChange={setProductFormVisible}
+        onFinish={async () => {
+          await waitTime(2000)
+          message.success('提交成功');
+          return true;
+        }}
+        submitter={{
+          render: (props, defaultDoms) => {
+            return [
+              <Button
+                key="save"
+                type="primary"
+                onClick={() => {
+                  props.submit();
+                }}
+              >
+                保存
+              </Button>
+            ];
+          },
         }}
       >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: '规则名称为必填项',
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm>
-      <UpdateForm
-        onSubmit={async (value: any) => {
-          const success = await handleUpdate(value);
-
-          if (success) {
-            handleUpdateModalVisible(false);
-            setCurrentRow(undefined);
-
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalVisible(false);
-          setCurrentRow(undefined);
-        }}
-        updateModalVisible={updateModalVisible}
-        values={currentRow || {}}
-      />
-
-      <Drawer
-        width={600}
-        visible={showDetail}
-        onClose={() => {
-          setCurrentRow(undefined);
-          setShowDetail(false);
-        }}
-        closable={false}
-      >
-        {currentRow?.name && (
-          <ProDescriptions<API.RuleListItem>
-            column={2}
-            title={currentRow?.name}
-            request={async () => ({
-              data: currentRow || {},
-            })}
-            params={{
-              id: currentRow?.name,
-            }}
-            columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
-          />
-        )}
-      </Drawer>
+        <ProForm.Group>
+          <ProFormText width="md" name="sortWeights" label="排序" placeholder="请填排序权重！" />
+          <ProFormText width="md" name="address" label="商品分类" placeholder="请填写商品分类！" rules={[{ required: true, message: '请填写商品分类！' }]} />
+        </ProForm.Group>
+      </DrawerForm>
     </PageContainer >
   )
 }
