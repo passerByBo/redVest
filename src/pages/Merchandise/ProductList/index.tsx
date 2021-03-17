@@ -16,7 +16,8 @@ import ProForm, {
   ProFormSelect,
   ProFormUploadButton,
   ProFormTextArea,
-  DrawerForm
+  DrawerForm,
+  ProFormRadio,
 } from '@ant-design/pro-form';
 /**
  * 添加节点
@@ -310,10 +311,65 @@ const ProductList: React.FC = () => {
           },
         }}
       >
-        <ProForm.Group>
+        <ProForm.Group title='商品基本信息'>
           <ProFormText width="md" name="sortWeights" label="排序" placeholder="请填排序权重！" />
-          <ProFormText width="md" name="address" label="商品分类" placeholder="请填写商品分类！" rules={[{ required: true, message: '请填写商品分类！' }]} />
+          <ProFormText width="md" name="categories" label="商品分类" placeholder="请填写商品分类！" rules={[{ required: true, message: '请填写商品分类！' }]} />
         </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormText width="md" name="sortWeights" label="专题名称" placeholder="请填专题名称！" rules={[{ required: true, message: '请填专题名称！' }]} />
+          <ProFormText width="md" name="categories" label="商品名称" placeholder="请填写商品名称！" rules={[{ required: true, message: '请填写商品名称！' }]} />
+        </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormText width="md" name="sortWeights" label="商品简称" placeholder="请填写商品简称！" />
+          <ProFormText width="md" name="categories" label="商品修饰语" placeholder="请填写商品修饰语！" />
+        </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormText width="md" name="sortWeights" label="商品品牌" placeholder="请填写商品品牌！" />
+          <ProFormText width="md" name="categories" label="商品规格" placeholder="请填写商品规格！" rules={[{ required: true, message: '请填写商品规格！' }]} />
+        </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormRadio.Group
+            name="radio"
+            label="状态"
+            options={[
+              {
+                label: '上架',
+                value: '上架',
+              },
+              {
+                label: '下架',
+                value: '下架',
+              }
+            ]}
+          />
+
+        </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormText width="md" name="categories" label="商品介绍" placeholder="请填写商品介绍！" />
+          <ProFormText width="md" name="sortWeights" label="商品货号" placeholder="请填商品货号！" rules={[{ required: true, message: '请填商品货号！' }]} />
+        </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormText width="md" name="categories" label="库存数量" placeholder="请填写库存数量！" />
+          <ProFormText width="md" name="sortWeights" label="本店售价" placeholder="请填本店售价！" />
+        </ProForm.Group>
+
+        <ProForm.Group>
+          <ProFormText width="md" name="categories" label="市场售价" placeholder="请填写市场售价！" />
+          <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
+        </ProForm.Group>
+
+        <ProForm.Group title='营销信息'>
+          <ProFormText width="md" name="categories" label="市场售价" placeholder="请填写市场售价！" />
+          <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
+        </ProForm.Group>
+
+
       </DrawerForm>
     </PageContainer >
   )
