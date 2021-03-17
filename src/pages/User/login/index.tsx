@@ -1,10 +1,12 @@
 import {
   LockOutlined,
   UserOutlined,
+  WechatOutlined,
+  MobileOutlined
 } from '@ant-design/icons';
-import { Alert, message, Tabs } from 'antd';
+import { Alert, message, Tabs, Space } from 'antd';
 import React, { useState } from 'react';
-import ProForm, {ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
+import ProForm, { ProFormCheckbox, ProFormText, ProFormCaptcha } from '@ant-design/pro-form';
 import { Link, history, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/login';
@@ -40,6 +42,7 @@ const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
+  const [checkPhoneNumber, setPhoneNumber] = useState(false);
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
@@ -115,10 +118,7 @@ const Login: React.FC = () => {
               />
               {/* <Tabs.TabPane
                 key="mobile"
-                tab={intl.formatMessage({
-                  id: 'pages.login.phoneLogin.tab',
-                  defaultMessage: '手机号登录',
-                })}
+                tab='手机号登录'
               /> */}
             </Tabs>
 
@@ -139,7 +139,7 @@ const Login: React.FC = () => {
                   rules={[
                     {
                       required: true,
-                      message: '用户名是必填项！',
+                      message: '请输入用户名！',
                     },
                   ]}
                 />
@@ -153,83 +153,12 @@ const Login: React.FC = () => {
                   rules={[
                     {
                       required: true,
-                      message: '密码是必填项！',
+                      message: '请输入密码！',
                     },
                   ]}
                 />
               </>
             )}
-            {/*
-            {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误" />}
-            {type === 'mobile' && (
-              <>
-                <ProFormText
-                  fieldProps={{
-                    size: 'large',
-                    prefix: <MobileOutlined className={styles.prefixIcon} />,
-                  }}
-                  name="mobile"
-                  placeholder={intl.formatMessage({
-                    id: 'pages.login.phoneNumber.placeholder',
-                    defaultMessage: '手机号',
-                  })}
-                  rules={[
-                    {
-                      required: true,
-                      message: '手机号是必填项！',
-                    },
-                    {
-                      pattern: /^1\d{10}$/,
-                      message: '不合法的手机号！',
-                    },
-                  ]}
-                />
-                <ProFormCaptcha
-                  fieldProps={{
-                    size: 'large',
-                    prefix: <LockOutlined className={styles.prefixIcon} />,
-                  }}
-                  captchaProps={{
-                    size: 'large',
-                  }}
-                  placeholder={intl.formatMessage({
-                    id: 'pages.login.captcha.placeholder',
-                    defaultMessage: '请输入验证码',
-                  })}
-                  captchaTextRender={(timing, count) => {
-                    if (timing) {
-                      return `${count} ${intl.formatMessage({
-                        id: 'pages.getCaptchaSecondText',
-                        defaultMessage: '获取验证码',
-                      })}`;
-                    }
-
-                    return intl.formatMessage({
-                      id: 'pages.login.phoneLogin.getVerificationCode',
-                      defaultMessage: '获取验证码',
-                    });
-                  }}
-                  name="captcha"
-                  rules={[
-                    {
-                      required: true,
-                      message: '验证码是必填项！',
-                    },
-                  ]}
-                  onGetCaptcha={async (phone) => {
-                    const result = await getFakeCaptcha({
-                      phone,
-                    });
-
-                    if (result === false) {
-                      return;
-                    }
-
-                    message.success('获取验证码成功！验证码为：1234');
-                  }}
-                />
-              </>
-            )} */}
             <div
               style={{
                 marginBottom: 24,
@@ -247,14 +176,72 @@ const Login: React.FC = () => {
               </a>
             </div>
           </ProForm>
-          {/* <Space className={styles.other}>
+          <Space className={styles.other}>
             其他登录方式 :
-            <AlipayCircleOutlined className={styles.icon} />
-            <TaobaoCircleOutlined className={styles.icon} />
-            <WeiboCircleOutlined className={styles.icon} />
-          </Space> */}
+            <WechatOutlined className={styles.icon} />
+          </Space>
         </div>
       </div>
+
+      {/* 验证手机号 */}
+      {status === 'error' && <LoginMessage content="验证码错误" />}
+      {checkPhoneNumber && (
+        <>
+          <ProFormText
+            fieldProps={{
+              size: 'large',
+              prefix: <MobileOutlined className={styles.prefixIcon} />,
+            }}
+            name="mobile"
+            placeholder='手机号'
+            rules={[
+              {
+                required: true,
+                message: '手机号是必填项！',
+              },
+              {
+                pattern: /^1\d{10}$/,
+                message: '不合法的手机号！',
+              },
+            ]}
+          />
+          <ProFormCaptcha
+            fieldProps={{
+              size: 'large',
+              prefix: <LockOutlined className={styles.prefixIcon} />,
+            }}
+            captchaProps={{
+              size: 'large',
+            }}
+            placeholder='请输入验证码'
+            captchaTextRender={(timing, count) => {
+              if (timing) {
+                return `${count} 获取验证码`;
+              }
+
+              return '获取验证码'
+            }}
+            name="captcha"
+            rules={[
+              {
+                required: true,
+                message: '验证码是必填项！',
+              },
+            ]}
+            onGetCaptcha={async (phone) => {
+              const result = await getFakeCaptcha({
+                phone,
+              });
+
+              if (result === false) {
+                return;
+              }
+
+              message.success('获取验证码成功！验证码为：1234');
+            }}
+          />
+        </>
+      )}
       <Footer />
     </div>
   );
