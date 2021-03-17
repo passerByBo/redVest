@@ -2,7 +2,7 @@ import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined } f
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Input, Drawer } from 'antd';
+import { Button, message, Form } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import UpdateForm from './components/UpdateForm';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
@@ -18,7 +18,13 @@ import ProForm, {
   ProFormTextArea,
   DrawerForm,
   ProFormRadio,
+  ProFormUploadDragger,
+  ProFormSwitch,
 } from '@ant-design/pro-form';
+// 引入编辑器组件
+import BraftEditor from 'braft-editor'
+// 引入编辑器样式
+import 'braft-editor/dist/index.css'
 /**
  * 添加节点
  *
@@ -364,11 +370,57 @@ const ProductList: React.FC = () => {
           <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
         </ProForm.Group>
 
+        <ProFormUploadDragger max={4} label="商品图片" name="productsPics" />
+        <ProFormUploadDragger max={4} label="轮播图" name="carousel" />
+
         <ProForm.Group title='营销信息'>
-          <ProFormText width="md" name="categories" label="市场售价" placeholder="请填写市场售价！" />
-          <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
+          <ProFormRadio.Group
+            width="md"
+            name="radio"
+            label="销售模式"
+            options={[
+              {
+                label: '北京代理',
+                value: 'a',
+              },
+              {
+                label: '代理A',
+                value: 'b',
+              },
+              {
+                label: '代理B',
+                value: 'c',
+              },
+            ]}
+          />
+          <ProFormSwitch name="isShow" label="是否显示" />
         </ProForm.Group>
 
+
+        <ProForm.Group title="详细信息">
+
+        </ProForm.Group>
+        <ProFormText name="categories" label="商品关键字" placeholder="请输入商品关键字！" />
+
+        <Form.Item name="productDetail" label="商品详情" >
+          <BraftEditor
+            className='my-editor'
+            placeholder="请输入商品详情！"
+          />
+        </Form.Item>
+        <ProFormText name="remark" label="备注" placeholder="请输入商品备注！" />
+
+
+        <ProForm.Group title="质检报告">
+
+        </ProForm.Group>
+
+        <Form.Item name="inspectionReport" label="质检报告" >
+          <BraftEditor
+            className='my-editor'
+            placeholder="请输入质检报告！"
+          />
+        </Form.Item>
 
       </DrawerForm>
     </PageContainer >
