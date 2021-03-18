@@ -83,7 +83,7 @@ const EnterpriseCertification: React.FC = () => {
   }
 
   //tab切换
-  const onTabChange = (key) => {
+  const onTabChange = (key: string) => {
     let newColumns = [...columnsState]
     let isGen = newColumns[newColumns.length - 1].dataIndex === 'option';
     if (!isGen && key === 'initiate') {
@@ -103,6 +103,7 @@ const EnterpriseCertification: React.FC = () => {
 
     setColumnsState(newColumns)
   }
+  
   return (
     <PageContainer
       onTabChange={onTabChange}

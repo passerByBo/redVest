@@ -111,7 +111,7 @@ const MerchandiseType: React.FC = () => {
     const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
     const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
     //编辑商品
-    const [editProduct, setEditProduct] = useState<ProductListItem>()
+    const [editProduct, setEditProduct] = useState<ProductListItem>();
     const columns: ProColumns<ProductListItem>[] = [
         {
             title: '商品类型编号',
