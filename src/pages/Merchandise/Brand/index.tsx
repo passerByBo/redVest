@@ -4,12 +4,21 @@ import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Input, Drawer } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import ProForm, {
+    ModalForm,
+    ProFormText,
+    ProFormTextArea,
+    ProFormSelect,
+    ProFormDateRangePicker,
+    DrawerForm,
+    ProFormRadio,
+} from '@ant-design/pro-form';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 import UpdateForm from './components/UpdateForm';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
+import { getBrandList } from '@/services/merchandise/product';
 /**
  * 添加节点
  *
@@ -35,7 +44,13 @@ const handleAdd = async (fields: API.RuleListItem) => {
  *
  * @param fields
  */
-
+const waitTime = (time: number = 100) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(true);
+        }, time);
+    });
+};
 const handleUpdate = async (fields: FormValueType) => {
     const hide = message.loading('正在配置');
 
@@ -77,6 +92,15 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
         return false;
     }
 };
+type ProductListItem = {
+    id: string,
+    topicName: string,
+    productBrandId: string,
+    isEffective: string,
+    isShow: string,
+    isRecommented: string,
+    [key: string]: string,
+}
 const Brand: React.FC = () => {
     /** 新建窗口的弹窗 */
     const [createModalVisible, handleModalVisible] = useState<boolean>(false);
@@ -87,87 +111,64 @@ const Brand: React.FC = () => {
     const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
     const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
 
-    const columns: ProColumns<API.RuleListItem>[] = [
+    //编辑商品
+    const [editProduct, setEditProduct] = useState<ProductListItem>()
+
+    const columns: ProColumns<ProductListItem>[] = [
         {
             title: '商品品牌',
-            dataIndex: 'name',
-            render: (dom, entity) => {
+            dataIndex: 'id',
+            render: ((_, item) => {
                 return (
-                    <a
-                        onClick={() => {
-                            setCurrentRow(entity);
-                            setShowDetail(true);
-                        }}
-                    >
-                        {dom}
-                    </a>
-                );
-            },
+                    <a onClick={() => { setEditProduct(item); setShowDetail(true) }}>{_}</a>
+                )
+            })
         },
         {
             title: '品牌编号',
-            dataIndex: 'status',
+            dataIndex: 'productBrandId',
             valueType: 'textarea',
         },
         {
             title: '品牌logo',
-            dataIndex: 'status',
+            dataIndex: 'id',
             valueType: 'textarea',
             search: false,
         },
         {
             title: '品牌专区大图',
-            dataIndex: 'name',
+            dataIndex: 'imageType',
             search: false,
-            render: (dom, entity) => {
-                return (
-                    <a
-                        onClick={() => {
-                            alert('专题组图片')
-                        }}
-                    >
-                        {dom}
-                    </a>
-                );
-            },
+            valueType: 'textarea',
         },
         {
             title: '排序',
             sorter: true,
             search: false,
-            dataIndex: 'updatedAt',
-            valueType: 'dateTime',
+            dataIndex: 'productBrandId',
+            valueType: 'textarea',
         },
         {
             title: '是否推荐',
-            sorter: true,
             search: false,
-            dataIndex: 'updatedAt',
-            valueType: 'dateTime',
+            dataIndex: 'isRecommented',
+            valueType: 'textarea',
         },
         {
             title: '是否展示',
             search: false,
-            dataIndex: 'desc',
+            dataIndex: 'isShow',
             valueType: 'textarea',
         },
         {
             title: '是否有效',
-            dataIndex: 'option',
-            valueType: 'option',
-            render: (_, record) => [
-                <a
-                    key="config"
-                    onClick={() => {
-                    }}
-                >
-                    编辑
-              </a>,
-            ],
+            dataIndex: 'isEffective',
+            search: false,
+            valueType: 'textarea',
         },
         {
             title: '是否审核通过',
-            dataIndex: 'desc',
+            dataIndex: 'isEffective',
             valueType: 'textarea',
         }
     ]
@@ -184,7 +185,7 @@ const Brand: React.FC = () => {
                         <PlusOutlined />新建
                     </Button>
                 ]}
-                request={rule}
+                request={getBrandList}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {
@@ -227,7 +228,6 @@ const Brand: React.FC = () => {
             }
             <ModalForm
                 title='新建专题组'
-                width="400px"
                 visible={createModalVisible}
                 onVisibleChange={handleModalVisible}
                 onFinish={async (value) => {
@@ -242,62 +242,133 @@ const Brand: React.FC = () => {
                     }
                 }}
             >
-                <ProFormText
-                    rules={[
-                        {
-                            required: true,
-                            message: '规则名称为必填项',
-                        },
-                    ]}
-                    width="md"
-                    name="name"
-                />
-                <ProFormTextArea width="md" name="desc" />
-            </ModalForm>
-            <UpdateForm
-                onSubmit={async (value: any) => {
-                    const success = await handleUpdate(value);
-
-                    if (success) {
-                        handleUpdateModalVisible(false);
-                        setCurrentRow(undefined);
-
-                        if (actionRef.current) {
-                            actionRef.current.reload();
-                        }
-                    }
-                }}
-                onCancel={() => {
-                    handleUpdateModalVisible(false);
-                    setCurrentRow(undefined);
-                }}
-                updateModalVisible={updateModalVisible}
-                values={currentRow || {}}
-            />
-
-            <Drawer
-                width={600}
-                visible={showDetail}
-                onClose={() => {
-                    setCurrentRow(undefined);
-                    setShowDetail(false);
-                }}
-                closable={false}
-            >
-                {currentRow?.name && (
-                    <ProDescriptions<API.RuleListItem>
-                        column={2}
-                        title={currentRow?.name}
-                        request={async () => ({
-                            data: currentRow || {},
-                        })}
-                        params={{
-                            id: currentRow?.name,
-                        }}
-                        columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
+                <ProForm.Group>
+                    <ProFormText
+                        width="md"
+                        name="name"
+                        label="签约客户名称"
+                        tooltip="最长为 24 位"
+                        placeholder="请输入名称"
                     />
-                )}
-            </Drawer>
+                    <ProFormText width="md" name="company" label="我方公司名称" placeholder="请输入名称" />
+                </ProForm.Group>
+                <ProForm.Group>
+                    <ProFormText width="md" name="contract" label="合同名称" placeholder="请输入名称" />
+                    <ProFormDateRangePicker name="contractTime" label="合同生效时间" />
+                </ProForm.Group>
+                <ProForm.Group>
+                    <ProFormSelect
+                        options={[
+                            {
+                                value: 'chapter',
+                                label: '盖章后生效',
+                            },
+                        ]}
+                        width="xs"
+                        name="useMode"
+                        label="合同约定生效方式"
+                    />
+                    <ProFormSelect
+                        width="xs"
+                        options={[
+                            {
+                                value: 'time',
+                                label: '履行完终止',
+                            },
+                        ]}
+                        name="unusedMode"
+                        label="合同约定失效效方式"
+                    />
+                </ProForm.Group>
+                <ProFormText width="sm" name="id" label="主合同编号" />
+                <ProFormText name="project" disabled label="项目名称" initialValue="xxxx项目" />
+                <ProFormText width="xs" name="mangerName" disabled label="商务经理" initialValue="启途" />
+            </ModalForm>
+            <DrawerForm
+                visible={showDetail}
+                title={editProduct ? editProduct.productName : '商品基础信息'}
+                onVisibleChange={setShowDetail}
+                onFinish={async () => {
+                    await waitTime(2000)
+                    message.success('提交成功');
+                    return true;
+                }}
+                submitter={{
+                    render: (props, defaultDoms) => {
+                        return [
+                            <Button
+                                key="save"
+                                type="primary"
+                                onClick={() => {
+                                    props.submit();
+                                }}
+                            >
+                                保存
+              </Button>
+                        ];
+                    },
+                }}
+            >
+                <ProForm.Group title='商品基本信息'>
+                    <ProFormText width="md" name="sortWeights" label="排序" placeholder="请填排序权重！" />
+                    <ProFormText width="md" name="categories" label="商品分类" placeholder="请填写商品分类！" rules={[{ required: true, message: '请填写商品分类！' }]} />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="sortWeights" label="专题名称" placeholder="请填专题名称！" rules={[{ required: true, message: '请填专题名称！' }]} />
+                    <ProFormText width="md" name="categories" label="商品名称" placeholder="请填写商品名称！" rules={[{ required: true, message: '请填写商品名称！' }]} />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="sortWeights" label="商品简称" placeholder="请填写商品简称！" />
+                    <ProFormText width="md" name="categories" label="商品修饰语" placeholder="请填写商品修饰语！" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="sortWeights" label="商品品牌" placeholder="请填写商品品牌！" />
+                    <ProFormText width="md" name="categories" label="商品规格" placeholder="请填写商品规格！" rules={[{ required: true, message: '请填写商品规格！' }]} />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormRadio.Group
+                        name="radio"
+                        label="状态"
+                        options={[
+                            {
+                                label: '上架',
+                                value: '上架',
+                            },
+                            {
+                                label: '下架',
+                                value: '下架',
+                            }
+                        ]}
+                    />
+
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="categories" label="商品介绍" placeholder="请填写商品介绍！" />
+                    <ProFormText width="md" name="sortWeights" label="商品货号" placeholder="请填商品货号！" rules={[{ required: true, message: '请填商品货号！' }]} />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="categories" label="库存数量" placeholder="请填写库存数量！" />
+                    <ProFormText width="md" name="sortWeights" label="本店售价" placeholder="请填本店售价！" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="categories" label="市场售价" placeholder="请填写市场售价！" />
+                    <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
+                </ProForm.Group>
+
+                <ProForm.Group title='营销信息'>
+                    <ProFormText width="md" name="categories" label="市场售价" placeholder="请填写市场售价！" />
+                    <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
+                </ProForm.Group>
+
+
+            </DrawerForm>
         </PageContainer>
     )
 }
