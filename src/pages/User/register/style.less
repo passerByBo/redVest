@@ -1,8 +1,8 @@
 @import '~antd/es/style/themes/default.less';
 
-.container {
+.container{
   display: flex;
-  flex-direction: column;
+  flex-direction:column;
   height: 100vh;
   overflow: auto;
   background: @layout-body-background;
@@ -29,10 +29,9 @@
     background-repeat: no-repeat;
     background-position: center 110px;
     background-size: 100%;
-  }
-
-  .content {
-    padding: 32px 0 24px;
+    .content {
+      padding: 32px 0 24px;
+    }
   }
 }
 
@@ -72,7 +71,7 @@
 }
 
 .main {
-  width: 328px;
+  width: 500px;
   margin: 0 auto;
   @media screen and (max-width: @screen-sm) {
     width: 95%;
@@ -118,5 +117,14 @@
   .prefixIcon {
     color: @primary-color;
     font-size: @font-size-base;
+  }
+
+  .submit {
+    width: 50%;
+  }
+
+  .login {
+    float: right;
+    line-height: @btn-height-lg;
   }
 }

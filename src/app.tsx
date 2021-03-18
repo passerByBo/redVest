@@ -17,6 +17,22 @@ export const initialStateConfig = {
   loading: <PageLoading />,
 };
 
+const noLoginRoute = () => {
+  const { location } = history;
+   const {pathname} = location
+  let nologinArr:string[] =  [
+    '/user/login',
+    '/user/register',
+    '/user/register-result',
+  ]
+
+  if(nologinArr.includes(pathname)){
+    return true;
+  }
+  return false;
+}
+
+
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
@@ -30,7 +46,12 @@ export async function getInitialState(): Promise<{
       const currentUser = await queryCurrentUser();
       return currentUser;
     } catch (error) {
-      history.push('/user/login');
+
+      //可能以任意链接的方式进入到登陆
+      if (!noLoginRoute()) {
+        history.push('/user/login');
+      }
+
     }
     return undefined;
   };
@@ -49,6 +70,7 @@ export async function getInitialState(): Promise<{
   };
 }
 
+
 // https://umijs.org/zh-CN/plugins/plugin-layout
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
@@ -60,7 +82,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== '/user/login') {
+      if (!initialState?.currentUser && !noLoginRoute()) {
         history.push('/user/login');
       }
     },

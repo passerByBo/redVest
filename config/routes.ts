@@ -11,6 +11,16 @@ export default [
             path: '/user/login',
             component: './User/login',
           },
+          {
+            name: 'register',
+            path: '/user/register',
+            component: './User/register',
+          },
+          {
+            name: 'register',
+            path: '/user/register-result',
+            component: './User/register-result',
+          },
         ],
       },
     ],
