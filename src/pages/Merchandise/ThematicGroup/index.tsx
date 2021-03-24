@@ -12,6 +12,7 @@ import ProForm, {
     ProFormDateRangePicker,
     DrawerForm,
     ProFormRadio,
+    ProFormSwitch
 } from '@ant-design/pro-form';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 import UpdateForm from './components/UpdateForm';
@@ -250,17 +251,16 @@ const ThematicGroup: React.FC = () => {
                     <ProFormText
                         width="md"
                         name="name"
-                        label="签约客户名称"
+                        label="专题组"
                         tooltip="最长为 24 位"
                         placeholder="请输入名称"
                     />
-
-                    <ProFormText width="md" name="company" label="我方公司名称" placeholder="请输入名称" />
                 </ProForm.Group>
                 <ProForm.Group>
                     <ProFormText width="md" name="contract" label="合同名称" placeholder="请输入名称" />
                     <ProFormDateRangePicker name="contractTime" label="合同生效时间" />
                 </ProForm.Group>
+                <ProFormSwitch name="isShow" label="是否有效" />
                 <ProForm.Group>
                     <ProFormSelect
                         options={[
