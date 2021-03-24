@@ -3,7 +3,6 @@ import React from 'react';
 import classNames from 'classnames';
 import styles from './index.less';
 
-
 export interface TrendProps {
   colorful?: boolean;
   flag: 'up' | 'down';
@@ -20,26 +19,24 @@ const Trend: React.FC<TrendProps> = ({
   className,
   ...rest
 }) => {
-
   const classString = classNames(
     styles.trendItem,
     {
       [styles.trendItemGrey]: !colorful,
-      [styles.reverseColor]: reverseColor && colorful
-    }
-  )
+      [styles.reverseColor]: reverseColor && colorful,
+    },
+    className,
+  );
   return (
     <div {...rest} className={classString} title={typeof children === 'string' ? children : ''}>
       <span>{children}</span>
-      {
-        flag && (
-          <span className={styles[flag]}>
-            {flag === 'up' ? <CaretUpOutlined/> : <CaretDownOutlined/>}
-          </span>
-        )
-      }
+      {flag && (
+        <span className={styles[flag]}>
+          {flag === 'up' ? <CaretUpOutlined /> : <CaretDownOutlined />}
+        </span>
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default Trend;

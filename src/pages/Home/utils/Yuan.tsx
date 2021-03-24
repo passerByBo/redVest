@@ -1,33 +1,32 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { yuan } from '../components/Charts';
-/** 减少使用 dangerouslySetInnerHTML */
-export default class Yuan extends React.Component<{
+
+/**
+ * 减少使用dangerouslySetInnerHTML
+ */
+
+
+const Yuan: React.FC<{
   children: React.ReactText;
-}> {
-  main: HTMLSpanElement | undefined | null = null;
+}> = (props) => {
 
-  componentDidMount() {
-    this.renderToHtml();
-  }
+  const actionRef = useRef() as React.MutableRefObject<HTMLSpanElement | null>;
 
-  componentDidUpdate() {
-    this.renderToHtml();
-  }
 
-  renderToHtml = () => {
-    const { children } = this.props;
-    if (this.main) {
-      this.main.innerHTML = yuan(children);
+  const renderToHtml = () => {
+    const { children } = props;
+    if (actionRef) {
+      actionRef.current && (actionRef.current.innerHTML = yuan(children));
     }
-  };
-
-  render() {
-    return (
-      <span
-        ref={(ref) => {
-          this.main = ref;
-        }}
-      />
-    );
   }
+
+  useEffect(() => {
+    renderToHtml();
+  })
+  return (
+    <span ref={actionRef}>
+    </span>
+  )
 }
+
+export default Yuan;
