@@ -54,6 +54,7 @@ const ChartCard: React.FC<ChartCardProps> = (props) => {
     ...rest
   } = props;
 
+  console.log('props',props)
 
   const renderContent = () => {
     if (loading) {

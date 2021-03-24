@@ -15,8 +15,8 @@ const Yuan: React.FC<{
 
   const renderToHtml = () => {
     const { children } = props;
-    if (actionRef && actionRef.current && actionRef.current.innerHTML) {
-      actionRef.current.innerHTML = yuan(children);
+    if (actionRef) {
+      actionRef.current && (actionRef.current.innerHTML = yuan(children));
     }
   }
 
@@ -25,7 +25,6 @@ const Yuan: React.FC<{
   })
   return (
     <span ref={actionRef}>
-
     </span>
   )
 }
