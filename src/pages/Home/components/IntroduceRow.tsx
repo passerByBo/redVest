@@ -2,13 +2,15 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Tooltip, Space } from 'antd';
 import numeral from 'numeral';
 import React from 'react';
-import { ChartCard, Field,MiniArea } from './Charts';
+import { ChartCard, Field, MiniArea } from './Charts';
 import Trend from './Trend';
 import Yuan from '../utils/Yuan'
 import styles from '../style.less';
 import { RightOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { StatisticCard } from '@ant-design/pro-card';
-
+import SaleCard from './SaleCard';
+import IconTag from './IconTag';
+import { ListOutlined, DollarOutlined } from '@/components/icon'
 const { Statistic } = StatisticCard;
 
 const topColResponsiveProps = {
@@ -25,59 +27,40 @@ const topColResponsiveProps = {
 const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: { [key: string]: string }[] }) => (
   <Row gutter={24}>
     <Col {...topColResponsiveProps}>
-      <ChartCard
-        bordered={false}
-        title='总销售额'
-        action={
-          <Tooltip
-            title='指标说明'
-          >
-            <InfoCircleOutlined />
-          </Tooltip>
-        }
-        loading={loading}
-        total={() => <Yuan>126560</Yuan>}
-        footer={
-          <Field
-            label={'日销售额'}
-            value={`￥${numeral(12323).format('0,0')}`}
-          />
-        }
-        contentHeight={46}
-      >
-        <Trend flag="up" style={{ marginRight: 16 }}>
-          周同比
-          <span className={styles.trendText}>12%</span>
-        </Trend>
-        <Trend flag="down">
-          日同比
-          <span className={styles.trendText}>11%</span>
-        </Trend>
-      </ChartCard>
+      <SaleCard
+        name='今日订单总是'
+        total={20000}
+        flag='up'
+        icon={<IconTag icon={<ListOutlined style={{ fontSize: 36, boxShadow: '0 5px 20px rgba(50,91,235, 0.5)' }} />} />}
+        style={{ background: `linear-gradient(180deg,#6194F7,#325BEB)` }}
+      />
     </Col>
     <Col {...topColResponsiveProps}>
-      <ChartCard
-        bordered={false}
-        title='访问量'
-        action={
-          <Tooltip
-            title='指标说明'
-          >
-            <InfoCircleOutlined />
-          </Tooltip>
-        }
-        loading={loading}
-        total={numeral(8848).format('0.0')}
-        footer={
-          <Field
-            label={'日销售额'}
-            value={`￥${numeral(1234).format('0,0')}`}
-          />
-        }
-        contentHeight={46}
-      >
-        <MiniArea color="#975FE4" data={visitData} />
-      </ChartCard>
+      <SaleCard
+        name='今日订单总是'
+        total={20000}
+        flag='up'
+        icon={<IconTag icon={<DollarOutlined style={{ fontSize: 44, boxShadow: '0 5px 20px rgba(50,91,235, 0.5)' }} />} />}
+        style={{ background: `linear-gradient(180deg,#FA9CB2,#F2637B)` }}
+      />
+    </Col>
+    <Col {...topColResponsiveProps}>
+      <SaleCard
+        name='今日订单总是'
+        total={20000}
+        flag='up'
+        icon={<IconTag icon={<DollarOutlined style={{ fontSize: 44, boxShadow: '0 5px 20px rgba(50,91,235, 0.5)' }} />} />}
+        style={{ background: `linear-gradient(180deg,#C898F3,#975FE4)` }}
+      />
+    </Col>
+    <Col {...topColResponsiveProps}>
+      <SaleCard
+        name='今日订单总是'
+        total={20000}
+        flag='up'
+        icon={<IconTag icon={<DollarOutlined style={{ fontSize: 44, boxShadow: '0 5px 20px rgba(50,91,235, 0.5)' }} />} />}
+        style={{ background: `linear-gradient(180deg,#84E7AB,#4DCB73)` }}
+      />
     </Col>
   </Row>
 )
