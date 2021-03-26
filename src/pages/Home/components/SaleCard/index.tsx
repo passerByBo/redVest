@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card } from 'antd';
 import { CardProps } from 'antd/es/card';
-import {UpOutlined, DownOutlined} from '@/components/icon'
+import {UpOutlined, DownOutlined} from '@/components/icon';
+import numeral from 'numeral';
 import styles from './index.less'
 export interface SaleCartProps extends CardProps {
   name: string;
@@ -39,7 +40,7 @@ const SaleCard: React.FC<SaleCartProps> = (props) => {
         <div className={styles.left}>
           <div className={styles.name}>{name}</div>
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <b className={styles.total}>{total}</b>
+            <b className={styles.total}>{numeral(total).format('0,0')}</b>
             <DownOutlined style={{fontSize: 20}}/>
           </div>
         </div>
