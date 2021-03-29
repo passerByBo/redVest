@@ -3,8 +3,8 @@ import { IconProps } from '@/components/icon/types';
 
 const dollarSVG = () => (
   <svg width="1em" height="1em" viewBox="0 0 44 44">
-    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-      <g transform="translate(-1384.000000, -244.000000)" fill="#FFFFFF" fill-rule="nonzero">
+    <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+      <g transform="translate(-1384.000000, -244.000000)" fill="#FFFFFF" fillRule="nonzero">
         <g transform="translate(1100.000000, 186.000000)">
           <g>
             <g transform="translate(266.000000, 40.000000)">

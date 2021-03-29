@@ -4,17 +4,134 @@
   color: red;
 }
 
+.name {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.text {
+  color: #000000;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.flexRow{
+  display: flex;
+  flex-direction: row;
+}
+
+.flexColumn{
+  display: flex;
+  flex-direction: column;
+}
+
 .overviewContent {
   width: 100%;
   height: 100%;
-  .overviewItem{
-       display: flex;
-       flex-direction: row;
-       height: 80px;
-  }
+  .overviewItem {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 80px;
+    padding-right: 50px;
+    padding-left: 20px;
 
-  .bottomLine{
+    .overviewItemTitle {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .overviewItemColumn {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+  .bottomLine {
     margin-bottom: -1px;
     border-bottom: 1px solid @layout-body-background;
+  }
+}
+
+.commissionWithdrawal {
+  display: flex;
+  flex-direction: column;
+  // align-items: center;
+  height: 160px;
+
+  .titleWrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    height: 80px;
+    padding: 0 14px;
+    background: #eaeefd;
+    border-radius: 39.5px;
+    .text {
+      color: #325beb;
+      font-size: 24px;
+      line-height: 32px;
+    }
+  }
+
+  .commissionContainer {
+    display: flex;
+    flex-direction: row;
+    height: 80px;
+    width: 100%;
+    align-items: center;
+    .commissionContainerItem {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .line {
+      width: 1px;
+      height: 48px;
+      background: #e9e9e9;
+    }
+  }
+}
+
+.pendingTransaction{
+  display: flex;
+  flex-direction:column;
+  height: 202px;
+
+  .pendingTransactionItem{
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    margin-bottom: 1px;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+    .content{
+      align-items: center;
+      width:180px;
+      .wrap{
+        margin-left: 16px;
+      }
+    }
+  }
+}
+
+.commodityAnalysis{
+  display: flex;
+  width: 100%;
+  height: 100%;
+ position: relative;
+  .tip{
+      font-size: 14px;
+      color: rgba(0,0,0,0.85);
+      line-height: 22px;
   }
 }
