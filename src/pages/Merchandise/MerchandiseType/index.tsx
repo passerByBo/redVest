@@ -12,6 +12,9 @@ import ProForm, {
     ProFormDateRangePicker,
     DrawerForm,
     ProFormRadio,
+    ProFormDatePicker,
+    ProFormUploadDragger,
+    ProFormSwitch
 } from '@ant-design/pro-form';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 import UpdateForm from './components/UpdateForm';
