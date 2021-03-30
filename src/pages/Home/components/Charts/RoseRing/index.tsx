@@ -36,19 +36,19 @@ const RoseRing: React.FC<RoseRingProps> = (props) => {
     },
     {
       type: '餐厅',
-      value: 18,
+      value: 24,
     },
     {
       type: '书房',
-      value: 15,
+      value: 22,
     },
     {
       type: '卧室',
-      value: 10,
+      value: 20,
     },
     {
       type: '阳台',
-      value: 5,
+      value: 18,
     },
   ];
 

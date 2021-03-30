@@ -16,12 +16,12 @@
   line-height: 32px;
 }
 
-.flexRow{
+.flexRow {
   display: flex;
   flex-direction: row;
 }
 
-.flexColumn{
+.flexColumn {
   display: flex;
   flex-direction: column;
 }
@@ -29,6 +29,7 @@
 .overviewContent {
   width: 100%;
   height: 100%;
+
   .overviewItem {
     display: flex;
     flex-direction: row;
@@ -49,6 +50,7 @@
       justify-content: center;
     }
   }
+
   .bottomLine {
     margin-bottom: -1px;
     border-bottom: 1px solid @layout-body-background;
@@ -72,6 +74,7 @@
     padding: 0 14px;
     background: #eaeefd;
     border-radius: 39.5px;
+
     .text {
       color: #325beb;
       font-size: 24px;
@@ -85,6 +88,7 @@
     height: 80px;
     width: 100%;
     align-items: center;
+
     .commissionContainerItem {
       display: flex;
       flex: 1;
@@ -101,12 +105,12 @@
   }
 }
 
-.pendingTransaction{
+.pendingTransaction {
   display: flex;
-  flex-direction:column;
+  flex-direction: column;
   height: 202px;
 
-  .pendingTransactionItem{
+  .pendingTransactionItem {
     display: flex;
     flex: 1;
     flex-direction: row;
@@ -114,20 +118,75 @@
     justify-content: space-between;
     padding-left: 20px;
     padding-right: 20px;
-    .content{
+
+    .content {
       align-items: center;
-      width:180px;
-      .wrap{
+      width: 180px;
+
+      .wrap {
         margin-left: 16px;
       }
     }
   }
 }
 
-.commodityAnalysis{
-  .tip{
-      font-size: 14px;
-      color: rgba(0,0,0,0.85);
-      align-self: flex-start;
+.commodityAnalysis {
+  .tip {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.85);
+    align-self: flex-start;
+  }
+}
+
+.orderStatistics {
+  // position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  .orderList {
+    width: 212px;
+    min-width: 212px;
+
+    .orderListItem {
+      justify-content: space-between;
+      flex: 1;
+
+      .orderListItemLeft {
+        justify-content: center;
+      }
+
+      .orderListItemRight {
+        justify-content: center;
+
+        .lineHeight32 {
+          line-height: 32px;
+        }
+
+        .red6 {
+          color: @red-6;
+        }
+
+        .green6 {
+          color: @green-6;
+        }
+
+        :global {
+          .anticon-caret-up {
+            color: @red-6;
+          }
+
+          .anticon-caret-down {
+            color: @green-6;
+          }
+        }
+      }
+    }
+  }
+
+  .line {
+    background: #E9E9E9;
+    width: 1px;
+    height: 304px;
+    margin: 0 24px;
   }
 }
