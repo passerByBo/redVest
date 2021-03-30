@@ -83,7 +83,7 @@ const RoseRing: React.FC<RoseRingProps> = (props) => {
             height={height}
             data={data}
             autoFit
-            radius={0.8}
+            radius={1}
             radiusField='value'
             categoryField='type'
             colorField='type'
