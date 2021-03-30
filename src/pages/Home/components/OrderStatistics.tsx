@@ -23,4 +23,4 @@ const OrderStatistics: React.FC<OrderStatisticsProps> = (props) => {
   )
 }
 
-export default OrderStatistics
+export default OrderStatistics;
