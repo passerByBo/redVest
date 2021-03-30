@@ -4,12 +4,43 @@ import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Input, Drawer } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import ProForm, {
+    ModalForm,
+    ProFormText,
+    ProFormTextArea,
+    ProFormSelect,
+    ProFormDateRangePicker,
+    DrawerForm,
+    ProFormRadio,
+    ProFormDatePicker,
+    ProFormUploadDragger,
+    ProFormSwitch
+} from '@ant-design/pro-form';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 import UpdateForm from './components/UpdateForm';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
+
+type ProductListItem = {
+    id: string,
+    topicName: string,
+    productBrandId: string,
+    isEffective: string,
+    isShow: string,
+    isRecommented: string,
+    [key: string]: string,
+}
+const waitTime = (time: number = 100) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(true);
+        }, time);
+    });
+};
+
+//编辑商品
+// const [editProduct, setEditProduct] = useState<ProductListItem>();
 /**
  * 添加节点
  *
@@ -227,8 +258,7 @@ const Thematic: React.FC = () => {
                 )
             }
             <ModalForm
-                title='新建专题组'
-                width="400px"
+                title='新建专题'
                 visible={createModalVisible}
                 onVisibleChange={handleModalVisible}
                 onFinish={async (value) => {
@@ -243,62 +273,87 @@ const Thematic: React.FC = () => {
                     }
                 }}
             >
-                <ProFormText
-                    rules={[
-                        {
-                            required: true,
-                            message: '规则名称为必填项',
-                        },
-                    ]}
-                    width="md"
-                    name="name"
-                />
-                <ProFormTextArea width="md" name="desc" />
+                <ProForm.Group>
+                    <ProFormText width="md" name="name" label="专题组" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="name" label="专题名称" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="name" label="专题副标题" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="contract" label="标签" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProFormUploadDragger max={4} label="专题组图片" name="productsPics" />
+
+                <ProForm.Group>
+                    <ProFormTextArea width="xl" label="专题组描述" name="remark" />
+                </ProForm.Group>
+
+                <ProFormSwitch name="isShow" label="是否有效" />
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="contract" label="排序" placeholder="请输入名称" />
+                </ProForm.Group>
             </ModalForm>
-            <UpdateForm
-                onSubmit={async (value: any) => {
-                    const success = await handleUpdate(value);
-
-                    if (success) {
-                        handleUpdateModalVisible(false);
-                        setCurrentRow(undefined);
-
-                        if (actionRef.current) {
-                            actionRef.current.reload();
-                        }
-                    }
-                }}
-                onCancel={() => {
-                    handleUpdateModalVisible(false);
-                    setCurrentRow(undefined);
-                }}
-                updateModalVisible={updateModalVisible}
-                values={currentRow || {}}
-            />
-
-            <Drawer
-                width={600}
+            <DrawerForm
                 visible={showDetail}
-                onClose={() => {
-                    setCurrentRow(undefined);
-                    setShowDetail(false);
+                // title={editProduct ? editProduct.productName : '专题组'}
+                onVisibleChange={setShowDetail}
+                onFinish={async () => {
+                    await waitTime(2000)
+                    message.success('提交成功');
+                    return true;
                 }}
-                closable={false}
+                submitter={{
+                    render: (props, defaultDoms) => {
+                        return [
+                            <Button
+                                key="save"
+                                type="primary"
+                                onClick={() => {
+                                    props.submit();
+                                }}
+                            >
+                                保存
+                             </Button>
+                        ];
+                    },
+                }}
             >
-                {currentRow?.name && (
-                    <ProDescriptions<API.RuleListItem>
-                        column={2}
-                        title={currentRow?.name}
-                        request={async () => ({
-                            data: currentRow || {},
-                        })}
-                        params={{
-                            id: currentRow?.name,
-                        }}
-                        columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
-                    />
-                )}
-            </Drawer>
+                <ProForm.Group>
+                    <ProFormText width="md" name="name" label="专题组" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="name" label="专题名称" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="name" label="专题副标题" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="contract" label="标签" placeholder="请输入名称" />
+                </ProForm.Group>
+
+                <ProFormUploadDragger max={4} label="专题组图片" name="productsPics" />
+
+                <ProForm.Group>
+                    <ProFormTextArea width="xl" label="专题组描述" name="remark" />
+                </ProForm.Group>
+
+                <ProFormSwitch name="isShow" label="是否有效" />
+
+                <ProForm.Group>
+                    <ProFormText width="md" name="contract" label="排序" placeholder="请输入名称" />
+                </ProForm.Group>
+            </DrawerForm>
         </PageContainer>
     )
 }

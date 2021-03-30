@@ -1,5 +1,5 @@
 export default [
-  {
+  {//登录管理
     path: '/user',
     layout: false,
     routes: [
@@ -24,60 +24,75 @@ export default [
         ],
       },
     ],
-  }, //我的店铺
-  {
+  },
+  {//我的店铺
     path: '/home',
     name: '我的店铺',
     icon: 'shop',
     // access: 'canAdmin',
     component: './Home',
-  }, //商品管理
-  {
+  },
+  {//商品管理
     path: '/merchandise',
     name: '商品管理',
     icon: 'shopping',
     access: 'canAdmin',
-    // component: './Merchandise',
     routes: [
       {
         path: '/merchandise/thematic-group',
         name: '专题组管理',
-        icon: 'smile',
         component: './Merchandise/ThematicGroup',
       },
       {
         path: '/merchandise/thematic',
         name: '专题管理',
-        icon: 'smile',
         component: './Merchandise/Thematic',
       },
       {
         path: '/merchandise/brand',
         name: '品牌管理',
-        icon: 'smile',
         component: './Merchandise/Brand',
       },
       {
         path: '/merchandise/type',
-        name: '类型管理',
-        icon: 'smile',
+        name: '商品分类管理',
         component: './Merchandise/MerchandiseType',
       },
       {
         path: '/merchandise/product-list',
-        name: '商品列表',
-        icon: 'smile',
+        name: 'SPU商品列表',
         component: './Merchandise/ProductList',
       },
+      {
+        path: '/merchandise/model',
+        name: '规格模板库',
+        component: './Merchandise/SpecificationModel',
+      },
+      {
+        path: '/merchandise/label',
+        name: '标签管理',
+        component: './Merchandise/Label',
+      },
+      {
+        path: '/merchandise/recycle',
+        name: '商品回收站',
+        component: './Merchandise/Recycle',
+      }
     ],
   },
-  {
+  {//订单管理
     path: '/order',
     name: '订单管理',
     icon: 'orderedList',
     component: './Order',
   },
-  {
+  {//SKU台账
+    path: '/sku',
+    name: 'SKU台账',
+    icon: 'orderedList',
+    component: './Order',
+  },
+  {//客户管理
     path: '/customer',
     name: '客户管理',
     icon: 'user',
@@ -85,7 +100,7 @@ export default [
     routes: [
       {
         path: '/customer/certification',
-        name: '认证信息',
+        name: '商家认证信息',
         icon: 'smile',
         routes: [
           {
@@ -129,7 +144,7 @@ export default [
       },
     ],
   },
-  {
+  {//营销管理
     path: '/marketing',
     name: '营销管理',
     icon: 'fund',
@@ -141,7 +156,7 @@ export default [
         routes: [
           {
             path: 'marketing/announcement-info/classification',
-            name: '分类管理',
+            name: '文章分类管理',
             icon: 'table',
             component: './Marketing/AnnouncementInfo/Classification',
           },
@@ -160,13 +175,13 @@ export default [
         routes: [
           {
             path: 'marketing/coupon/package-maintenance',
-            name: '套餐维护',
+            name: '卡券套餐管理',
             icon: 'table',
             component: './Marketing/Coupon/PackageMaintenance',
           },
           {
             path: 'marketing/coupon/coupon-production',
-            name: '卡券制作',
+            name: '卡券制作管理',
             icon: 'table',
             component: './Marketing/Coupon/CouponProduction',
           },
@@ -178,9 +193,15 @@ export default [
         icon: 'table',
         component: './Marketing/SharingRules',
       },
+      {
+        path: 'marketing/recommend',
+        name: '首页推荐管理',
+        icon: 'table',
+        component: './Marketing/SharingRules',
+      },
     ],
   },
-  {
+  {//运营管理
     path: '/operation',
     name: '运营管理',
     icon: 'robot',
@@ -200,19 +221,51 @@ export default [
         name: '运营分析',
         component: './Welcome',
       },
+      {
+        path: '/operation/order-setting',
+        name: '订单设置',
+        component: './Welcome',
+      },
+      {
+        path: '/operation/express-model',
+        name: '快递模板',
+        component: './Welcome',
+      },
     ],
   },
-  {
-    path: 'log',
+  {//系统管理
+    path: '/system',
     icon: 'container',
-    name: '操作日志',
-    component: './Welcome',
+    name: '系统管理',
+    routes: [
+      {
+        path: '/system/login-log',
+        name: '登录日志',
+        component: './Welcome',
+      },
+      {
+        path: '/system/operation-log',
+        name: '操作日志',
+        component: './Welcome',
+      },
+    ]
   },
-  {
+  {//帮助中心
     path: '/help',
     icon: 'questionCircle',
     name: '帮助中心',
-    component: './Home',
+    routes: [
+      {
+        path: '/help/document',
+        name: '平台帮助文档',
+        component: './Welcome',
+      },
+      {
+        path: '/help/contact',
+        name: '联系我们',
+        component: './Welcome',
+      },
+    ]
   },
   {
     path: '/',
