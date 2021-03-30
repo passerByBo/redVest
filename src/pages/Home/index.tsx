@@ -14,6 +14,8 @@ const OverviewData = React.lazy(() => import('./components/OverviewData'));
 const CommissionWithdrawal = React.lazy(() => import('./components/CommissionWithdrawal'));
 const PendingTransaction = React.lazy(() => import('./components/PendingTransaction'));
 const CommodityAnalysis = React.lazy(() => import('./components/CommodityAnalysis'));
+const OrderStatistics = React.lazy(() => import('./components/OrderStatistics'));
+
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -76,7 +78,7 @@ const Home: React.FC = () => {
       <Row gutter={24}>
       <Col xl={24} lg={24} md={24} xs={24}>
           <Suspense fallback={null}>
-            <OverviewData loading={false} />
+            <OrderStatistics loading={false} />
           </Suspense>
         </Col>
       </Row>

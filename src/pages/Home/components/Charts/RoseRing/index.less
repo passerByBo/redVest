@@ -1,0 +1,24 @@
+@import '~antd/es/style/themes/default.less';
+
+.roseRing {
+  position: relative;
+
+  .chart {
+    position: relative;
+  }
+
+  &.hasLegend .chart {
+    width: ~'calc(100% - 240px)';
+  }
+}
+
+.legendBlock {
+  &.hasLegend .chart {
+    width: 100%;
+    margin: 0 0 32px 0;
+  }
+  .legend {
+    position: relative;
+    transform: none;
+  }
+}

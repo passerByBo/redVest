@@ -7,8 +7,8 @@ import { IconProps } from '@/components/icon/types';
 
 const receiptSVG = () => (
 <svg width="32px" height="32px" viewBox="0 0 32 32">
-    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g transform="translate(-1042.000000, -889.000000)" fill-rule="nonzero">
+    <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+        <g transform="translate(-1042.000000, -889.000000)" fillRule="nonzero">
             <g transform="translate(328.000000, 873.000000)">
                 <g transform="translate(698.000000, 0.000000)">
                     <g transform="translate(16.000000, 16.000000)">
