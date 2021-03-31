@@ -1,16 +1,33 @@
 import React from 'react';
-import ReactFitText from 'react-fittext';
-import { Card, Space } from 'antd';
+import { Card, Space, DatePicker } from 'antd';
+import { RangePickerProps } from 'antd/es/date-picker/generatePicker';
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { TimelineChart } from './Charts'
 import styles from '../style.less';
 
-export interface OrderStatisticsProps {
 
+type RangePickerValue = RangePickerProps<moment.Moment>['value'];
+
+export interface OrderStatisticsProps {
+  rangePickerValue: RangePickerValue;
+  isActive: (key: 'today' | 'week' | 'month' | 'year') => string;
+  orderData: any[];
+  loading: boolean;
+  handleRangePickerChange: (dates: RangePickerValue, dateStrings: [string, string]) => void;
+  selectDate: (key: 'today' | 'week' | 'month' | 'year') => void;
 }
 
+const { RangePicker } = DatePicker;
 const OrderStatistics: React.FC<OrderStatisticsProps> = (props) => {
+
+
+  const {
+    loading,
+    isActive,
+    selectDate
+  } = props;
+
 
   const offlineChartData = [];
   for (let i = 0; i < 20; i += 1) {
@@ -21,6 +38,17 @@ const OrderStatistics: React.FC<OrderStatisticsProps> = (props) => {
     });
   }
 
+  const extra = (
+    <div className={styles.orderExtraWrap}>
+      <div className={styles.orderExtra}>
+        <a className={isActive('week')} onClick={() => selectDate('week')}>本周</a>
+        <a className={isActive('month')} onClick={() => selectDate('month')}>本月</a>
+        <a className={isActive('year')} onClick={() => selectDate('year')}>今年</a>
+      </div>
+      <RangePicker style={{ width: 256 }}></RangePicker>
+    </div>
+  )
+
   return (
     <Card
       loading={false}
@@ -29,6 +57,7 @@ const OrderStatistics: React.FC<OrderStatisticsProps> = (props) => {
       style={{
         height: '100%',
       }}
+      extra={extra}
     >
       <div className={styles.orderStatistics}>
         <div className={classnames(styles.orderList, styles.flexColumn)}>
@@ -79,14 +108,14 @@ const OrderStatistics: React.FC<OrderStatisticsProps> = (props) => {
         </div>
         <div className={styles.line} />
         {/* <div style={{ padding: '0 24px', flex: 1}}> */}
-          <TimelineChart
-            height={304}
-            titleMap={{
-              y1: '客流量',
-              y2: '支付笔数'
-            }}
-            data={offlineChartData}
-          />
+        <TimelineChart
+          height={300}
+          titleMap={{
+            y1: '客流量',
+            y2: '支付笔数'
+          }}
+          data={offlineChartData}
+        />
         {/* </div> */}
       </div>
     </Card >

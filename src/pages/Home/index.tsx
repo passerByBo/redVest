@@ -29,7 +29,13 @@ const Home: React.FC = () => {
 
   }, [])
 
+  const isActive = (type: 'today' | 'week' | 'month' | 'year') => {
 
+  };
+
+  const selectDate = (type: 'today' | 'week' | 'month' | 'year') => {
+
+  }
 
 
   return (
@@ -43,7 +49,7 @@ const Home: React.FC = () => {
 
       <Row
         gutter={24}
-        style={{marginBottom: 24}}
+        style={{ marginBottom: 24 }}
       >
         <Col xl={16} lg={16} md={24} xs={24}>
           <Suspense fallback={null}>
@@ -60,7 +66,7 @@ const Home: React.FC = () => {
 
       <Row
         gutter={24}
-        style={{marginBottom: 24}}
+        style={{ marginBottom: 24 }}
       >
         <Col xl={16} lg={16} md={24} xs={24}>
           <Suspense fallback={null}>
@@ -76,9 +82,13 @@ const Home: React.FC = () => {
       </Row>
 
       <Row gutter={24}>
-      <Col xl={24} lg={24} md={24} xs={24}>
+        <Col xl={24} lg={24} md={24} xs={24}>
           <Suspense fallback={null}>
-            <OrderStatistics loading={false} />
+            <OrderStatistics
+             rangePickerValue={null}
+              isActive={isActive}
+              loading={false}
+              selectDate={selectDate} />
           </Suspense>
         </Col>
       </Row>

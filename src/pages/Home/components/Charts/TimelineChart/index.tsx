@@ -179,7 +179,7 @@ const TimelineChart: React.FC<TimelineChartProps> = (props) => {
             min: 0,
         },
     };
-   
+
     return (
         <div className={styles.timelineChart} style={{ height: height + 30 }}>
             <Chart height={height + 30} data={data} scale={cols} autoFit>

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card } from 'antd';
 import { CardProps } from 'antd/es/card';
-import {UpOutlined, DownOutlined} from '@/components/icon';
+import { UpOutlined, DownOutlined } from '@/components/icon';
 import numeral from 'numeral';
+import ReactFitText from 'react-fittext';
 import styles from './index.less'
 export interface SaleCartProps extends CardProps {
   name: string;
@@ -38,11 +39,12 @@ const SaleCard: React.FC<SaleCartProps> = (props) => {
     return (
       <div className={styles.saleCard}>
         <div className={styles.left}>
-          <div className={styles.name}>{name}</div>
-          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <b className={styles.total}>{numeral(total).format('0,0')}</b>
-            <DownOutlined style={{fontSize: 20}}/>
+          <ReactFitText minFontSize={16} maxFontSize={18}><div className={styles.name}>{name}</div></ReactFitText>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <ReactFitText minFontSize={35} maxFontSize={40}><b className={styles.total}>{numeral(total).format('0,0')}</b> </ReactFitText>
+            <ReactFitText minFontSize={16} maxFontSize={20}><DownOutlined style={{ fontSize: 20 }} /></ReactFitText>
           </div>
+
         </div>
         {
           icon && <div className={styles.right}>
@@ -50,6 +52,7 @@ const SaleCard: React.FC<SaleCartProps> = (props) => {
           </div>
         }
       </div>
+
     )
   }
 
