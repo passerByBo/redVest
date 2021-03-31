@@ -7,6 +7,7 @@ import ProCard from '@ant-design/pro-card';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
+import {history} from 'umi'
 const EnterpriseInfo: React.FC = () => {
 
     const actionRef = useRef<ActionType>();
@@ -112,6 +113,7 @@ const EnterpriseInfo: React.FC = () => {
                         type="primary"
                         key="primary"
                         onClick={() => {
+                          history.push('/customer/archive/enterprise-info/enterprise-application')
                         }}
                     >
                         <PlusOutlined /> 新建
