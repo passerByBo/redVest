@@ -43,6 +43,7 @@ const GlobalHeaderRight: React.FC = () => {
       <span
         className={styles.action}
         onClick={() => {
+          //Xyyw!#hbx.81567
           window.open('https://www.xyxayf.com:5606/portal/r/w');
         }}
       >
