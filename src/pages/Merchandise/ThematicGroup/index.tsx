@@ -2,33 +2,27 @@ import { PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Input, Drawer } from 'antd';
+import { Button, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import ProForm, {
     ModalForm,
     ProFormText,
     ProFormTextArea,
-    ProFormSelect,
-    ProFormDateRangePicker,
     DrawerForm,
-    ProFormRadio,
     ProFormDatePicker,
     ProFormUploadDragger,
     ProFormSwitch
 } from '@ant-design/pro-form';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
-import UpdateForm from './components/UpdateForm';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
+import { addRule, removeRule } from '@/services/ant-design-pro/rule';
 import { getSpecialGroupList } from '@/services/merchandise/product';
-type ProductListItem = {
+type ThematicGroupListItem = {
     id: string,
     topicName: string,
     productBrandId: string,
     isEffective: string,
     isShow: string,
     isRecommented: string,
+    updatedAt: string,
     [key: string]: string,
 }
 const waitTime = (time: number = 100) => {
@@ -58,30 +52,7 @@ const handleAdd = async (fields: API.RuleListItem) => {
         return false;
     }
 };
-/**
- * 更新节点
- *
- * @param fields
- */
 
-const handleUpdate = async (fields: FormValueType) => {
-    const hide = message.loading('正在配置');
-
-    try {
-        await updateRule({
-            name: fields.name,
-            desc: fields.desc,
-            key: fields.key,
-        });
-        hide();
-        message.success('配置成功');
-        return true;
-    } catch (error) {
-        hide();
-        message.error('配置失败请重试！');
-        return false;
-    }
-};
 /**
  * 删除节点
  *
@@ -109,16 +80,14 @@ const ThematicGroup: React.FC = () => {
     /** 新建窗口的弹窗 */
     const [createModalVisible, handleModalVisible] = useState<boolean>(false);
     /** 分布更新窗口的弹窗 */
-    const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
     const [showDetail, setShowDetail] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
-    const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-    const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+    const [selectedRowsState, setSelectedRows] = useState<ThematicGroupListItem[]>([]);
     //编辑商品
-    const [editProduct, setEditProduct] = useState<ProductListItem>();
-    const columns: ProColumns<ProductListItem>[] = [
+    const [editProduct, setEditProduct] = useState<ThematicGroupListItem>();
+    const columns: ProColumns<ThematicGroupListItem>[] = [
         {
-            title: '专题组',
+            title: '专题组名称',
             dataIndex: 'id',
             render: ((_, item) => {
                 return (
@@ -147,14 +116,12 @@ const ThematicGroup: React.FC = () => {
         {
             title: '开始日期',
             sorter: true,
-            search: false,
             dataIndex: 'updatedAt',
             valueType: 'textarea',
         },
         {
             title: '结束日期',
             sorter: true,
-            search: false,
             dataIndex: 'updatedAt',
             valueType: 'textarea',
         },
@@ -167,15 +134,28 @@ const ThematicGroup: React.FC = () => {
         {
             title: '操作',
             dataIndex: 'option',
-            valueType: 'textarea',
-            render: (_, record) => [
+            valueType: 'option',
+            search: false,
+            width: 200,
+            render: (text, record, _, action) => [
                 <a
-                    key="config"
+                    key="editable"
                     onClick={() => {
+                        // action.startEditable?.(record.id);
+                        console.log(text);
                     }}
                 >
                     编辑
-              </a>,
+                </a>,
+                <a
+                    key="delete"
+                    onClick={() => {
+                        console.log(record);
+                        // setDataSource(dataSource.filter((item) => item.id !== record.id));
+                    }}
+                >
+                    删除
+                </a>,
             ],
         },
     ]
@@ -183,9 +163,9 @@ const ThematicGroup: React.FC = () => {
 
     return (
         <PageContainer>
-            <ProTable<API.RuleListItem, API.PageParams>
+            <ProTable<ThematicGroupListItem>
                 actionRef={actionRef}
-                rowKey="key"
+                rowKey="id"
                 search={{ labelWidth: 120 }}
                 toolBarRender={() => [
                     <Button type="primary" key="primary" onClick={() => { handleModalVisible(true) }}>
@@ -196,11 +176,11 @@ const ThematicGroup: React.FC = () => {
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {
+                        console.log(_, selectedRows);
                         setSelectedRows(selectedRows);
                     },
                 }}
             >
-
             </ProTable>
             {
                 selectedRowsState?.length > 0 && (
@@ -215,8 +195,8 @@ const ThematicGroup: React.FC = () => {
                                 </a>
                                     项 &nbsp;&nbsp;
                                     <span>
-                                    这里可以统计已选项的一些参数{selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)} 万
-                                    </span>
+                                    {/* 这里可以统计已选项的一些参数{selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)} 万 */}
+                                </span>
                             </div>
                         }
                     >
