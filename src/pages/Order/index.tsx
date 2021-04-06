@@ -7,6 +7,7 @@ import ProTable from '@ant-design/pro-table';
 import { orderList } from '@/services/order';
 import ProCard from '@ant-design/pro-card';
 import ProDescriptions from '@ant-design/pro-descriptions';
+import { history } from 'umi';
 
 const { Dragger } = Upload;
 //订单数据类型
@@ -28,15 +29,53 @@ interface OrderListItem {
   status: string,
 }
 
-const orderStatusEnum = {
-  '全部': { text: '全部' },
-  '待付款': { text: '待付款' },
-  '待发货': { text: '待发货' },
-  '待收货': { text: '待收货' },
-  '已完成': { text: '已完成' },
-  '已关闭': { text: '已关闭' },
-  '已取消': { text: '已取消' },
+['待付款', '待发货', '待收货', '已完成', '已关闭'];
 
+const orderStatusEnum = {
+  '-0': {
+    text: '全部',
+    value: 0
+  },
+  '0': {
+    text: '待付款',
+    value: 1,
+    status: 'Warning'
+  },
+  '1': {
+    text: '待发货',
+    value: 2,
+    status: 'Error'
+  },
+  '2': {
+    text: '待收货',
+    value: 3,
+    status: 'Default'
+  },
+  '3': {
+    text: '已完成',
+    value: 4,
+    status: 'Success'
+  },
+  '4': {
+    text: '已关闭',
+    value: 5,
+    status: 'Processing'
+  },
+}
+
+const payStatusEnum = {
+  '1': {
+    text: '待付款',
+    value: '1',
+  },
+  '2': {
+    text: '已退款/退款审核中',
+    value: '2',
+  },
+  '3': {
+    text: '已退款',
+    value: '3',
+  },
 }
 
 const data = [
@@ -78,7 +117,9 @@ const data = [
   ),
 }));
 
-const Order: React.FC = () => {
+const Order: React.FC = (props) => {
+
+  const { children } = props;
 
 
   //导入快递单号状态
@@ -92,19 +133,25 @@ const Order: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<OrderListItem>();
   const columns: ProColumns<OrderListItem>[] = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      valueType: 'index',
-    },
-    {
       title: '订单号',
       dataIndex: 'orderNumber',
       valueType: 'textarea',
+      render: (_, record) => (
+        <a onClick={() => { history.push(`/order/${record.id}`) }}>{_}</a>
+      )
+
     },
     {
       title: '下单时间',
       dataIndex: 'orderTime',
       valueType: 'dateTimeRange',
+    },
+    {
+      title: '订单状态',
+      dataIndex: 'status',
+      valueType: 'select',
+      // initialValue: [1],
+      valueEnum: orderStatusEnum
     },
     {
       title: '用户名',
@@ -113,36 +160,25 @@ const Order: React.FC = () => {
       search: false,
     },
     {
-      title: '收货人',
-      dataIndex: 'receiver',
+      title: '会员手机号',
+      dataIndex: 'consigneePhone',
       valueType: 'textarea',
+      search: false,
     },
     {
-      title: '收货人电话',
+      title: '收货人手机号',
       dataIndex: 'consigneePhone',
       valueType: 'textarea',
     },
     {
-      title: '省',
-      dataIndex: 'province',
+      title: '总金额（￥）',
+      dataIndex: 'totalAmount',
       valueType: 'textarea',
       search: false,
     },
     {
-      title: '市',
-      dataIndex: 'city',
-      valueType: 'textarea',
-      search: false,
-    },
-    {
-      title: '区',
-      dataIndex: 'area',
-      valueType: 'textarea',
-      search: false,
-    },
-    {
-      title: '详细地址',
-      dataIndex: 'address',
+      title: '应付金额（￥）',
+      dataIndex: 'orderNumber',
       valueType: 'textarea',
       search: false,
     },
@@ -150,7 +186,15 @@ const Order: React.FC = () => {
       title: '支付方式',
       dataIndex: 'paymentMethod',
       valueType: 'textarea',
+    },
+    {
+      title: '付款状态',
+      dataIndex: 'payStatus',
+      valueType: 'select',
+      filters: true,
+      onFilter: true,
       search: false,
+      valueEnum: payStatusEnum
     },
     {
       title: '所属商家',
@@ -158,37 +202,23 @@ const Order: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: '总金额',
-      dataIndex: 'totalAmount',
-      valueType: 'textarea',
-      search: false,
-    },
-    {
-      title: '应付金额',
-      dataIndex: 'orderNumber',
-      valueType: 'textarea',
-      search: false,
-    },
-    {
-      title: '订单状态',
-      dataIndex: 'status',
-      valueType: 'select',
-      initialValue: ['全部'],
-      valueEnum: orderStatusEnum
-
-    },
-    {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <a onClick={() => {
-          setCurrentRow(record);
-          setShowDetail(true);
-        }}>查看订单</a>,
+        // <a onClick={() => {
+        //   setCurrentRow(record);
+        //   setShowDetail(true);
+        // }}>查看订单</a>,
         <a onClick={() => {
 
-        }}>取消订单</a>
+        }}>备注订单</a>,
+        <a onClick={() => {
+
+        }}>修改快递</a>,
+        <a onClick={() => {
+
+        }}>立即退款</a>
       ]
     }
   ]
@@ -271,10 +301,16 @@ const Order: React.FC = () => {
     setImportVisible(false)
   }
 
+  const local = '/order'
+
+  const { location: { pathname } } = history;
+
 
 
   return (
-    <PageContainer>
+    pathname === local ? <PageContainer
+    title='我是撒打算打算'
+    >
       <ProTable
         headerTitle="订单列表"
         actionRef={actionRef}
@@ -290,8 +326,8 @@ const Order: React.FC = () => {
 
             }}
           >
-            <ExportOutlined /> 待发货订单导出
-          </Button>,
+            <ExportOutlined /> 导出
+            </Button>,
           <Button
             type="primary"
             key="primary"
@@ -300,7 +336,7 @@ const Order: React.FC = () => {
             }}
           >
             <ImportOutlined /> 快递单号批量导入
-          </Button>
+            </Button>
         ]}
         request={orderList}
         columns={columns}
@@ -322,8 +358,8 @@ const Order: React.FC = () => {
               >
                 {selectedRowsState.length}
               </a>{' '}
-              项 &nbsp;&nbsp;
-              <span>
+                项 &nbsp;&nbsp;
+                <span>
 
               </span>
             </div>
@@ -335,7 +371,7 @@ const Order: React.FC = () => {
             }}
           >
             批量干点啥
-          </Button>
+            </Button>
           <Button type="primary">批量审批</Button>
         </FooterToolbar>
       )}
@@ -356,7 +392,7 @@ const Order: React.FC = () => {
           >
             <Button onClick={() => { }} type="primary">
               发货
-            </Button>
+              </Button>
           </div>
         }
       >
@@ -485,19 +521,19 @@ const Order: React.FC = () => {
           <p className="ant-upload-text">点击或者将文件拖拽到这里进行上传！</p>
           <p className="ant-upload-hint">
             您导入的数据必须符合模板（<span style={{ color: 'red' }}>模板为点击"待发货订单导出" 按钮导出的Excel</span>）格式，否则数据不能正常导入。
-          <br />
-          (请上传Excle(*.xls/*.xlsx)文件)
-          </p>
+            <br />
+            (请上传Excle(*.xls/*.xlsx)文件)
+            </p>
         </Dragger>
-        <div style={{textAlign: 'left', marginTop: 8}}>
-            说明：<br/>
-            1、模板中的标题行（即第一行）不允许删除或者修改；<br/>
-            2、必填字段必须填写，不能为空；<br/>
-            3、需要修改收货地址信息时，请保持同一订单号下所有的收货地址相同，且只需要修改标题行中带"(可修改)"的字段；<br/>
-            4、填写"配送单号"前，请设置该列的单元格格式为文本<br/>
-          </div>
+        <div style={{ textAlign: 'left', marginTop: 8 }}>
+          说明：<br />
+              1、模板中的标题行（即第一行）不允许删除或者修改；<br />
+              2、必填字段必须填写，不能为空；<br />
+              3、需要修改收货地址信息时，请保持同一订单号下所有的收货地址相同，且只需要修改标题行中带"(可修改)"的字段；<br />
+              4、填写"配送单号"前，请设置该列的单元格格式为文本<br />
+        </div>
       </Modal>
-    </PageContainer >
+    </PageContainer > : children
   )
 }
 

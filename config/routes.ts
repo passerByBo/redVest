@@ -85,6 +85,14 @@ export default [
     name: '订单管理',
     icon: 'orderedList',
     component: './Order',
+    hideChildrenInMenu: true,
+    routes: [
+      {
+        path: '/order/:id',
+        name: '商品详情',
+        component: './Order/Detail',
+      }
+    ]
   },
   {//SKU台账
     path: '/sku',
