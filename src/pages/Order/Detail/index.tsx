@@ -1,4 +1,4 @@
-import { PageContainer } from '@ant-design/pro-layout';
+import { PageContainer, GridContent } from '@ant-design/pro-layout';
 import React from 'react';
 
 const Detail: React.FC = (props) => {
@@ -9,7 +9,9 @@ const Detail: React.FC = (props) => {
         ghost: true,
       }}
     >
+      <GridContent>
 
+      </GridContent>
     </PageContainer >
   )
 
