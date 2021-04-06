@@ -3,27 +3,27 @@ import moment from 'moment';
 import { parse } from 'url';
 //订单数据类型
 interface OrderListItem {
-  id: string,
-  orderNumber: string,
-  orderTime: string,
-  userName: string,
-  receiver: string,
-  consigneePhone: string,
-  province: string,
-  city: string,
-  area: string,
-  address: string,
-  paymentMethod: string,
-  ownedBusiness: string,
-  totalAmount: string,
-  amountsPayable: string,
-  status: string,
+  id: string;
+  orderNumber: string;
+  orderTime: string;
+  userName: string;
+  receiver: string;
+  consigneePhone: string;
+  province: string;
+  city: string;
+  area: string;
+  address: string;
+  paymentMethod: string;
+  ownedBusiness: string;
+  totalAmount: string;
+  amountsPayable: string;
+  status: string;
 }
 const genOrderList = (current: number, pageSize: number) => {
   const orderListSource = [];
-  let statusList = ['待付款', '待发货', '待收货', '已完成', '已关闭', '已取消'];
+  let statusList = ['待付款', '待发货', '待收货', '已完成', '已关闭'];
   for (let i = 0; i < pageSize; i++) {
-    let randIndex = Math.round(Math.random() * 6);
+    let randIndex = Math.round(Math.random() * 5);
     const index = (current - 1) * 10 + i;
     orderListSource.push({
       id: 'ddddddddddddddd' + index,
@@ -40,7 +40,8 @@ const genOrderList = (current: number, pageSize: number) => {
       ownedBusiness: '红背心自营',
       totalAmount: index * 2.34,
       amountsPayable: index * 2.34,
-      status: statusList[randIndex],
+      status: randIndex,
+      payStatus: randIndex - 2 <= 0 ? 1 : randIndex - 2,
     });
   }
 
@@ -54,16 +55,16 @@ function getOrderList(req: Request, res: Response, u: string) {
     realUrl = req.url;
   }
   const { current = 1, pageSize = 10 } = req.query;
-  const params = (parse(realUrl, true).query as unknown) as OrderListItem &  {
-      sorter: any;
-      filter: any;
-    };
-    let dataSource = [...orderListDataSource].slice(
-      ((current as number) - 1) * (pageSize as number),
-      (current as number) * (pageSize as number),
-    );
+  const params = (parse(realUrl, true).query as unknown) as OrderListItem & {
+    sorter: any;
+    filter: any;
+  };
+  let dataSource = [...orderListDataSource].slice(
+    ((current as number) - 1) * (pageSize as number),
+    (current as number) * (pageSize as number),
+  );
 
-    const sorter = JSON.parse(params.sorter || ('{}' as any));
+  const sorter = JSON.parse(params.sorter || ('{}' as any));
   if (sorter) {
     dataSource = dataSource.sort((prev, next) => {
       let sortNumber = 0;

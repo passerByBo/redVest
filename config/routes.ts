@@ -1,5 +1,6 @@
 export default [
-  {//登录管理
+  {
+    //登录管理
     path: '/user',
     layout: false,
     routes: [
@@ -25,14 +26,16 @@ export default [
       },
     ],
   },
-  {//我的店铺
+  {
+    //我的店铺
     path: '/home',
     name: '我的店铺',
     icon: 'shop',
     // access: 'canAdmin',
     component: './Home',
   },
-  {//商品管理
+  {
+    //商品管理
     path: '/merchandise',
     name: '商品管理',
     icon: 'shopping',
@@ -77,22 +80,33 @@ export default [
         path: '/merchandise/recycle',
         name: '商品回收站',
         component: './Merchandise/Recycle',
-      }
+      },
     ],
   },
-  {//订单管理
+  {
+    //订单管理
     path: '/order',
     name: '订单管理',
     icon: 'orderedList',
     component: './Order',
+    hideChildrenInMenu: true,
+    routes: [
+      {
+        path: '/order/:id',
+        name: '商品详情',
+        component: './Order/Detail',
+      },
+    ],
   },
-  {//SKU台账
+  {
+    //SKU台账
     path: '/sku',
     name: 'SKU台账',
     icon: 'orderedList',
     component: './Order',
   },
-  {//客户管理
+  {
+    //客户管理
     path: '/customer',
     name: '客户管理',
     icon: 'user',
@@ -107,16 +121,16 @@ export default [
             path: '/customer/certification/enterprise-certification',
             name: '企业认证申请',
             icon: 'smile',
-             component: './Customer/Certification/EnterpriseCertification',
+            component: './Customer/Certification/EnterpriseCertification',
             // hideChildrenInMenu: true,
-            routes:[
+            routes: [
               {
                 path: '/customer/certification/enterprise-certification/enterprise-application',
                 name: '企业认证申请新增',
                 component: './Customer/Certification/EnterpriseCertification/EnterpriseApplication',
-                hideInMenu: true
-              }
-            ]
+                hideInMenu: true,
+              },
+            ],
           },
           {
             path: '/customer/certification/merchant-certification',
@@ -153,7 +167,8 @@ export default [
       },
     ],
   },
-  {//营销管理
+  {
+    //营销管理
     path: '/marketing',
     name: '营销管理',
     icon: 'fund',
@@ -174,7 +189,7 @@ export default [
             name: '公告管理',
             icon: 'table',
             component: './Marketing/AnnouncementInfo/Announcement',
-          }
+          },
         ],
       },
       {
@@ -210,7 +225,8 @@ export default [
       },
     ],
   },
-  {//运营管理
+  {
+    //运营管理
     path: '/operation',
     name: '运营管理',
     icon: 'robot',
@@ -242,7 +258,8 @@ export default [
       },
     ],
   },
-  {//系统管理
+  {
+    //系统管理
     path: '/system',
     icon: 'container',
     name: '系统管理',
@@ -257,9 +274,10 @@ export default [
         name: '操作日志',
         component: './Welcome',
       },
-    ]
+    ],
   },
-  {//帮助中心
+  {
+    //帮助中心
     path: '/help',
     icon: 'questionCircle',
     name: '帮助中心',
@@ -274,7 +292,7 @@ export default [
         name: '联系我们',
         component: './Welcome',
       },
-    ]
+    ],
   },
   {
     path: '/',
