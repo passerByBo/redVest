@@ -94,7 +94,6 @@ export default [
       {
         path: '/order/:id',
         name: '商品详情',
-        component: './Order/Detail',
       },
     ],
   },
