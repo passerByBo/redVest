@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import moment from 'moment';
 import { parse } from 'url';
-//商品数据类型
-type ProductListItem = {
+//专题组管理数据类型
+type ThematicGroupListItem = {
     id: string,
     topicName: string,
     productBrandId: string,
     isEffective: string,
     isShow: string,
     isRecommented: string,
-    updatedAt:string,
+    updatedAt: string,
     [key: string]: string,
 }
 const genProductList = (current: number, pageSize: number) => {
@@ -41,7 +41,7 @@ async function getProductTypeList(req: Request, res: Response, u: string) {
         realUrl = req.url;
     }
     const { current = 1, pageSize = 10 } = req.query;
-    const params = (parse(realUrl, true).query as unknown) as ProductListItem & {
+    const params = (parse(realUrl, true).query as unknown) as ThematicGroupListItem & {
         sorter: any;
         filter: any;
     };
