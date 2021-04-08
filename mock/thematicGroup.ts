@@ -92,7 +92,7 @@ async function getProductTypeList(req: Request, res: Response, u: string) {
     }
 
     if (params.orderNumber) {
-        dataSource = dataSource.filter((data) => data?.orderNumber?.includes(params.orderNumber || ''));
+        // dataSource = dataSource.filter((data) => data?.orderNumber?.includes(params.orderNumber || ''));
     }
     const result = {
         data: dataSource,
