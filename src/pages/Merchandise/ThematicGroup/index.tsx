@@ -297,7 +297,6 @@ const ThematicGroup: React.FC = () => {
                     <ProFormTextArea width="xl" label="专题组描述" name="remark" />
                 </ProForm.Group>
 
-
             </DrawerForm>
         </PageContainer>
     )

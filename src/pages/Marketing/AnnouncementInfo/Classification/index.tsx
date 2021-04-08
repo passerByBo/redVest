@@ -19,7 +19,7 @@ const Classification: React.FC = () => {
             search: false,
         },
         {
-            title: '分类名称',
+            title: '文章分类名称',
             dataIndex: 'name',
             valueType: 'textarea',
         },
@@ -30,7 +30,7 @@ const Classification: React.FC = () => {
             search: false,
         },
         {
-            title: '级别',
+            title: '分类级别',
             dataIndex: 'name',
             valueType: 'textarea',
         },
@@ -60,11 +60,10 @@ const Classification: React.FC = () => {
     return (
         <PageContainer
             header={{
-                title: '分类管理',
+                title: '文章分类管理',
             }}
         >
             <ProTable<API.RuleListItem, API.PageParams>
-                headerTitle="分类管理"
                 actionRef={actionRef}
                 rowKey="key"
                 search={{

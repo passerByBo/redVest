@@ -58,11 +58,10 @@ const Announcement: React.FC = () => {
     return (
         <PageContainer
             header={{
-                title: '分类管理',
+                title: '公告管理',
             }}
         >
             <ProTable<API.RuleListItem, API.PageParams>
-                headerTitle="分类管理"
                 actionRef={actionRef}
                 rowKey="key"
                 search={{
