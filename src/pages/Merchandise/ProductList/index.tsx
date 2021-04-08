@@ -1,30 +1,25 @@
-import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined } from '@ant-design/icons';
+import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Form } from 'antd';
+import { Button, message, Form, Divider } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import UpdateForm from './components/UpdateForm';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import { getProductList } from '@/services/merchandise/product';
+import { SKUTip, SPUTip } from './tips';
 import ProForm, {
-  ModalForm,
   ProFormText,
-  ProFormDateRangePicker,
-  ProFormSelect,
-  ProFormUploadButton,
-  ProFormTextArea,
   DrawerForm,
   ProFormRadio,
   ProFormUploadDragger,
   ProFormSwitch,
 } from '@ant-design/pro-form';
+import LogTableModal from './components/LogTableModal';
+import SKUTableModal from './components/SKUTableModal';
 // 引入编辑器组件
-import BraftEditor from 'braft-editor'
+import BraftEditor from 'braft-editor';
 // 引入编辑器样式
-import 'braft-editor/dist/index.css'
+import 'braft-editor/dist/index.css';
 /**
  * 添加节点
  *
@@ -125,6 +120,13 @@ const ProductList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<ProductListItem>();
   const [selectedRowsState, setSelectedRows] = useState<ProductListItem[]>([]);
 
+  //操作日志弹窗显示状态
+  const [logTableModalVisible, setLogTableModalVisible] = useState(false);
+  //SKU规格属性信息弹窗显示状态
+  const [skuTableModalVisible, setSKUTableModalVisible] = useState(false);
+
+
+
   //tab切换state
   const [productTab, setProductTab] = useState('added')
 
@@ -134,18 +136,47 @@ const ProductList: React.FC = () => {
   //编辑商品
   const [editProduct, setEditProduct] = useState<ProductListItem>()
 
-  //操作按钮state
-  const [toolBarRenderList, setToolBarRenderList] = useState([[
-    (<Button danger ghost type="primary" key="primary" onClick={() => { }}>
+
+  const addBtn = (<Button type="primary" key="primary" onClick={() => { handleModalVisible(true) }}>
+    <PlusOutlined />新建
+  </Button>)
+
+  const deleteBtn = (
+    <Button ghost type="primary" key="primary" onClick={() => { }}>
+      <DeleteOutlined />删除
+    </Button>
+  )
+
+  const addedBtn = (
+    <Button ghost type="primary" key="primary" onClick={() => { }}>
+      <VerticalAlignTopOutlined />上架
+    </Button>
+  )
+
+  const downBtn = (
+    <Button ghost type="primary" key="primary" onClick={() => { }}>
       <VerticalAlignBottomOutlined />下架
-    </Button>)
-  ]]);
+    </Button>
+  )
+
+
+  //操作按钮state
+  const [toolBarRenderList, setToolBarRenderList] = useState([downBtn, addBtn]);
 
   const columns: ProColumns<ProductListItem>[] = [
+    {
+      title: '商品编码',
+      dataIndex: 'code',
+    },
+    {
+      title: '商品分类名称',
+      dataIndex: 'code',
+    },
     {
       title: '商品名称',
       dataIndex: 'productName',
       valueType: 'textarea',
+      width: 300,
       render: ((_, item) => {
         return (
           <a onClick={() => { setEditProduct(item); setProductFormVisible(true) }}>{_}</a>
@@ -153,31 +184,19 @@ const ProductList: React.FC = () => {
       })
     },
     {
+      title: '商品主图',
+      dataIndex: 'imgUrl',
+      search: false
+    },
+    {
+      title: '商品副标题',
+      dataIndex: 'subTitle',
+      search: false
+    },
+    {
       title: '商铺名称',
       dataIndex: 'shopName',
       valueType: 'textarea',
-    },
-    {
-      title: '专题名称',
-      dataIndex: 'topicName',
-      valueType: 'textarea',
-      search: false,
-    },
-    {
-      title: '商品货号',
-      dataIndex: 'productNo',
-      valueType: 'textarea',
-    },
-    {
-      title: '商品分类',
-      dataIndex: 'categories',
-      valueType: 'textarea',
-    },
-    {
-      title: '商品规格',
-      dataIndex: 'productSpecify',
-      valueType: 'textarea',
-      search: false,
     },
     {
       title: '商品品牌',
@@ -185,10 +204,26 @@ const ProductList: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: '上架日期',
-      dataIndex: 'shelfOnDate',
+      title: '标签',
+      dataIndex: '',
       search: false,
-      valueType: 'textarea',
+    },
+    {
+      title: '包含SKU数',
+      tooltip: SKUTip,
+      dataIndex: 'productBrand',
+      search: false,
+      render: (_, record) => (
+        <a onClick={() => { setSKUTableModalVisible(true) }}>{_}</a>
+      )
+    },
+    {
+      title: 'SKU告急库存',
+      dataIndex: 'productBrand',
+      search: false,
+      render: (_, record) => (
+        <a onClick={() => { setSKUTableModalVisible(true) }}>{_}</a>
+      )
     },
     {
       title: '销售价格',
@@ -197,31 +232,56 @@ const ProductList: React.FC = () => {
       search: false,
     },
     {
-      title: '返现率',
-      dataIndex: 'shareRatio',
-      valueType: 'textarea',
+      title: 'SPU销量',
+      tip: SKUTip,
+      dataIndex: 'bbb',
       search: false,
+    },
+    {
+      title: '审核结果',
+      dataIndex: '',
+    },
+    {
+      title: '操作',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <>
+          <a onClick={() => setLogTableModalVisible(true)}>日志</a>
+          <Divider type="vertical" />
+          <a>编辑</a>
+          <Divider type="vertical" />
+          <a>下架</a>
+          <Divider type="vertical" />
+          <a>删除</a>
+        </>
+      )
     }
   ]
 
   const onTabChange = (key: string) => {
-    let toolBarList = [];
+    let toolBarList: any[] = [];
+
     //切换到已上架
     if (key === 'added') {
       toolBarList = [
-        <Button danger ghost type="primary" key="primary" onClick={() => { }}>
-          <VerticalAlignBottomOutlined />下架
-       </Button>
+        downBtn
       ]
     } else if (key === 'notListed') {
-      //切换到已下架和未上架
-      toolBarList = [<Button ghost type="primary" key="primary" onClick={() => { handleModalVisible(true) }}>
-        <PlusOutlined />新建
-    </Button>,
-      <Button type="primary" key="primary" onClick={() => { }}>
-        <VerticalAlignTopOutlined />上架
-   </Button>,]
+      //切换到已下架
+      toolBarList = [
+        deleteBtn,
+        addedBtn
+      ]
+    } else {
+      //待上架商品操作按钮
+      toolBarList = [
+        deleteBtn,
+        addedBtn
+      ]
     }
+
+    toolBarList.push(addBtn)
     setToolBarRenderList(toolBarList)
     setProductTab(key)
   }
@@ -234,18 +294,21 @@ const ProductList: React.FC = () => {
       tabList={
         [
           {
-            tab: '商品信息(已上架)',
+            tab: '已上架商品',
             key: 'added'
           },
           {
-            tab: '商品信息(未上架|已下架)',
+            tab: '已下架商品',
             key: 'notListed'
+          },
+          {
+            tab: '待上架商品',
+            key: 'toBe'
           }
         ]
       }
     >
       <ProTable<ProductListItem, API.PageParams>
-        headerTitle="商品列表"
         actionRef={actionRef}
         rowKey="key"
         search={{ labelWidth: 120 }}
@@ -423,6 +486,10 @@ const ProductList: React.FC = () => {
         </Form.Item>
 
       </DrawerForm>
+
+      <LogTableModal visible={logTableModalVisible} onOk={() => { setLogTableModalVisible(false) }} onCancel={() => { setLogTableModalVisible(false) }} />
+      <SKUTableModal visible={skuTableModalVisible} onOk={() => { setSKUTableModalVisible(false) }} onCancel={() => { setSKUTableModalVisible(false) }} />
+
     </PageContainer >
   )
 }
