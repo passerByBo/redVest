@@ -14,7 +14,7 @@ const SpecificationModel: React.FC = () => {
 
   const actionRef = useRef<ActionType>()
 
-  const [addFormModalVisible, setAddFormModalVisible] = useState(false);
+  const [addFormModalVisible, setAddFormModalVisible] = useState(true);
   const columns: ProColumns = [
     {
       title: '模板名称',
