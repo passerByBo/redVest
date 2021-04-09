@@ -54,7 +54,8 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
     }
 
     const body = (b && b.body) || req.body;
-    const { method, name, desc, key } = body;
+    console.log('body', body);
+    const { method, articleName, desc, key } = body;
 
     switch (method) {
         /* eslint no-case-declarations:0 */
@@ -66,21 +67,18 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
                 const i = Math.ceil(Math.random() * 10000);
                 const newRule = {
                     key: tableListDataSource.length,
-                    href: 'https://ant.design',
-                    avatar: [
-                        'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
-                        'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
-                    ][i % 2],
-                    name,
-                    owner: '曲丽丽',
+                    articleName,
                     desc,
-                    callNo: Math.floor(Math.random() * 1000),
-                    status: (Math.floor(Math.random() * 10) % 2).toString(),
-                    updatedAt: new Date(),
-                    createdAt: new Date(),
-                    progress: Math.ceil(Math.random() * 100),
+                    sortLevel: '1',
+                    parentTypeName: '享受生活',
+                    sort: Math.floor(Math.random() * 2 + 1) + '',
+                    isShow: i % 2 === 0 ? '是' : '否',
+                    keywords: [
+                        '服装',
+                        '家具'
+                    ][i % 2]
                 };
-                // tableListDataSource.unshift(newRule);
+                tableListDataSource.unshift(newRule);
                 return res.json(newRule);
             })();
             return;
