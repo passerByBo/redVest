@@ -5,9 +5,10 @@ import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import type { TableListItem } from './data.d';
+import type { FormValueType } from './components/UpdateModal';
 import { queryRule, updateRule, addRule, removeRule } from './service';
 import AddModal from './components/AddModal'
-
+import UpdateModal from './components/UpdateModal'
 
 /**
  * 添加节点
@@ -24,6 +25,29 @@ const handleAdd = async (fields: TableListItem) => {
     } catch (error) {
         hide();
         message.error('添加失败请重试！');
+        return false;
+    }
+};
+
+/**
+ * 更新节点
+ *
+ * @param fields
+ */
+const handleUpdate = async (fields: FormValueType) => {
+    const hide = message.loading('正在配置');
+    try {
+        await updateRule({
+            articleName: fields.articleName,
+            desc: fields.desc,
+            key: fields.key,
+        });
+        hide();
+        message.success('配置成功');
+        return true;
+    } catch (error) {
+        hide();
+        message.error('配置失败请重试！');
         return false;
     }
 };
@@ -53,7 +77,11 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 
 const Classification: React.FC = () => {
 
-    const [remarkOrderVisible, setRemarkOrderVisible] = useState(false);
+    const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
+    const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+
+    const [formValues, setFormValues] = useState({});
+
     const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
     const actionRef = useRef<ActionType>();
 
@@ -62,12 +90,12 @@ const Classification: React.FC = () => {
         if (actionRef.current) {
             actionRef.current.reload();
         }
-        setRemarkOrderVisible(false);
+        setAddModalVisible(false);
     };
 
-    const removeSingleRow = async (itemData: TableListItem) => {
+    const removeSingleRow = (itemData: TableListItem) => {
         const keys: number[] = [itemData.key];
-        await removeRule({
+        removeRule({
             key: keys,
         });
         message.success('删除成功，即将刷新');
@@ -126,7 +154,10 @@ const Classification: React.FC = () => {
             dataIndex: 'option',
             valueType: 'option',
             render: (_, record) => [
-                <a onClick={() => { console.log(_) }}>编辑</a>,
+                <a onClick={() => {
+                    setUpdateModalVisible(true);
+                    setFormValues(record);
+                }}>编辑</a>,
                 <a onClick={() => removeSingleRow(record)}>删除</a>
             ],
         },
@@ -148,7 +179,7 @@ const Classification: React.FC = () => {
                         type="primary"
                         key="primary"
                         onClick={() => {
-                            setRemarkOrderVisible(true)
+                            setAddModalVisible(true)
                         }}
                     >
                         <PlusOutlined /> 新建
@@ -181,9 +212,28 @@ const Classification: React.FC = () => {
                 </FooterToolbar>
             )}
             <AddModal
-                visible={remarkOrderVisible}
+                visible={addModalVisible}
                 onFinish={onFinish}
-                onCancel={() => setRemarkOrderVisible(false)} />
+                onCancel={() => setAddModalVisible(false)} />
+            <UpdateModal
+                onSubmit={async (value) => {
+                    console.log('UpdateModal', value);
+                    const success = await handleUpdate(value);
+                    if (success) {
+                        setUpdateModalVisible(false);
+                        setFormValues({});
+                        if (actionRef.current) {
+                            actionRef.current.reload();
+                        }
+                    }
+                }}
+                onCancel={() => {
+                    setUpdateModalVisible(false);
+                    setFormValues({});
+                }}
+                updateModalVisible={updateModalVisible}
+                values={formValues}
+            />
         </PageContainer>
     )
 }

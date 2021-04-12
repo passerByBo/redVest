@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Modal, DatePicker, Input, Form, InputNumber, Radio, Select, Tooltip, message } from 'antd';
+import { Modal, Input, Form, Select } from 'antd';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -26,7 +26,6 @@ const AddModal: React.FC<RemarkOrderModelProps> = (props) => {
     const handleFinish = async () => {
         await waitTime(2000);
         const values = await form.validateFields();
-        message.success('提交成功');
         onFinish(values);
     }
 
@@ -59,24 +58,23 @@ const AddModal: React.FC<RemarkOrderModelProps> = (props) => {
                         },
                     ]}
                 >
-                    <Input placeholder="请输入分类名称" />
+                    <Input placeholder="请输入分类名称" allowClear />
                 </FormItem>
                 <FormItem
                     {...formItemLayout}
                     label="上级分类名称"
                     name="parentTypeName"
                 >
-                    <Input placeholder="请输入上级分类名称" />
+                    <Input placeholder="请输入上级分类名称" allowClear />
                 </FormItem>
                 <FormItem
                     {...formItemLayout}
                     label="级别"
                     name="sortLevel"
                 >
-                    <Input placeholder="请输入级别" />
+                    <Input placeholder="请输入级别" allowClear />
                 </FormItem>
                 <FormItem
-                    {...formItemLayout}
                     label="描述"
                     name="desc"
                 >
@@ -87,14 +85,14 @@ const AddModal: React.FC<RemarkOrderModelProps> = (props) => {
                     label="排序"
                     name="sort"
                 >
-                    <Input placeholder="请输入排序" />
+                    <Input placeholder="请输入排序" allowClear />
                 </FormItem>
                 <FormItem
                     {...formItemLayout}
                     label="关键字"
                     name="keywords"
                 >
-                    <Input placeholder="请输入关键字" />
+                    <Input placeholder="请输入关键字" allowClear />
                 </FormItem>
                 <FormItem
                     {...formItemLayout}

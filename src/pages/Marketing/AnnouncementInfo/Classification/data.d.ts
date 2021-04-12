@@ -10,8 +10,9 @@ export type TableListItem = {
 };
 
 export type TableListParams = {
-    name?: string;
+    articleName?: string;
     desc?: string;
+    key?: number;
     pageSize?: number;
     currentPage?: number;
 };
