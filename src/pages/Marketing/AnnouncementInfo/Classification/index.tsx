@@ -207,7 +207,7 @@ const Classification: React.FC = () => {
                         }}
                     >
                         批量删除
-          </Button>
+                    </Button>
                     <Button type="primary">批量审批</Button>
                 </FooterToolbar>
             )}

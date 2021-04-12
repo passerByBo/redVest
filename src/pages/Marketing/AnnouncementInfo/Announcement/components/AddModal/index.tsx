@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Form, Select } from 'antd';
+import { Modal, Input, Form, Select, DatePicker } from 'antd';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -36,7 +36,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
 
     return (
         <Modal
-            title="文章分类维护单"
+            title="公告管理"
             visible={visible}
             centered
             onOk={() => handleFinish()}
@@ -50,7 +50,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                 name="basic"
             >
                 <FormItem
-                    label="分类名称"
+                    label="文章分类名称"
                     name="articleName"
                     rules={[
                         {
@@ -58,46 +58,68 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                         },
                     ]}
                 >
-                    <Input placeholder="请输入分类名称" allowClear />
+                    <Input placeholder="请输入文章分类名称" allowClear />
                 </FormItem>
+
                 <FormItem
-                    label="上级分类名称"
-                    name="parentTypeName"
+                    label="文章标题"
+                    name="articleTitle"
+                    rules={[
+                        {
+                            required: true
+                        },
+                    ]}
                 >
-                    <Input placeholder="请输入上级分类名称" allowClear />
+                    <Input placeholder="请输入文章标题" allowClear />
                 </FormItem>
+
                 <FormItem
-                    label="级别"
-                    name="sortLevel"
+                    label="文章重要性"
+                    name="articleLevel"
                 >
-                    <Input placeholder="请输入级别" allowClear />
+                    <Input placeholder="请选择文章重要性" allowClear />
                 </FormItem>
+
                 <FormItem
-                    label="描述"
+                    label="外部链接"
+                    name="outerLink"
+                >
+                    <Input placeholder="请输入外部链接" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="是否展示"
                     name="desc"
-                >
-                    <Input.TextArea rows={4} placeholder="请输入描述内容" />
-                </FormItem>
-                <FormItem
-                    label="排序"
-                    name="sort"
-                >
-                    <Input placeholder="请输入排序" allowClear />
-                </FormItem>
-                <FormItem
-                    label="关键字"
-                    name="keywords"
-                >
-                    <Input placeholder="请输入关键字" allowClear />
-                </FormItem>
-                <FormItem
-                    label="是否在导航栏显示"
-                    name="isShow"
+                    rules={[
+                        {
+                            required: true
+                        },
+                    ]}
                 >
                     <Select>
                         <Option value="0">是</Option>
                         <Option value="1">否</Option>
                     </Select>
+                </FormItem>
+
+                <FormItem
+                    label="作者"
+                    name="author"
+                >
+                    <Input placeholder="请输入作者名称" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="发布时间"
+                    name="releaseTime"
+                    rules={[{ required: true, message: '请选择开始时间！' }]}
+                >
+                    <DatePicker
+                        style={{ width: '100%' }}
+                        showTime
+                        format="YYYY-MM-DD HH:mm:ss"
+                        placeholder="选择发布时间"
+                    />
                 </FormItem>
             </Form>
         </Modal>
