@@ -19,25 +19,25 @@ const SharingRules: React.FC = () => {
             search: false,
         },
         {
-            title: '活动名称',
+            title: '名称',
             dataIndex: 'name',
             valueType: 'textarea',
             search: false,
         },
         {
-            title: '活动开始时间',
+            title: '类型',
             dataIndex: 'createAt',
             valueType: 'textarea',
             search: false,
         },
         {
-            title: '活动结束时间',
+            title: '专题图片',
             dataIndex: 'createAt',
             valueType: 'textarea',
             search: false,
         },
         {
-            title: '活动规则类型',
+            title: '是否有效',
             dataIndex: 'status',
             valueType: 'textarea',
             search: false,
@@ -52,12 +52,12 @@ const SharingRules: React.FC = () => {
     return (
         <PageContainer
             header={{
-                title: '分享规则管理',
+                title: '轮播精选',
             }}
         >
             <ProTable<API.RuleListItem, API.PageParams>
                 search={false}
-                headerTitle="分享规则管理"
+                headerTitle="轮播精选"
                 actionRef={actionRef}
                 rowKey="key"
                 toolBarRender={() => [

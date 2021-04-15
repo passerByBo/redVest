@@ -1,16 +1,44 @@
-import React, { useRef } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { EllipsisOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu } from 'antd';
+import React, { useState, useRef } from 'react';
+import { PlusOutlined, DeleteOutlined, ExportOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProCard from '@ant-design/pro-card';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
+import { rule } from '@/services/ant-design-pro/rule';
+import AddPackageModal from './components/AddPackageModal'
+
 const PackageMaintenance: React.FC = () => {
 
+    const [addCouponModalVisible, setAddCouponModalVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
 
+    const onFinish = () => {
+        // handleAdd(newData);
+        // if (actionRef.current) {
+        //     actionRef.current.reload();
+        // }
+        setAddCouponModalVisible(false);
+    };
+
+    const onTabChange = (key: string) => {
+        console.log(key);
+    };
+
+    const toolBarRenderList = [
+        (
+            <Button type="primary" key="primary" onClick={() => { setAddCouponModalVisible(true) }}>
+                <PlusOutlined />新建
+            </Button>
+        ), (
+            <Button key="delete" danger onClick={() => { }}>
+                <DeleteOutlined />删除
+            </Button>
+        ), (
+            <Button key="export" onClick={() => { }}>
+                <ExportOutlined />导出
+            </Button>
+        )
+    ]
     const columns: ProColumns<API.RuleListItem>[] = [
         {
             title: '序号',
@@ -49,37 +77,55 @@ const PackageMaintenance: React.FC = () => {
             dataIndex: 'name',
             valueType: 'textarea',
             search: false,
-        }
+        }, {
+            title: '操作',
+            dataIndex: 'option',
+            valueType: 'option',
+            render: (_, record) => [
+                <a onClick={() => { }}>编辑</a>,
+                <a onClick={() => { }}>下架</a>
+            ],
+        },
     ]
     return (
         <PageContainer
             header={{
                 title: '套餐维护',
             }}
+            tabList={
+                [
+                    {
+                        tab: '审核通过套餐',
+                        key: 'passed'
+                    },
+                    {
+                        tab: '审核未通过套餐',
+                        key: 'denied'
+                    }
+                ]
+            }
+            onTabChange={onTabChange}
         >
             <ProTable<API.RuleListItem, API.PageParams>
                 headerTitle="套餐维护"
                 actionRef={actionRef}
                 rowKey="key"
                 search={{
-                    labelWidth: 120,
+                    labelWidth: 100,
+                    defaultCollapsed: false
                 }}
-                toolBarRender={() => [
-                    <Button
-                        type="primary"
-                        key="primary"
-                        onClick={() => {
-                        }}
-                    >
-                        <PlusOutlined /> 新建
-          </Button>,
-                ]}
+                toolbar={{ actions: toolBarRenderList }}
                 request={rule}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {
                     },
                 }}
+            />
+            <AddPackageModal
+                visible={addCouponModalVisible}
+                onCancel={() => setAddCouponModalVisible(false)}
+                onFinish={onFinish}
             />
         </PageContainer>
     )
