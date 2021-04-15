@@ -62,9 +62,32 @@ export default [
         component: './Merchandise/MerchandiseType',
       },
       {
-        path: '/merchandise/product-list',
-        name: 'SPU商品列表',
+        path: '/merchandise/product',
+        name: 'SPU商品',
         component: './Merchandise/ProductList',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/merchandise/product/list',
+            name: '商品列表',
+            component: './Merchandise/ProductList/list',
+          },
+          {
+            path: '/merchandise/product/add',
+            name: '商品新增',
+            component: './Merchandise/ProductList/productForm',
+          },
+          {
+            path: '/merchandise/product/edit',
+            name: '商品编辑',
+            component: './Merchandise/ProductList/productForm',
+          },
+          {
+            path: '/merchandise/product/list/:id',
+            name: '商品详情',
+            component: './Merchandise/ProductList/productDetail',
+          }
+        ],
       },
       {
         path: '/merchandise/model',
