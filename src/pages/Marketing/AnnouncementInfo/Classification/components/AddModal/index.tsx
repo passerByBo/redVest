@@ -6,8 +6,8 @@ const FormItem = Form.Item;
 
 export interface AddModalProps {
     visible: boolean;
-    onCancel(): void;
-    onFinish: Function;
+    onCancel: () => void;
+    onFinish: (values: any) => void;
 }
 
 const waitTime = (time: number = 100) => {

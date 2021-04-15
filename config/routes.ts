@@ -238,16 +238,28 @@ export default [
         ],
       },
       {
-        path: 'marketing/sharing-rules',
-        name: '分享规则管理',
-        icon: 'table',
-        component: './Marketing/SharingRules',
-      },
-      {
         path: 'marketing/recommend',
         name: '首页推荐管理',
         icon: 'table',
-        component: './Marketing/SharingRules',
+        routes: [
+          {
+            path: 'marketing/recommend/topic',
+            name: '专题精选管理',
+            icon: 'table',
+            component: './Marketing/HomepageRecommend/Topic',
+          },
+          {
+            path: 'marketing/recommend/banner',
+            name: '轮播精选管理',
+            icon: 'table',
+            component: './Marketing/HomepageRecommend/Banner',
+          }, {
+            path: 'marketing/recommend/product',
+            name: '产品推荐管理',
+            icon: 'table',
+            component: './Marketing/HomepageRecommend/Product',
+          }
+        ],
       },
     ],
   },
