@@ -68,6 +68,10 @@ export default [
         hideChildrenInMenu: true,
         routes: [
           {
+            path: '/merchandise/product',
+            redirect: '/merchandise/product/list',
+          },
+          {
             path: '/merchandise/product/list',
             name: '商品列表',
             component: './Merchandise/ProductList/list',
