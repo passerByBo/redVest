@@ -139,7 +139,7 @@ const List: React.FC = (props) => {
   const [editProduct, setEditProduct] = useState<ProductListItem>()
 
 
-  const addBtn = (<Button type="primary" key="primary" onClick={() => { handleModalVisible(true) }}>
+  const addBtn = (<Button type="primary" key="primary"  onClick={() => { history.push(`/merchandise/product/add`) }}>
     <PlusOutlined />新建
   </Button>)
 
