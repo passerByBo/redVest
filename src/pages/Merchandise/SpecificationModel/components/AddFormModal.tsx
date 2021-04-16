@@ -1,7 +1,7 @@
 import { Button, Col, Form, Input, Modal, Row, Space } from 'antd';
 import styles from '../style.less';
 import React, { useState } from 'react';
-import { SpecifyItem, Specify } from './Specify';
+import { SpecifyItem, Specify } from '../../components/Specify';
 import { CheckOutlined, PlusCircleOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 export interface AddFormModalProps {

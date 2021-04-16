@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { history } from 'umi';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Col, Form, Input, Modal, Row, Select, Space, Table, TreeSelect, Upload } from 'antd';
+import { Button, Card, Col, Form, Input, Modal, Popover, Radio, Row, Select, Space, Table, TreeSelect, Upload } from 'antd';
 import styles from '../style.less';
 // 引入编辑器组件
 import BraftEditor from 'braft-editor';
 // 引入编辑器样式
 import 'braft-editor/dist/index.css';
-import { PlusOutlined } from '@ant-design/icons';
+import { CheckOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
+import { ColumnsType } from 'antd/lib/table';
+
+import { AttrEditableRow, AttrEditableCell } from "./components/AttrEditable"
+import { ISpecify } from '../../SpecificationModel/components/AddFormModal';
+import { SpecifyItem, Specify } from '../../components/Specify';
+
 const { SHOW_PARENT } = TreeSelect;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -111,13 +117,184 @@ const smallItemLayout = {
 //   },
 // };
 
+//后续根据接口文档补充
+export interface IProductAttr {
+  [key: string]: string;
+}
+const TableTitle: React.FC<{ title: string, callback: Function }> = ({ title, callback }) => {
+  const [visible, setVisible] = useState(false);
+  const inputRef = useRef<Input>(null);
+  const handleVisibleChange = (visible: boolean) => {
+    setVisible(visible)
+  }
+
+  const handleOk = () => {
+    const value = inputRef?.current?.input?.value || ''
+    inputRef?.current?.handleReset()
+    callback(value);
+    setVisible(false)
+  }
+
+  return (
+    <>
+      <span>{title}</span>
+      <Popover
+
+        content={
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <Input ref={inputRef} />
+            <Space style={{ marginTop: 10 }} >
+              <Button size="small" onClick={() => { setVisible(false) }}>取消</Button>
+              <Button size="small" type="primary" onClick={() => { handleOk() }}>确定</Button>
+            </Space>
+
+          </div>
+        }
+        title={title}
+        trigger="click"
+        visible={visible}
+        onVisibleChange={handleVisibleChange}
+      >
+        <EditOutlined onClick={callback()} className={styles.titleIcon} />
+      </Popover>
+
+    </>
+  )
+}
+
+/**
+ * 修改列
+ * @param value
+ * @param key
+ */
+const hangleColumnChange = (value: string, key: string) => {
+  console.log(value, key)
+}
+
+const productYColumn = [
+  {
+    title: 'SKU属性',
+    dataIndex: '1',
+  },
+  {
+    title: '商品图片',
+    dataIndex: '2',
+  },
+  {
+    title: '货号',
+    dataIndex: '3',
+  },
+  {
+    title: '销售价',
+    dataIndex: '4',
+  },
+  {
+    title: '成本价',
+    dataIndex: '5',
+  },
+  {
+    title: '划线价',
+    dataIndex: '6',
+  },
+  {
+    title: '库存价',
+    dataIndex: '7',
+  },
+  {
+    title: '重量',
+    dataIndex: '8',
+  },
+  {
+    title: '体积',
+    dataIndex: '9',
+  },
+  {
+    title: '体积',
+    dataIndex: '9',
+  },
+  {
+    title: <TableTitle title='一级返佣' callback={(value) => { hangleColumnChange(value, '10') }} />,
+    dataIndex: '10',
+    editable: true,
+  },
+  {
+    title: <TableTitle title='二级返佣' callback={(value) => { hangleColumnChange(value, '10') }} />,
+    dataIndex: '11',
+    editable: true,
+  },
+]
+
+const productAttrColumn = [
+  {
+    title: 'SKU属性',
+    dataIndex: '1',
+  },
+  {
+    title: '商品图片',
+    dataIndex: '2',
+  },
+  {
+    title: <TableTitle title='货号' callback={(value) => { hangleColumnChange(value, '3') }} />,
+    dataIndex: '3',
+    editable: true,
+  },
+  {
+    title: <TableTitle title='销售价' callback={(value) => { hangleColumnChange(value, '4') }} />,
+    dataIndex: '4',
+    editable: true,
+  },
+  {
+    title: <TableTitle title='成本价' callback={(value) => { hangleColumnChange(value, '5') }} />,
+    dataIndex: '5',
+    editable: true,
+  },
+  {
+    title: <TableTitle title='划线价' callback={(value) => { hangleColumnChange(value, '6') }} />,
+    dataIndex: '6',
+    editable: true,
+  },
+  {
+    title: <TableTitle title='库存价' callback={(value) => { hangleColumnChange(value, '7') }} />,
+    dataIndex: '7',
+    editable: true,
+  },
+  {
+    title: <TableTitle title='重量' callback={(value) => { hangleColumnChange(value, '8') }} />,
+    dataIndex: '8',
+    editable: true,
+  },
+  {
+    title: <TableTitle title='体积' callback={(value) => { hangleColumnChange(value, '9') }} />,
+    dataIndex: '9',
+    editable: true,
+  },
+]
+
+const components = {
+  body: {
+    row: AttrEditableRow,
+    cell: AttrEditableCell,
+  }
+}
+
 const ProductForm: React.FC<IProductFormProps> = (props) => {
 
+  //规格模板
+  const [specify, setSpecify] = useState<ISpecify>({ name: '', value: '' });
+  const [specifies, setSpecifies] = useState<string[]>([]);
+  const [specifiesMap, setSpecifiesMap] = useState<Map<string, string[]>>(new Map());
+  const [specifyInputs, setSpecifyInputs] = useState<string[]>([]);
+  const [addSpecifyVisible, setAddSpecifyVisible] = useState(false);
 
   const [coverPictures, setCoverPictures] = useState<any[]>([...fileList])
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string>();
   const [previewTitle, setPreviewTitle] = useState<string>();
+
+  const [commission, setCommission] = useState(1);
+
+  //商品属性列表元数据
+  const [productsAttr, setProductsAttr] = useState<IProductAttr[]>([{ 1: '1', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }, { 1: '2', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }]);
 
   const [form] = Form.useForm();
 
@@ -155,6 +332,104 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       <div style={{ marginTop: 8 }}>选择图片</div>
     </div>
   );
+
+  const handleSave = (row) => {
+    const newData = [productsAttr];
+    const index = newData.findIndex(item => row.key === item.key);
+    const item = newData[index];
+    newData.splice(index, 1, {
+      ...item,
+      ...row,
+    });
+    setProductsAttr([...newData]);
+  };
+
+  const getColumns = (columns) => {
+    return columns.map(col => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: (record) => ({
+          record,
+          editable: col.editable,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          handleSave: handleSave,
+        }),
+      };
+    })
+  }
+
+
+  const attrColumn = getColumns(productAttrColumn);
+
+  const yColumn = getColumns(productYColumn);
+
+
+  const specifyChange = (e, key: string) => {
+    setSpecify({ ...specify, [key]: e.target.value })
+  }
+
+  const addSpecify = (data: ISpecify) => {
+    const { name, value } = data;
+    setSpecifies([...specifies, name]);
+    setSpecifiesMap(specifiesMap.set(name, [value]));
+    setAddSpecifyVisible(false);
+  }
+
+  /**
+ * 删除规格值
+ * @param name 规格名称
+ * @param index 当前规格值所在位置
+ */
+  const deleteSpecifyValue = (name: string, index: number): void => {
+    let valueArr = [...(specifiesMap.get(name) || [])];
+    valueArr.splice(index, 1);
+    specifiesMap.set(name, valueArr)
+    let newMap = new Map(specifiesMap);
+    setSpecifiesMap(newMap);
+  }
+
+  /**
+   * 删除规格
+   * @param name 规格名称
+   */
+  const deleteSpecify = (name: string, index: number): void => {
+    specifiesMap.delete(name)
+    setSpecifiesMap(specifiesMap);
+
+    //删除保存的新增规格值的数组
+    let arr = [...specifyInputs];
+    arr.splice(index, 1);
+    setSpecifyInputs(arr);
+  }
+
+  const addSpecifyValue = (name: string, index: number) => {
+    let value = specifyInputs[index];
+
+    //将新的数据加入到Map中
+    let valueArr = [...(specifiesMap.get(name) || [])];
+    valueArr.push(value);
+    setSpecifiesMap(specifiesMap.set(name, valueArr));
+
+    //每次添加完数据后清空原来的输入框
+    let arr = [...specifyInputs];
+    arr[index] = '';
+    setSpecifyInputs(arr);
+  }
+
+  const specifyValueChange = (e, index: number) => {
+    let arr = [...specifyInputs];
+    arr[index] = e.target.value;
+    setSpecifyInputs(arr);
+  }
+
+
+  const handleCommissionChange = (e) => {
+    setCommission(e.target.value);
+  }
 
   return (
     <Form
@@ -309,18 +584,59 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   </Select>
                   <Button >确认</Button>
                 </Input.Group>
-                <Button type="primary" ghost className={styles.right10}>添加新规格</Button>
+                <Button type="primary" ghost className={styles.right10} onClick={() => { setAddSpecifyVisible(true) }}>添加新规格</Button>
                 <Button type="primary">立即生成</Button>
               </Col>
             </Row>
 
-            {/* <Table
+            {
+              addSpecifyVisible && (
+                <Row className={styles.addModalWrap} gutter={24}>
+                  <Col className={styles.addModalCol} span={9}>
+                    <span className={styles.label60} >规格:</span>
+                    <Input onChange={(e) => specifyChange(e, 'name')} value={specify.name} placeholder='请输入规格'></Input>
+                  </Col>
+                  <Col className={styles.addModalCol} span={9}>
+                    <span className={styles.label80}>规格值:</span>
+                    <Input onChange={(e) => specifyChange(e, 'value')} value={specify.value} placeholder='请输入规格值'></Input>
+                  </Col>
+                  <Col className={styles.addModalCol} span={6}>
+                    <Space>
+                      <Button size="small">取消</Button>
+                      <Button size="small" type='primary' onClick={() => { addSpecify(specify) }}>确认</Button>
+                    </Space>
+                  </Col>
+                </Row>
+              )
+            }
+
+
+            {
+              [...specifiesMap.keys()].map((name, i) => (
+                <Specify name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
+                  {
+                    (specifiesMap.get(name) || []).map((value: string, index: number) => (
+                      <SpecifyItem value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
+                    ))
+                  }
+
+                  <Input.Group compact style={{ width: 162, marginTop: 10 }}>
+                    <Input style={{ width: 120 }} value={specifyInputs[i]} placeholder="请输入规格值" onChange={(e) => { specifyValueChange(e, i) }} />
+                    <Button onClick={() => { addSpecifyValue(name, i) }} icon={<CheckOutlined />} type='primary'></Button>
+                  </Input.Group>
+                </Specify>
+              ))
+            }
+
+            <Table
+              style={{ marginTop: 24 }}
+              pagination={false}
               components={components}
-              rowClassName={() => 'editable-row'}
+              rowClassName={styles['editable-row']}
               bordered
-              dataSource={dataSource}
-              columns={columns as ColumnTypes}
-            /> */}
+              dataSource={productsAttr}
+              columns={attrColumn as ColumnsType}
+            />
           </Card>
 
           <Row>
@@ -333,6 +649,65 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               </Form.Item>
             </Col>
           </Row>
+
+          <Row gutter={16}>
+            <Col  {...smallItemLayout}>
+              <Form.Item name="123123" label="商品状态">
+                <Radio.Group onChange={() => { }} value={1}>
+                  <Radio value={1}>上架</Radio>
+                  <Radio value={2}>下架</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col  {...smallItemLayout}>
+              <Form.Item name="sdfwse" label="商品状态">
+                <Radio.Group onChange={() => { }} value={1}>
+                  <Radio value={1}>开启</Radio>
+                  <Radio value={2}>关闭</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col  {...smallItemLayout}>
+              <Form.Item name="hjghj" label="商品状态">
+                <Radio.Group onChange={() => { }} value={1}>
+                  <Radio value={1}>开启</Radio>
+                  <Radio value={2}>关闭</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col  {...smallItemLayout}>
+              <Form.Item name="fdsf" label="商品状态">
+                <Radio.Group onChange={() => { }} value={1}>
+                  <Radio value={1}>免费包邮</Radio>
+                  <Radio value={2}>邮费到付</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Space>
+            <span>佣金设置</span>
+            <Radio.Group onChange={handleCommissionChange} value={commission}>
+              <Radio value={1}>默认设置</Radio>
+              <Radio value={2}>自定义设置</Radio>
+            </Radio.Group>
+          </Space>
+
+          {
+            commission === 2 &&
+            (
+              <Table
+                style={{ marginTop: 24 }}
+                pagination={false}
+                components={components}
+                rowClassName={styles['editable-row']}
+                bordered
+                dataSource={productsAttr}
+                columns={yColumn as ColumnsType}
+              />
+            )
+          }
+
         </Card>
 
         {/* 预览图片 */}

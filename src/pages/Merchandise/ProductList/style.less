@@ -1,6 +1,11 @@
 .card {
   margin-bottom: 24px;
 
+  .titleIcon {
+    margin-left: 5px;
+    color: @primary-color;
+  }
+
   .selectBtn {
     display: flex;
     flex-direction: column;
@@ -29,5 +34,45 @@
 
   .right10 {
     margin-right: 10px;
+  }
+
+  .editable-cell {
+    position: relative;
+  }
+
+  .editable-cell-value-wrap {
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+
+  .editable-row:hover .editable-cell-value-wrap {
+    padding: 4px 11px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+  }
+
+  [data-theme='dark'] .editable-row:hover .editable-cell-value-wrap {
+    border: 1px solid #434343;
+  }
+
+  .addModalWrap {
+    margin-top: 24px;
+    max-width: 623px;
+
+    .addModalCol {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .label60 {
+        width: 60px;
+        text-align: justify-all;
+      }
+
+      .label80 {
+        width: 80px;
+        text-align: justify-all;
+      }
+    }
   }
 }
