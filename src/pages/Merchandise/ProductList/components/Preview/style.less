@@ -1,0 +1,278 @@
+@import '~antd/es/style/themes/default.less';
+
+.previeWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  // align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  .space{
+
+  }
+  .deviceName{
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .dot{
+    background: #eee;
+    border: 1px solid rgba(0, 0, 0, .05);
+    border-radius: 50%;
+    display: inline-block;
+    height: 1rem;
+    width: 1rem;
+    cursor:pointer ;
+  }
+
+  .ant-pro-card-body{
+    padding: 0;
+  }
+
+  .dvicesBtns {
+    height: 30px;
+    display: flex;
+    flex-direction:row;
+    position: relative;
+    justify-content:center;
+  }
+
+  .devicesWrap {
+  }
+
+  .devicesTitle {
+    color: #000000;
+    font-size: 16px;
+  }
+
+  .container-wrapper {
+    width: 100%;
+    height: 100%;
+    background-color: #FFFFFF;
+  }
+
+  .container {
+    position: absolute;
+    left: 0;
+    top: 44px;
+    right: -17px;
+    bottom: 0;
+    background-color: rgb(245, 245, 245);
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  /* iphonex适配样式 */
+  .device-iphone-x .container-wrapper {
+    position: relative;
+    width: 375px;
+    height: 812px;
+    overflow: hidden;
+    border-radius: 40px;
+  }
+
+  .device-iphone-x .header-fill {
+    position: field;
+    top: 0;
+    height: 44px;
+    background: #ffffff;
+  }
+
+  .device-iphone-x .container {
+    position: absolute;
+    top: 88px;
+    right: -17px;
+    bottom: 0;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: rgb(245, 245, 245);
+  }
+
+  /* iphone8适配样式 */
+  .device-iphone-8 .container-wrapper {
+    position: relative;
+    width: 375px;
+    height: 667px;
+    overflow: hidden;
+    border: 2px solid #222;
+    border-radius: 4px;
+  }
+
+  /* Google Pixel 2 XL 样式适配*/
+
+  .device-google-pixel-2-xl .container-wrapper {
+    position: relative;
+    width: 360px;
+    height: 720px;
+    overflow: hidden;
+    border: 2px solid #222;
+    border-radius: 27px;
+  }
+
+  .device-google-pixel-2-xl .container {
+    position: absolute;
+    top: 44px;
+    right: -17px;
+    bottom: 0;
+    left: 0;
+    height: 676px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: rgb(245, 245, 245);
+  }
+
+  .device-google-pixel-2-xl .el-tabs__item {
+    width: 150px;
+    text-align: center;
+  }
+  /* Google Pixel 兼容样式 */
+  .device-google-pixel .container-wrapper {
+    position: relative;
+    width: 324px;
+    height: 576px;
+    overflow: hidden;
+    border: 2px solid #222;
+    border-radius: 2px;
+  }
+
+  .device-google-pixel .el-tabs__item {
+    width: 160px;
+    text-align: center;
+  }
+
+  /* Samsung Galaxy S8兼容样式 */
+  .device-galaxy-s8 .container-wrapper {
+    position: relative;
+    width: 360px;
+    height: 740px;
+    overflow: hidden;
+    border: 2px solid #222;
+    border-radius: 34px;
+  }
+
+  .device-galaxy-s8 .el-tabs__item {
+    width: 177px;
+    text-align: center;
+  }
+
+  /* iPad Pro 兼容样式 */
+  .device-ipad-pro .container-wrapper {
+    position: relative;
+    width: 510px;
+    height: 680px;
+    overflow: hidden;
+    border: 2px solid #222;
+    border-radius: 2px;
+  }
+
+  .device-ipad-pro .el-tabs__item {
+    width: 253px;
+    text-align: center;
+  }
+
+  header {
+    position: field;
+    top: 44px;
+    height: 44px;
+    color: #333333;
+    font-size: 34rpx;
+    line-height: 44px;
+    text-align: center;
+    background-color: #ffffff;
+  }
+
+  .carouselImg{
+    width: 100%;
+    height: 348px;
+  }
+
+  .title-box {
+    height: 168px;
+    background-color: #ffffff;
+    padding-top: 25px;
+    box-sizing: border-box;
+  }
+
+  .price-label {
+    margin-left: 16px;
+    font-family: PingFangSC-Regular;
+    font-size: 12px;
+    color: #325beb;
+    letter-spacing: 0;
+  }
+
+  .price-info {
+    display: flex;
+    flex-direction: row;
+    padding-left: 16px;
+    box-sizing: border-box;
+  }
+  .integer-part {
+    display: inline-block;
+    color: #325beb;
+    font-weight: bold;
+    font-size: 32px;
+  }
+  .integer-part::before {
+    content: "￥";
+    display: inline-block;
+    font-size: 16px;
+    color: #325beb;
+    font-weight: bold;
+  }
+  .decimal-part {
+    display: inline;
+    font-size: 16px;
+    color: #325beb;
+    letter-spacing: 0;
+    font-weight: bold;
+  }
+  .retail-price {
+    font-size: 12px;
+    color: #999999;
+    letter-spacing: 0;
+    margin-left: 8px;
+    display: inline-block;
+    font-weight: lighter;
+    text-decoration: line-through;
+    margin-top: 20px;
+  }
+  .retail-price::before {
+    content: "零售价￥";
+    display: inline-block;
+    text-decoration: none;
+  }
+  .product-title {
+    padding-left: 16px;
+    padding-right: 10px;
+    font-family: PingFang-SC-Heavy;
+    font-size: 16px;
+    color: #333333;
+    letter-spacing: 0;
+    font-weight: bolder;
+    box-sizing: border-box;
+  }
+
+  /* 原子CSS */
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-content-center {
+  justify-content: center;
+}
+.flex-items-center {
+  align-items: center;
+}
+}
