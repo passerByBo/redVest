@@ -143,21 +143,21 @@ export default [
         name: '商家认证信息',
         icon: 'smile',
         routes: [
-          {
-            path: '/customer/certification/enterprise-certification',
-            name: '企业认证申请',
-            icon: 'smile',
-            component: './Customer/Certification/EnterpriseCertification',
-            // hideChildrenInMenu: true,
-            routes: [
-              {
-                path: '/customer/certification/enterprise-certification/enterprise-application',
-                name: '企业认证申请新增',
-                component: './Customer/Certification/EnterpriseCertification/EnterpriseApplication',
-                hideInMenu: true,
-              },
-            ],
-          },
+          // {
+          //   path: '/customer/certification/enterprise-certification',
+          //   name: '企业认证申请',
+          //   icon: 'smile',
+          //   component: './Customer/Certification/EnterpriseCertification',
+          //   // hideChildrenInMenu: true,
+          //   routes: [
+          //     {
+          //       path: '/customer/certification/enterprise-certification/enterprise-application',
+          //       name: '企业认证申请新增',
+          //       component: './Customer/Certification/EnterpriseCertification/EnterpriseApplication',
+          //       hideInMenu: true,
+          //     },
+          //   ],
+          // },
           {
             path: '/customer/certification/merchant-certification',
             name: '商家认证申请',
@@ -171,12 +171,12 @@ export default [
         name: '归档信息管理',
         icon: 'smile',
         routes: [
-          {
-            path: '/customer/archive/enterprise-info',
-            name: '企业信息管理',
-            icon: 'smile',
-            component: './Customer/Archive/EnterpriseInfo',
-          },
+          // {
+          //   path: '/customer/archive/enterprise-info',
+          //   name: '企业信息管理',
+          //   icon: 'smile',
+          //   component: './Customer/Archive/EnterpriseInfo',
+          // },
           {
             path: '/customer/archive/business-info',
             name: '商家信息管理',
