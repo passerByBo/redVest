@@ -14,6 +14,8 @@ import { ColumnsType } from 'antd/lib/table';
 import { AttrEditableRow, AttrEditableCell } from "./components/AttrEditable"
 import { ISpecify } from '../../SpecificationModel/components/AddFormModal';
 import { SpecifyItem, Specify } from '../../components/Specify';
+import Preview from '../components/Preview';
+
 
 const { SHOW_PARENT } = TreeSelect;
 const { TextArea } = Input;
@@ -293,6 +295,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
   const [commission, setCommission] = useState(1);
 
+
+  const [previewProductVisible, setPreviewProductVisible] = useState(false);
+
   //商品属性列表元数据
   const [productsAttr, setProductsAttr] = useState<IProductAttr[]>([{ 1: '1', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }, { 1: '2', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }]);
 
@@ -432,270 +437,203 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   }
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      hideRequiredMark
-      initialValues={{}}
-      onFinish={() => { }}
-      onFinishFailed={() => { }}
-    >
-      <PageContainer>
-        <Card title="基本信息" className={styles.card} bordered={false}>
-          <Row>
-            <Col span={24}>
-              <Form.Item
-                label={'商品分类'}
-                name="name"
-                rules={[{ required: true, message: '请选择商品分类' }]}
-              >
-                <TreeSelect {...tProps} placeholder="一级类目 < 二级类目" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col {...largItemLayout}>
-              <Form.Item
-                label={'商品名称'}
-                name="name"
-                rules={[{ required: true, message: '请输入商品名称' }]}
-              >
-                <Input placeholder="请输入商品名称" />
-              </Form.Item>
-            </Col>
-            <Col {...largItemLayout}>
-              <Form.Item
-                label={'商品副标题'}
-                name="subName"
-                rules={[{ required: true, message: '请输入商品副标题名称' }]}
-              >
-                <Input placeholder="请输入商品副标题名称" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col {...smallItemLayout}>
-              <Form.Item
-                label={'商品品牌'}
-                name="ping31235pai"
-                rules={[{ required: true, message: '请输入商品品牌' }]}
-              >
-                <Input placeholder="请输入商品品牌" />
-              </Form.Item>
-            </Col>
-            <Col {...smallItemLayout}>
-              <Form.Item
-                label={'商品编码'}
-                name="pin1321gpai"
-              >
-                <Input placeholder="请输入商品编码" />
-              </Form.Item>
-            </Col>
-            <Col {...smallItemLayout}>
-              <Form.Item
-                label={'单位'}
-                name="ping11pai"
-              >
-                <Input placeholder="请输入单位" />
-              </Form.Item>
-            </Col>
-            <Col {...smallItemLayout}>
-              <Form.Item
-                label={'商品排序'}
-                name="pingpai22"
-              >
-                <Input placeholder="请输入商品排序" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24} >
-              <Form.Item
-                style={{ marginBottom: 0 }}
-                label={'商品简介'}
-                name="pingpai33"
-              >
-                <TextArea placeholder="请输入商品简介" allowClear />
-              </Form.Item>
-
-            </Col>
-          </Row>
-        </Card>
-
-        <Card title="商品图文信息" className={styles.card} bordered={false}>
-
-          <Row>
-            <Col span={24}>
-              <Form.Item
-                label={'商品封面主图'}
-                name="pingpai322223"
-              >
-                <Upload
-                  openFileDialogOnClick={false}
-                  listType="picture-card"
-                  fileList={coverPictures}
-                  onPreview={handlePreview}
-                  onChange={handleChange}
-                >
-                  {fileList.length >= 5 ? null : uploadButton}
-                </Upload>
-                <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，只可上传一张。</span>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col span={24}>
-              <Form.Item
-                label={'商品轮播图'}
-                name="123123123"
-              >
-                <Upload
-                  openFileDialogOnClick={false}
-                  listType="picture-card"
-                  fileList={coverPictures}
-                  onPreview={handlePreview}
-                  onChange={handleChange}
-                >
-                  {fileList.length >= 5 ? null : uploadButton}
-                </Upload>
-                <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，最多可上传5张。</span>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Card type="inner" title="商品规格" className={styles.card}>
+    <>
+      <Form
+        form={form}
+        layout="vertical"
+        hideRequiredMark
+        initialValues={{}}
+        onFinish={() => { }}
+        onFinishFailed={() => { }}
+      >
+        <PageContainer>
+          <Card title="基本信息" className={styles.card} bordered={false}>
             <Row>
-              <Col span={24} className={styles.specifyRow}>
-                <span className={classnames(styles.label, styles.right10)}>选择规格模板:</span>
-                <Input.Group className={styles.right10} compact style={{ width: 265 }}>
-                  <Select
-                    showSearch
-                    placeholder="选择规格模板"
-                    optionFilterProp="children"
-                    onChange={() => { }}
-                    style={{ width: 200 }}
-                  // filterOption={(input, option) => {}}
-                  >
-                    <Option value="1">规格模板1</Option>
-                    <Option value="2">规格模板2</Option>
-                    <Option value="3">规格模板3</Option>
-                  </Select>
-                  <Button >确认</Button>
-                </Input.Group>
-                <Button type="primary" ghost className={styles.right10} onClick={() => { setAddSpecifyVisible(true) }}>添加新规格</Button>
-                <Button type="primary">立即生成</Button>
+              <Col span={24}>
+                <Form.Item
+                  label={'商品分类'}
+                  name="name"
+                  rules={[{ required: true, message: '请选择商品分类' }]}
+                >
+                  <TreeSelect {...tProps} placeholder="一级类目 < 二级类目" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col {...largItemLayout}>
+                <Form.Item
+                  label={'商品名称'}
+                  name="name"
+                  rules={[{ required: true, message: '请输入商品名称' }]}
+                >
+                  <Input placeholder="请输入商品名称" />
+                </Form.Item>
+              </Col>
+              <Col {...largItemLayout}>
+                <Form.Item
+                  label={'商品副标题'}
+                  name="subName"
+                  rules={[{ required: true, message: '请输入商品副标题名称' }]}
+                >
+                  <Input placeholder="请输入商品副标题名称" />
+                </Form.Item>
               </Col>
             </Row>
 
-            {
-              addSpecifyVisible && (
-                <Row className={styles.addModalWrap} gutter={24}>
-                  <Col className={styles.addModalCol} span={9}>
-                    <span className={styles.label60} >规格:</span>
-                    <Input onChange={(e) => specifyChange(e, 'name')} value={specify.name} placeholder='请输入规格'></Input>
-                  </Col>
-                  <Col className={styles.addModalCol} span={9}>
-                    <span className={styles.label80}>规格值:</span>
-                    <Input onChange={(e) => specifyChange(e, 'value')} value={specify.value} placeholder='请输入规格值'></Input>
-                  </Col>
-                  <Col className={styles.addModalCol} span={6}>
-                    <Space>
-                      <Button size="small">取消</Button>
-                      <Button size="small" type='primary' onClick={() => { addSpecify(specify) }}>确认</Button>
-                    </Space>
-                  </Col>
-                </Row>
-              )
-            }
+            <Row gutter={16}>
+              <Col {...smallItemLayout}>
+                <Form.Item
+                  label={'商品品牌'}
+                  name="ping31235pai"
+                  rules={[{ required: true, message: '请输入商品品牌' }]}
+                >
+                  <Input placeholder="请输入商品品牌" />
+                </Form.Item>
+              </Col>
+              <Col {...smallItemLayout}>
+                <Form.Item
+                  label={'商品编码'}
+                  name="pin1321gpai"
+                >
+                  <Input placeholder="请输入商品编码" />
+                </Form.Item>
+              </Col>
+              <Col {...smallItemLayout}>
+                <Form.Item
+                  label={'单位'}
+                  name="ping11pai"
+                >
+                  <Input placeholder="请输入单位" />
+                </Form.Item>
+              </Col>
+              <Col {...smallItemLayout}>
+                <Form.Item
+                  label={'商品排序'}
+                  name="pingpai22"
+                >
+                  <Input placeholder="请输入商品排序" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={24} >
+                <Form.Item
+                  style={{ marginBottom: 0 }}
+                  label={'商品简介'}
+                  name="pingpai33"
+                >
+                  <TextArea placeholder="请输入商品简介" allowClear />
+                </Form.Item>
 
-
-            {
-              [...specifiesMap.keys()].map((name, i) => (
-                <Specify name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
-                  {
-                    (specifiesMap.get(name) || []).map((value: string, index: number) => (
-                      <SpecifyItem value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
-                    ))
-                  }
-
-                  <Input.Group compact style={{ width: 162, marginTop: 10 }}>
-                    <Input style={{ width: 120 }} value={specifyInputs[i]} placeholder="请输入规格值" onChange={(e) => { specifyValueChange(e, i) }} />
-                    <Button onClick={() => { addSpecifyValue(name, i) }} icon={<CheckOutlined />} type='primary'></Button>
-                  </Input.Group>
-                </Specify>
-              ))
-            }
-
-            <Table
-              style={{ marginTop: 24 }}
-              pagination={false}
-              components={components}
-              rowClassName={styles['editable-row']}
-              bordered
-              dataSource={productsAttr}
-              columns={attrColumn as ColumnsType}
-            />
+              </Col>
+            </Row>
           </Card>
 
-          <Row>
-            <Col span={24}>
-              <Form.Item name="productDetail" label="商品详情" rules={[{ required: true, message: '请输入商品详情' }]} >
-                <BraftEditor
-                  className='my-editor'
-                  placeholder=""
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Card title="商品图文信息" className={styles.card} bordered={false}>
 
-          <Row gutter={16}>
-            <Col  {...smallItemLayout}>
-              <Form.Item name="123123" label="商品状态">
-                <Radio.Group onChange={() => { }} value={1}>
-                  <Radio value={1}>上架</Radio>
-                  <Radio value={2}>下架</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col  {...smallItemLayout}>
-              <Form.Item name="sdfwse" label="商品状态">
-                <Radio.Group onChange={() => { }} value={1}>
-                  <Radio value={1}>开启</Radio>
-                  <Radio value={2}>关闭</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col  {...smallItemLayout}>
-              <Form.Item name="hjghj" label="商品状态">
-                <Radio.Group onChange={() => { }} value={1}>
-                  <Radio value={1}>开启</Radio>
-                  <Radio value={2}>关闭</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col  {...smallItemLayout}>
-              <Form.Item name="fdsf" label="商品状态">
-                <Radio.Group onChange={() => { }} value={1}>
-                  <Radio value={1}>免费包邮</Radio>
-                  <Radio value={2}>邮费到付</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-          </Row>
+            <Row>
+              <Col span={24}>
+                <Form.Item
+                  label={'商品封面主图'}
+                  name="pingpai322223"
+                >
+                  <Upload
+                    openFileDialogOnClick={false}
+                    listType="picture-card"
+                    fileList={coverPictures}
+                    onPreview={handlePreview}
+                    onChange={handleChange}
+                  >
+                    {fileList.length >= 5 ? null : uploadButton}
+                  </Upload>
+                  <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，只可上传一张。</span>
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <Space>
-            <span>佣金设置</span>
-            <Radio.Group onChange={handleCommissionChange} value={commission}>
-              <Radio value={1}>默认设置</Radio>
-              <Radio value={2}>自定义设置</Radio>
-            </Radio.Group>
-          </Space>
+            <Row>
+              <Col span={24}>
+                <Form.Item
+                  label={'商品轮播图'}
+                  name="123123123"
+                >
+                  <Upload
+                    openFileDialogOnClick={false}
+                    listType="picture-card"
+                    fileList={coverPictures}
+                    onPreview={handlePreview}
+                    onChange={handleChange}
+                  >
+                    {fileList.length >= 5 ? null : uploadButton}
+                  </Upload>
+                  <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，最多可上传5张。</span>
+                </Form.Item>
+              </Col>
+            </Row>
 
-          {
-            commission === 2 &&
-            (
+            <Card type="inner" title="商品规格" className={styles.card}>
+              <Row>
+                <Col span={24} className={styles.specifyRow}>
+                  <span className={classnames(styles.label, styles.right10)}>选择规格模板:</span>
+                  <Input.Group className={styles.right10} compact style={{ width: 265 }}>
+                    <Select
+                      showSearch
+                      placeholder="选择规格模板"
+                      optionFilterProp="children"
+                      onChange={() => { }}
+                      style={{ width: 200 }}
+                    // filterOption={(input, option) => {}}
+                    >
+                      <Option value="1">规格模板1</Option>
+                      <Option value="2">规格模板2</Option>
+                      <Option value="3">规格模板3</Option>
+                    </Select>
+                    <Button >确认</Button>
+                  </Input.Group>
+                  <Button type="primary" ghost className={styles.right10} onClick={() => { setAddSpecifyVisible(true) }}>添加新规格</Button>
+                  <Button type="primary">立即生成</Button>
+                </Col>
+              </Row>
+
+              {
+                addSpecifyVisible && (
+                  <Row className={styles.addModalWrap} gutter={24}>
+                    <Col className={styles.addModalCol} span={9}>
+                      <span className={styles.label60} >规格:</span>
+                      <Input onChange={(e) => specifyChange(e, 'name')} value={specify.name} placeholder='请输入规格'></Input>
+                    </Col>
+                    <Col className={styles.addModalCol} span={9}>
+                      <span className={styles.label80}>规格值:</span>
+                      <Input onChange={(e) => specifyChange(e, 'value')} value={specify.value} placeholder='请输入规格值'></Input>
+                    </Col>
+                    <Col className={styles.addModalCol} span={6}>
+                      <Space>
+                        <Button size="small">取消</Button>
+                        <Button size="small" type='primary' onClick={() => { addSpecify(specify) }}>确认</Button>
+                      </Space>
+                    </Col>
+                  </Row>
+                )
+              }
+
+
+              {
+                [...specifiesMap.keys()].map((name, i) => (
+                  <Specify name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
+                    {
+                      (specifiesMap.get(name) || []).map((value: string, index: number) => (
+                        <SpecifyItem value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
+                      ))
+                    }
+
+                    <Input.Group compact style={{ width: 162, marginTop: 10 }}>
+                      <Input style={{ width: 120 }} value={specifyInputs[i]} placeholder="请输入规格值" onChange={(e) => { specifyValueChange(e, i) }} />
+                      <Button onClick={() => { addSpecifyValue(name, i) }} icon={<CheckOutlined />} type='primary'></Button>
+                    </Input.Group>
+                  </Specify>
+                ))
+              }
+
               <Table
                 style={{ marginTop: 24 }}
                 pagination={false}
@@ -703,31 +641,106 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 rowClassName={styles['editable-row']}
                 bordered
                 dataSource={productsAttr}
-                columns={yColumn as ColumnsType}
+                columns={attrColumn as ColumnsType}
               />
-            )
-          }
+            </Card>
 
-        </Card>
+            <Row>
+              <Col span={24}>
+                <Form.Item name="productDetail" label="商品详情" rules={[{ required: true, message: '请输入商品详情' }]} >
+                  <BraftEditor
+                    className='my-editor'
+                    placeholder=""
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        {/* 预览图片 */}
-        <Modal
-          visible={previewVisible}
-          title={previewTitle}
-          footer={null}
-          onCancel={() => { setPreviewVisible(false) }}
-        >
-          <img alt="商品主图" style={{ width: '100%' }} src={previewImage} />
-        </Modal>
+            <Row gutter={16}>
+              <Col  {...smallItemLayout}>
+                <Form.Item name="123123" label="商品状态">
+                  <Radio.Group onChange={() => { }} value={1}>
+                    <Radio value={1}>上架</Radio>
+                    <Radio value={2}>下架</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col  {...smallItemLayout}>
+                <Form.Item name="sdfwse" label="商品状态">
+                  <Radio.Group onChange={() => { }} value={1}>
+                    <Radio value={1}>开启</Radio>
+                    <Radio value={2}>关闭</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col  {...smallItemLayout}>
+                <Form.Item name="hjghj" label="商品状态">
+                  <Radio.Group onChange={() => { }} value={1}>
+                    <Radio value={1}>开启</Radio>
+                    <Radio value={2}>关闭</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col  {...smallItemLayout}>
+                <Form.Item name="fdsf" label="商品状态">
+                  <Radio.Group onChange={() => { }} value={1}>
+                    <Radio value={1}>免费包邮</Radio>
+                    <Radio value={2}>邮费到付</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            </Row>
 
-      </PageContainer>
-      <FooterToolbar>
-        {/* {getErrorInfo(error)} */}
-        <Button type="primary" onClick={() => form?.submit()} loading={false}>
-          提交
+            <Space>
+              <span>佣金设置</span>
+              <Radio.Group onChange={handleCommissionChange} value={commission}>
+                <Radio value={1}>默认设置</Radio>
+                <Radio value={2}>自定义设置</Radio>
+              </Radio.Group>
+            </Space>
+
+            {
+              commission === 2 &&
+              (
+                <Table
+                  style={{ marginTop: 24 }}
+                  pagination={false}
+                  components={components}
+                  rowClassName={styles['editable-row']}
+                  bordered
+                  dataSource={productsAttr}
+                  columns={yColumn as ColumnsType}
+                />
+              )
+            }
+
+          </Card>
+
+          {/* 预览图片 */}
+          <Modal
+            visible={previewVisible}
+            title={previewTitle}
+            footer={null}
+            onCancel={() => { setPreviewVisible(false) }}
+          >
+            <img alt="商品主图" style={{ width: '100%' }} src={previewImage} />
+          </Modal>
+
+        </PageContainer>
+        <FooterToolbar>
+          {/* {getErrorInfo(error)} */}
+          <Button onClick={() => { setPreviewProductVisible(true) }} loading={false}>
+            预览
         </Button>
-      </FooterToolbar>
-    </Form >
+          <Button type="primary" onClick={() => form?.submit()} loading={false}>
+            提交
+        </Button>
+        </FooterToolbar>
+      </Form >
+
+      <Preview product={{}} visible={previewProductVisible} onCancel={() => { setPreviewProductVisible(false) }} />
+    </>
+
   )
 }
 
