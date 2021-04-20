@@ -181,7 +181,7 @@ const List: React.FC = (props) => {
       width: 300,
       render: ((_, item) => {
         return (
-          <a onClick={() => { history.push(`/merchandise/product/${item.id}`) }}>{_}</a>
+          <a onClick={() => { history.push(`/merchandise/product/list/${item.id}`) }}>{_}</a>
         )
       })
     },
