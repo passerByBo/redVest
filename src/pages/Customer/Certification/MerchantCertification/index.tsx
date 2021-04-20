@@ -6,10 +6,12 @@ import { Modal, Input, Form, Select, Table, Card, Button } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 import type { MerchantCertificationListItem } from './data';
-import FlowStep from './components/FlowStep'
+import FlowStep from './components/FlowStep';
+import AddModal from './components/AddModal';
+
 
 const MerchantCertification: React.FC = () => {
-
+    const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
     const [flowStepVisible, setFlowStepVisible] = useState<boolean>(false);
     const [statusKey, setStatusKey] = useState<string>('1');
     const [btnIndex, setBtnIndex] = useState<number>(0);
@@ -114,6 +116,7 @@ const MerchantCertification: React.FC = () => {
                             type="primary"
                             key="primary"
                             onClick={() => {
+                                setAddModalVisible(true)
                             }}
                         >
                             <PlusOutlined /> 新建
@@ -127,6 +130,11 @@ const MerchantCertification: React.FC = () => {
                     }}
                 />
             </PageContainer>
+            <AddModal
+                visible={addModalVisible}
+                onFinish={() => { }}
+                onCancel={() => setAddModalVisible(false)}
+            />
             <FlowStep visible={flowStepVisible} onCancel={onCancel} btnIndex={btnIndex} />
         </>
     )
