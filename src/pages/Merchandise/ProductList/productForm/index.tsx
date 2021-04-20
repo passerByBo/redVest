@@ -656,6 +656,17 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               </Col>
             </Row>
 
+            <Row>
+              <Col span={24}>
+                <Form.Item name="productDetail" label="质检报告" rules={[{ required: true, message: '请输入质检报告' }]} >
+                  <BraftEditor
+                    className='my-editor'
+                    placeholder=""
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
             <Row gutter={16}>
               <Col  {...smallItemLayout}>
                 <Form.Item name="123123" label="商品状态">

@@ -56,8 +56,8 @@
   }
 
   .addModalWrap {
-    margin-top: 24px;
     max-width: 623px;
+    margin-top: 24px;
 
     .addModalCol {
       display: flex;
@@ -74,5 +74,59 @@
         text-align: justify-all;
       }
     }
+  }
+}
+
+.main {
+  :global(.anticon-delete) {
+    display: none;
+  }
+  :global {
+    .ant-descriptions-row > td {
+      padding-bottom: 8px;
+    }
+    .ant-page-header-heading-extra {
+      flex-direction: column;
+    }
+  }
+
+  .headerList {
+    margin-bottom: 4px;
+    :global {
+      .ant-descriptions-row > td {
+        padding-bottom: 8px;
+      }
+    }
+
+    .stepDescription {
+      position: relative;
+      left: 38px;
+      padding-top: 8px;
+      font-size: 14px;
+      text-align: left;
+
+      > div {
+        margin-top: 8px;
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  .pageHeader {
+    :global {
+      .ant-page-header-heading-extra > * + * {
+        margin-left: 8px;
+      }
+    }
+    .moreInfo {
+      display: flex;
+      justify-content: space-between;
+      width: 200px;
+    }
+  }
+
+  .spanLabel{
+    width: 90px;
+    display: inline-block;
   }
 }
