@@ -88,14 +88,14 @@ const MemberInfo: React.FC = () => {
           defaultCollapsed: false,
         }}
         toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={() => {}}>
+          <Button type="primary" key="primary" onClick={() => { }}>
             <ExportOutlined /> 导出
           </Button>,
         ]}
         request={rule}
         columns={columns}
         rowSelection={{
-          onChange: (_, selectedRows) => {},
+          onChange: (_, selectedRows) => { },
         }}
       />
     </PageContainer>
