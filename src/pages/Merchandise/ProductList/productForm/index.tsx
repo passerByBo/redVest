@@ -15,6 +15,7 @@ import { AttrEditableRow, AttrEditableCell } from "./components/AttrEditable"
 import { ISpecify } from '../../SpecificationModel/components/AddFormModal';
 import { SpecifyItem, Specify } from '../../components/Specify';
 import Preview from '../components/Preview';
+import SelectPictureModal from '@/components/SelectPictureModal';
 
 
 const { SHOW_PARENT } = TreeSelect;
@@ -295,6 +296,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
   const [commission, setCommission] = useState(1);
 
+  //图片选择器
+  const [selectPictureVisible, setSelectPictureVisible] = useState(false);
+
 
   const [previewProductVisible, setPreviewProductVisible] = useState(false);
 
@@ -319,7 +323,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
   //选择图片
   const selectCoverPictures = (e) => {
-    alert(1)
+    setSelectPictureVisible(true);
   }
 
   const handlePreview = async file => {
@@ -736,6 +740,8 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
           >
             <img alt="商品主图" style={{ width: '100%' }} src={previewImage} />
           </Modal>
+
+          <SelectPictureModal visible={selectPictureVisible} onCancel={() => {setSelectPictureVisible(false)}}/>
 
         </PageContainer>
         <FooterToolbar>
