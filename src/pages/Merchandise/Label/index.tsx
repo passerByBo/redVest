@@ -42,7 +42,7 @@ const Label: React.FC = () => {
       header={{
         title: '标签管理',
       }}>
-      {/* <ProTable
+      {/* <ProTablegit
         actionRef={actionRef}
         rowKey="key"
         search={{
