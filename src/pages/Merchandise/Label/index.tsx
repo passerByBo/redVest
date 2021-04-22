@@ -1,48 +1,63 @@
-import { PlusOutlined } from '@ant-design/icons';
-import React, { useState, useRef } from 'react';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Input, Drawer } from 'antd';
-import ProTable from '@ant-design/pro-table';
-import ProForm, {
-  ModalForm,
-  ProFormText,
-  ProFormTextArea,
-  ProFormSelect,
-  ProFormDateRangePicker,
-  DrawerForm,
-  ProFormRadio,
-  ProFormDatePicker,
-  ProFormUploadDragger,
-  ProFormSwitch
-} from '@ant-design/pro-form';
+import React, { useRef, useState } from 'react';
+import { ExportOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-layout';
+import ProTable, { ProColumns } from '@ant-design/pro-table';
+import { Button, Divider, Space } from 'antd';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
-import UpdateForm from './components/UpdateForm';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
-import { getBrandList } from '@/services/merchandise/product';
-import { queryRule } from './service';
+import LabelForm from './component/labelForm';
 const Label: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
 
+  const [modelFormVisible, setModelFormVisible] = useState(false);
 
-  const columns: ProColumns<any> = [
+  const columns: ProColumns[] = [
     {
-      title: '',
-      dataIndex: 'callNo',
-
+      title: '序号',
+      dataIndex: 'index',
+      valueType: 'indexBorder',
     },
-
-  ]
+    {
+      title: '标签名称',
+      dataIndex: 'name',
+      tip: '规则名称是唯一的 key',
+    },
+    {
+      title: '操作',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <>
+          <a
+            key="config"
+            onClick={() => {
+            }}
+          >
+            编辑
+        </a>
+          <Divider type="vertical" />
+          <a key="subscribeAlert">
+            禁用
+        </a>
+          <Divider type="vertical" />
+          <a key="subscribeAlert">
+            置顶
+       </a>
+          <Divider type="vertical" />
+          <a key="subscribeAlert">
+            上移
+      </a>
+        </>
+      )
+    },
+  ];
 
   return (
     <PageContainer
       header={{
         title: '标签管理',
       }}>
-      {/* <ProTablegit
+      <ProTable
         actionRef={actionRef}
         rowKey="key"
         search={{
@@ -50,22 +65,36 @@ const Label: React.FC = () => {
         }}
         toolBarRender={() => [
           <Button
-            type="primary"
             key="primary"
             onClick={() => {
             }}
           >
-            <PlusOutlined /> "新建"
+            <ExportOutlined /> 导出
           </Button>,
+          <Button
+            key="primary1"
+            onClick={() => {
+            }}
+          >
+            <StopOutlined />禁用
+         </Button>,
+          <Button
+            onClick={() => setModelFormVisible(true)}
+            key="primary2"
+            type="primary"
+          >
+            <PlusOutlined /> 新建
+        </Button>,
         ]}
-        request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
+        request={rule}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
+
           },
         }}
-      /> */}
+      />
+      <LabelForm visible={modelFormVisible}  setModalVisit={setModelFormVisible}></LabelForm>
     </PageContainer>
   )
 }
