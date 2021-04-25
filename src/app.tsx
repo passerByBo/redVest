@@ -7,10 +7,10 @@ import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { ResponseError } from 'umi-request';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+ import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import logo from '../public/logo_white.png';
 
-// const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -39,14 +39,13 @@ const noLoginRoute = () => {
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
       const currentUser = await queryCurrentUser();
       return currentUser;
     } catch (error) {
-
       //可能以任意链接的方式进入到登陆
       if (!noLoginRoute()) {
         history.push('/user/login');
@@ -137,7 +136,10 @@ const errorHandler = (error: ResponseError) => {
   throw error;
 };
 
+console.log('process.env.NODE_ENV',process.env.NODE_ENV)
+
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
+  prefix: isDev ? 'http://10.10.10.54:8088/prod-api' : '',
   errorHandler,
-};
+}

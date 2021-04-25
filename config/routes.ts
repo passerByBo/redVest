@@ -129,7 +129,30 @@ export default [
     path: '/sku',
     name: 'SKU台账',
     icon: 'orderedList',
-    component: './Order',
+    hideChildrenInMenu: true,
+    routes:[
+      {
+        path: '/sku',
+        redirect: '/sku/list'
+      },
+      {
+        path: '/sku/list',
+        name: 'SKU台账列表',
+        component: './SKULedger/List',
+        routes:[
+          {
+            path: '/sku/list/stock-logger',
+            name: '库存日志',
+            component: './SKULedger/StockLoger',
+          },
+          {
+            path: '/sku/list/checklist',
+            name: '出库清单',
+            component: './SKULedger/OutStockCount',
+          }
+        ]
+      }
+    ]
   },
   {
     //客户管理
@@ -328,7 +351,7 @@ export default [
       {
         path: '/help/contact',
         name: '联系我们',
-        component: './Welcome',
+        component: './TableList',
       },
     ],
   },

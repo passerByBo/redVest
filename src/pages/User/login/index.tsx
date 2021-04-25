@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCheckbox, ProFormText, ProFormCaptcha } from '@ant-design/pro-form';
 import { Link, history, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/login';
+import { login } from '@/services/user/login';
 import styles from './index.less';
 
 const LoginMessage: React.FC<{
@@ -58,14 +58,14 @@ const Login: React.FC = () => {
     try {
       // 登录
       const msg = await login({ ...values, type });
-
-      if (msg.status === 'ok') {
+       console.log('msg',msg)
+      if (msg.code == '200') {
         message.success('登录成功！');
         await fetchUserInfo();
         goto();
         return;
-      } // 如果失败去设置用户错误信息
-
+      }
+      // 如果失败去设置用户错误信息
       setUserLoginState(msg);
     } catch (error) {
       message.error('登录失败，请重试！');
@@ -74,7 +74,8 @@ const Login: React.FC = () => {
     setSubmitting(false);
   };
 
-  const { status, type: loginType } = userLoginState;
+  //const { status, type: loginType } = userLoginState;
+  const {code, msg} = userLoginState;
   return (
     <div className={styles.container}>
       <div className={styles.lang}></div>
@@ -122,7 +123,7 @@ const Login: React.FC = () => {
               />
             </Tabs>
 
-            {status === 'error' && loginType === 'account' && (
+            {code != '200' && type === 'account' && (
               <LoginMessage
                 content='账户或密码错误！'
               />
