@@ -302,20 +302,20 @@ export default [
         name: '提现管理',
         component: './Operation/Withdrawal',
       },
-      {
-        path: '/operation/operational-analysis',
-        name: '运营分析',
-        component: './Welcome',
-      },
+      // {
+      //   path: '/operation/operational-analysis',
+      //   name: '运营分析',
+      //   component: './Welcome',
+      // },
       {
         path: '/operation/order-setting',
         name: '订单设置',
-        component: './Welcome',
+        component: './Operation/OrderSetting',
       },
       {
         path: '/operation/express-model',
         name: '快递模板',
-        component: './Welcome',
+        component: './Operation/ExpressModel',
       },
     ],
   },
