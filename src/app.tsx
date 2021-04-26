@@ -54,7 +54,6 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  console.log('history.location.pathname',history.location.pathname)
   // 如果是登录页面，不执行
   if (history.location.pathname !== '/user/login') {
     //不是登录页面从本地获取token，然后获取本地数据，需要根据返回的状态判断当前的token是否有效果
