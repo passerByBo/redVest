@@ -2,14 +2,13 @@ import React from 'react';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
 import { notification } from 'antd';
-import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
+import { RequestConfig, RunTimeLayoutConfig, useModel } from 'umi';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { ResponseError } from 'umi-request';
- import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import { queryCurrentUser } from '@/services/user/userInfo';
 import logo from '../public/logo_white.png';
-
 const isDev = process.env.NODE_ENV === 'development';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
@@ -19,14 +18,14 @@ export const initialStateConfig = {
 
 const noLoginRoute = () => {
   const { location } = history;
-   const {pathname} = location
-  let nologinArr:string[] =  [
+  const { pathname } = location
+  let nologinArr: string[] = [
     '/user/login',
     '/user/register',
     '/user/register-result',
   ]
 
-  if(nologinArr.includes(pathname)){
+  if (nologinArr.includes(pathname)) {
     return true;
   }
   return false;
@@ -37,13 +36,14 @@ const noLoginRoute = () => {
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<{
+  token?: string,
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
-   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: (token: string) => Promise<API.CurrentUser | undefined>;
 }> {
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = async (token: string) => {
     try {
-      const currentUser = await queryCurrentUser();
+      const currentUser = await queryCurrentUser(token);
       return currentUser;
     } catch (error) {
       //可能以任意链接的方式进入到登陆
@@ -54,9 +54,13 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
+  console.log('history.location.pathname',history.location.pathname)
   // 如果是登录页面，不执行
   if (history.location.pathname !== '/user/login') {
-    const currentUser = await fetchUserInfo();
+    //不是登录页面从本地获取token，然后获取本地数据，需要根据返回的状态判断当前的token是否有效果
+    //如果token失效跳转到登录页
+    let token = sessionStorage.getItem('token') || '';
+    const currentUser = await fetchUserInfo(token);
     return {
       fetchUserInfo,
       currentUser,
@@ -116,7 +120,10 @@ const codeMessage = {
  * @see https://beta-pro.ant.design/docs/request-cn
  */
 const errorHandler = (error: ResponseError) => {
+  console.log(JSON.stringify(error))
+  console.log(error.name)
   const { response } = error;
+
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
@@ -136,10 +143,30 @@ const errorHandler = (error: ResponseError) => {
   throw error;
 };
 
-console.log('process.env.NODE_ENV',process.env.NODE_ENV)
+const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
+  const authHeader: any = {};
+  //给用户添加token
+  if (!noLoginRoute()) {
+    let token = sessionStorage.getItem('token');
+    authHeader.Authorization = token;
+  }
+  return {
+    url: `${url}`,
+    options: { ...options, headers: authHeader },
+  };
+};
 
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
   prefix: isDev ? 'http://10.10.10.54:8088/prod-api' : '',
   errorHandler,
+  requestInterceptors: [authHeaderInterceptor],
+  errorConfig: {
+    adaptor: (resData) => {
+      return {
+        ...resData,
+        success: resData.status == 200,
+      };
+    },
+  },
 }

@@ -44,11 +44,11 @@ const Login: React.FC = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const [checkPhoneNumber, setPhoneNumber] = useState(false);
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-
+  const fetchUserInfo = async (token: string) => {
+    const userInfo = await initialState?.fetchUserInfo?.(token);
+    console.log('userInfo',userInfo)
     if (userInfo) {
-      setInitialState({ ...initialState, currentUser: userInfo });
+      setInitialState({ ...initialState, currentUser: userInfo, token });
     }
   };
 
@@ -57,11 +57,13 @@ const Login: React.FC = () => {
 
     try {
       // 登录
-      const msg = await login({ ...values, type });
-       console.log('msg',msg)
-      if (msg.code == '200') {
+      const res = await login({ ...values, type });
+      if (res.status == '200' && res.token) {
         message.success('登录成功！');
-        await fetchUserInfo();
+        //保存session到本地
+        sessionStorage.setItem('token', res.token);
+        //请求用户信息包括权限等
+        await fetchUserInfo(res.token);
         goto();
         return;
       }
@@ -74,8 +76,7 @@ const Login: React.FC = () => {
     setSubmitting(false);
   };
 
-  //const { status, type: loginType } = userLoginState;
-  const {code, msg} = userLoginState;
+  const { status, code, type: loginType } = userLoginState;
   return (
     <div className={styles.container}>
       <div className={styles.lang}></div>
@@ -123,7 +124,7 @@ const Login: React.FC = () => {
               />
             </Tabs>
 
-            {code != '200' && type === 'account' && (
+            {status === 200 && code === 100002 && type === 'account' && (
               <LoginMessage
                 content='账户或密码错误！'
               />

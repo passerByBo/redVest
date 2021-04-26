@@ -8,6 +8,8 @@ import { fakeChartData } from './service'
 import styles from './style.less';
 import { AnalysisData } from './data.d';
 import { ListOutlined, UpOutlined } from '@/components/icon';
+import { getHomeData } from '@/services/home/home';
+
 
 const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
 const OverviewData = React.lazy(() => import('./components/OverviewData'));
@@ -22,11 +24,9 @@ const Home: React.FC = () => {
   const [chartsData, setChartsData] = useState<AnalysisData>();
 
 
-  useEffect(() => {
-    fakeChartData().then(res => {
-      setChartsData(res.data)
-    })
-
+  useEffect(async () => {
+    let res = await getHomeData()
+    console.log(res)
   }, [])
 
   const isActive = (type: 'today' | 'week' | 'month' | 'year') => {
@@ -85,7 +85,7 @@ const Home: React.FC = () => {
         <Col xl={24} lg={24} md={24} xs={24}>
           <Suspense fallback={null}>
             <OrderStatistics
-             rangePickerValue={null}
+              rangePickerValue={null}
               isActive={isActive}
               loading={false}
               selectDate={selectDate} />
