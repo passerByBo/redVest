@@ -15,3 +15,17 @@ export async function getThematicGroupList(
     ...(options || {}),
   });
 }
+
+/**
+ * 新建专题组
+ *  */
+export async function addThematicGroup(body, options?: { [key: string]: any }) {
+  console.log('options', options);
+  return request('/product/specialGroup', {
+    method: 'POST',
+    data: {
+      ...body,
+    },
+    ...(options || {}),
+  });
+}

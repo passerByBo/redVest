@@ -1,8 +1,8 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message } from 'antd';
+import { Button, Form, message, Upload } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import ProForm, {
   ModalForm,
@@ -11,9 +11,10 @@ import ProForm, {
   DrawerForm,
   ProFormDatePicker,
   ProFormUploadDragger,
-  ProFormSwitch
+  ProFormSwitch,
+  ProFormDigit
 } from '@ant-design/pro-form';
-import { getThematicGroupList } from '@/services/merchandise/thematicGroup';
+import { getThematicGroupList, addThematicGroup } from '@/services/merchandise/thematicGroup';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 type ThematicGroupListItem = {
   id: string,
@@ -32,26 +33,7 @@ const waitTime = (time: number = 100) => {
     }, time);
   });
 };
-/**
- * 添加节点
- *
- * @param fields
- */
 
-const handleAdd = async (fields: API.RuleListItem) => {
-  const hide = message.loading('正在添加');
-
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
 
 /**
  * 删除节点
@@ -64,11 +46,11 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
   if (!selectedRows) return true;
 
   try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('删除成功，即将刷新');
+    // await removeRule({
+    //   key: selectedRows.map((row) => row.key),
+    // });
+    // hide();
+    // message.success('删除成功，即将刷新');
     return true;
   } catch (error) {
     hide();
@@ -85,6 +67,11 @@ const ThematicGroup: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<ThematicGroupListItem[]>([]);
   //编辑商品
   const [editProduct, setEditProduct] = useState<ThematicGroupListItem>();
+
+
+  const [fileList, setFileList] = useState([]);
+
+
   const columns: ProColumns<ThematicGroupListItem>[] = [
     {
       title: '专题组名称',
@@ -160,8 +147,78 @@ const ThematicGroup: React.FC = () => {
     },
   ]
 
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
+
+  /**
+ * 添加节点
+ *
+ * @param fields
+ */
+
+const handleAdd = async (fields) => {
+  const hide = message.loading('正在添加');
+
+  if (fields.hasOwnProperty('isValid')) {
+    fields.isValid ? fields.isValid = 'Y' : fields.isValid = 'N'
+  }
+
+  //处理上传图片form数据
+  if (fields.hasOwnProperty('specialGroupImgBig')) {
+    const specialGroupImgBig = fields.specialGroupImgBig;
+    console.log(specialGroupImgBig)
+    let picArr:string[] = [];
+    specialGroupImgBig.forEach((proxy) => {
+      if(proxy.status === 'done') {
+        let res = proxy.response;
+        if(res.status === 200){
+          picArr.push(res.fileName)
+        }
+      }
+    })
+    fields.specialGroupImgBig = picArr.join(',')
+  }
+  try {
+    let res = await addThematicGroup({ ...fields });
+    if (res.status === 200 && res.code !== 200) {
+      hide();
+      message.error('添加失败请重试！');
+      return false;
+    }
+    hide();
+    message.success('添加成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('添加失败请重试！');
+    return false;
+  }
+};
 
 
+  const uploadProps = {
+    name: 'file',
+    action: 'http://10.10.10.54:8088/prod-api/mall/common/upload',
+    headers: {
+      Authorization: sessionStorage.getItem('token'),
+    },
+  }
+
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+
+
+  const handleChange = ({ fileList }) => {
+    setFileList(fileList);
+  }
 
   return (
     <PageContainer>
@@ -217,11 +274,13 @@ const ThematicGroup: React.FC = () => {
         )
       }
       <ModalForm
+        omitNil={true}
+        initialValues={{ isValid: false }}
         title='新建专题组'
         visible={createModalVisible}
         onVisibleChange={handleModalVisible}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
+          const success = await handleAdd(value);
 
           if (success) {
             handleModalVisible(false);
@@ -233,27 +292,43 @@ const ThematicGroup: React.FC = () => {
         }}
       >
         <ProForm.Group>
-          <ProFormText width="md" name="name" label="专题组" placeholder="请输入名称" />
+          <ProFormText width="md" name="specialGroup" label="专题组" placeholder="请输入名称" />
+          <ProFormDigit label="排序" name="sort" width="md" />
         </ProForm.Group>
 
-        <ProFormSwitch name="isShow" label="是否有效" />
+        <ProFormSwitch name="isValid" label="是否有效" />
+
+        {/* <ProFormUploadDragger {...uploadProps } max={4} label="专题组图片" name="specialGroupImgBig" /> */}
+
+        <Form.Item
+          name="specialGroupImgBig"
+          label="专题组图片"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          extra="建议图片大小不超过250kb"
+        >
+          <Upload {...uploadProps}
+          showUploadList={{ showPreviewIcon: false }}
+            listType="picture-card"
+            fileList={fileList}
+            onChange={handleChange}>
+            {fileList.length >= 8 ? null : uploadButton}
+          </Upload>
+        </Form.Item>
+
 
         <ProForm.Group>
-          <ProFormText width="md" name="contract" label="排序" placeholder="请输入名称" />
-        </ProForm.Group>
-
-        <ProFormUploadDragger max={4} label="专题组图片" name="productsPics" />
-
-        <ProForm.Group>
-          <ProFormDatePicker name="date" label="开始日期" />
-          <ProFormDatePicker name="date" label="结束日期" />
+          <ProFormDatePicker width="md" name="startDate" label="开始日期" />
+          <ProFormDatePicker width="md" name="endDate" label="结束日期" />
         </ProForm.Group>
 
         <ProForm.Group>
-          <ProFormTextArea width="xl" label="专题组描述" name="remark" />
+          <ProFormTextArea width="xl" label="专题组描述" name="specialGroupDescribe" />
         </ProForm.Group>
-
       </ModalForm>
+
+
+
       <DrawerForm
         visible={showDetail}
         title={editProduct ? editProduct.productName : '专题组'}
