@@ -6,7 +6,7 @@ import { RequestConfig, RunTimeLayoutConfig, useModel } from 'umi';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import type { ResponseError } from 'umi-request';
+import type { RequestOptionsInit, ResponseError } from 'umi-request';
 import { queryCurrentUser } from '@/services/user/userInfo';
 import logo from '../public/logo_white.png';
 const isDev = process.env.NODE_ENV === 'development';
@@ -46,7 +46,11 @@ export async function getInitialState(): Promise<{
       const currentUser = await queryCurrentUser(token);
       return currentUser;
     } catch (error) {
+      console.log('取失败')
+      //errorhander报出错误所以导致又回到了登陆
       //可能以任意链接的方式进入到登陆
+      //获取用户信息失败跳转到登陆
+      //error handler也会处理一次错误
       if (!noLoginRoute()) {
         history.push('/user/login');
       }
@@ -117,12 +121,11 @@ const codeMessage = {
 
 /** 异常处理程序
  * @see https://beta-pro.ant.design/docs/request-cn
+ * 目前存在的问题是只要出现这类错误都会将页面跳转到登录页，需要排查
  */
 const errorHandler = (error: ResponseError) => {
-  console.log(JSON.stringify(error))
-  console.log(error.name)
   const { response } = error;
-
+  console.log(JSON.stringify(error));
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
@@ -155,15 +158,25 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   };
 };
 
+
+const resHeaderInterceptor = (response: Response, options: RequestOptionsInit) => {
+  return response;
+}
+
+
+
+
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
   prefix: isDev ? 'http://10.10.10.54:8088/prod-api' : '',
   errorHandler,
   requestInterceptors: [authHeaderInterceptor],
+  responseInterceptors: [resHeaderInterceptor],
   errorConfig: {
     adaptor: (resData) => {
       return {
         ...resData,
+        // success: resData.status == 200 && resData.code != 401,
         success: resData.status == 200,
       };
     },

@@ -24,9 +24,10 @@ const Home: React.FC = () => {
   const [chartsData, setChartsData] = useState<AnalysisData>();
 
 
-  useEffect(async () => {
-    let res = await getHomeData()
-    console.log(res)
+  useEffect( () => {
+    // let res = await getHomeData()
+
+    console.log('我是响应数据！')
   }, [])
 
   const isActive = (type: 'today' | 'week' | 'month' | 'year') => {

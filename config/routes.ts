@@ -39,7 +39,7 @@ export default [
     path: '/merchandise',
     name: '商品管理',
     icon: 'shopping',
-    access: 'canAdmin',
+    // access: 'canAdmin',
     routes: [
       {
         path: '/merchandise/thematic-group',

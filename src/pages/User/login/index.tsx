@@ -27,6 +27,7 @@ const LoginMessage: React.FC<{
 /** 此方法会跳转到 redirect 参数所在的位置 */
 
 const goto = () => {
+  //根据如何进入的登录页做跳转，如果直接进的登陆那么完成后再次跳转到登陆
   if (!history) return;
   setTimeout(() => {
     const { query } = history.location;
@@ -67,7 +68,7 @@ const Login: React.FC = () => {
         return;
       }
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      setUserLoginState(res);
     } catch (error) {
       message.error('登录失败，请重试！');
     }
