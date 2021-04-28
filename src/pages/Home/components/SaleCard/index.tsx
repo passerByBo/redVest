@@ -14,6 +14,16 @@ export interface SaleCartProps extends CardProps {
   color?: string;
   flag?: 'up' | 'down';
   contentStyle?: React.CSSProperties;
+  isFloat?:boolean,
+}
+
+const formatIsFloat = (num:number | React.ReactNode, isFloat:boolean) => {
+  if(typeof num !== 'number' && typeof num !== 'string') return num;
+  if(isFloat) {
+    return numeral(num).format('0,0.00')
+  }
+
+  return numeral(num).format('0,0')
 }
 
 const SaleCard: React.FC<SaleCartProps> = (props) => {
@@ -28,6 +38,7 @@ const SaleCard: React.FC<SaleCartProps> = (props) => {
     contentHeight,
     contentStyle,
     style,
+    isFloat = false,
     ...rest
   } = props;
 
@@ -41,8 +52,8 @@ const SaleCard: React.FC<SaleCartProps> = (props) => {
         <div className={styles.left}>
           <ReactFitText minFontSize={16} maxFontSize={18}><div className={styles.name}>{name}</div></ReactFitText>
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <ReactFitText minFontSize={35} maxFontSize={40}><b className={styles.total}>{numeral(total).format('0,0')}</b> </ReactFitText>
-            <ReactFitText minFontSize={16} maxFontSize={20}><DownOutlined style={{ fontSize: 20 }} /></ReactFitText>
+            <ReactFitText minFontSize={35} maxFontSize={40}><b className={styles.total}>{formatIsFloat(total, isFloat)}</b> </ReactFitText>
+            {/* <ReactFitText minFontSize={16} maxFontSize={20}><DownOutlined style={{ fontSize: 20 }} /></ReactFitText> */}
           </div>
 
         </div>

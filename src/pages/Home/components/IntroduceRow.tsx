@@ -24,12 +24,13 @@ const topColResponsiveProps = {
 
 
 
-const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: { [key: string]: string }[] }) => (
+
+const IntroduceRow = ({ loading, data }: { loading: boolean; data: { [key: string]: number } }) => (
   <Row gutter={24}>
     <Col {...topColResponsiveProps}>
       <SaleCard
         name='今日订单总数'
-        total={20000}
+        total={data.orderNumToday}
         flag='up'
         //'
         icon={<IconTag icon={<ListOutlined style={{ fontSize: 36 }} />} />}
@@ -38,8 +39,9 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: { [
     </Col>
     <Col {...topColResponsiveProps}>
       <SaleCard
+       isFloat={true}
         name='今日销售总额'
-        total={20000}
+        total={data.salesTotalToday}
         flag='up'
         icon={<IconTag icon={<DollarOutlined style={{ fontSize: 44 }} />} />}
         style={{ background: `linear-gradient(180deg,#FA9CB2,#F2637B)` }}
@@ -48,7 +50,8 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: { [
     <Col {...topColResponsiveProps}>
       <SaleCard
         name='昨日销售总额'
-        total={20000}
+        isFloat={true}
+        total={data.salesTotalYesterday}
         flag='up'
         icon={<IconTag icon={<DollarOutlined style={{ fontSize: 44}} />} />}
         style={{ background: `linear-gradient(180deg,#C898F3,#975FE4)` }}
@@ -56,8 +59,9 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: { [
     </Col>
     <Col {...topColResponsiveProps}>
       <SaleCard
+      isFloat={true}
         name='今日新增用户'
-        total={20000}
+        total={data.newUsersToday}
         flag='up'
         icon={<IconTag icon={<UserOutlined style={{ fontSize: 44}} />} />}
         style={{ background: `linear-gradient(180deg,#84E7AB,#4DCB73)` }}

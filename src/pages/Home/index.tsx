@@ -9,6 +9,7 @@ import styles from './style.less';
 import { AnalysisData } from './data.d';
 import { ListOutlined, UpOutlined } from '@/components/icon';
 import { getHomeData } from '@/services/home/home';
+import { useRequest } from 'umi';
 
 
 const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
@@ -20,15 +21,15 @@ const OrderStatistics = React.lazy(() => import('./components/OrderStatistics'))
 
 
 const Home: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [chartsData, setChartsData] = useState<AnalysisData>();
 
 
-  useEffect( () => {
-    // let res = await getHomeData()
+  const { data: homeData, loading } = useRequest(() => {
+    return getHomeData();
+  })
 
-    console.log('我是响应数据！')
-  }, [])
+  console.log('homeData',homeData)
 
   const isActive = (type: 'today' | 'week' | 'month' | 'year') => {
 
@@ -39,13 +40,18 @@ const Home: React.FC = () => {
   }
 
 
+  const introduceRowData = {
+    newUsersToday: homeData && homeData.newUsersToday,
+    orderNumToday: homeData && homeData.orderNumToday,
+    salesTotalToday: homeData && homeData.salesTotalToday,
+    salesTotalYesterday: homeData && homeData.salesTotalYesterday,
+  }
+
   return (
     <GridContent>
-      <>
-        <Suspense fallback={<PageLoading />}>
-          <IntroduceRow loading={loading} visitData={chartsData?.visitData} />
-        </Suspense>
-      </>
+      <Suspense fallback={<PageLoading />}>
+        <IntroduceRow loading={loading} data={introduceRowData} />
+      </Suspense>
 
 
       <Row
@@ -60,7 +66,7 @@ const Home: React.FC = () => {
 
         <Col xl={8} lg={8} md={24} xs={24}>
           <Suspense fallback>
-            <CommissionWithdrawal loading={false} />
+            <CommissionWithdrawal loading={loading} />
           </Suspense>
         </Col>
       </Row>
@@ -71,13 +77,13 @@ const Home: React.FC = () => {
       >
         <Col xl={16} lg={16} md={24} xs={24}>
           <Suspense fallback={null}>
-            <PendingTransaction loading={false} />
+            <PendingTransaction loading={loading} />
           </Suspense>
         </Col>
 
         <Col xl={8} lg={8} md={24} xs={24}>
           <Suspense fallback>
-            <CommodityAnalysis loading={false} />
+            <CommodityAnalysis loading={loading} />
           </Suspense>
         </Col>
       </Row>
@@ -88,7 +94,7 @@ const Home: React.FC = () => {
             <OrderStatistics
               rangePickerValue={null}
               isActive={isActive}
-              loading={false}
+              loading={loading}
               selectDate={selectDate} />
           </Suspense>
         </Col>

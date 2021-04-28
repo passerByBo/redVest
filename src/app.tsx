@@ -63,7 +63,6 @@ export async function getInitialState(): Promise<{
   const fetchUserInfo = async () => {
     try {
       const currentUser = await queryCurrentUser();
-    console.log('请求数据',currentUser)
       return currentUser;
     } catch (error) {
       console.error('请求用户数据baocu',error)
