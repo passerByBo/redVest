@@ -34,21 +34,22 @@ const goto = () => {
     const { redirect } = query as {
       redirect: string;
     };
+    console.log('xxxxxxxxx',redirect)
     history.push(redirect || '/');
   }, 10);
 };
 
 const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState, setUserLoginState] = useState({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
   const [checkPhoneNumber, setPhoneNumber] = useState(false);
 
-  const fetchUserInfo = async (token: string) => {
-    const userInfo = await initialState?.fetchUserInfo?.(token);
+  const fetchUserInfo = async () => {
+    const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
-      setInitialState({ ...initialState, currentUser: userInfo, token });
+      setInitialState({ ...initialState, currentUser: userInfo.data.user});
     }
   };
 
@@ -63,13 +64,14 @@ const Login: React.FC = () => {
         //保存session到本地
         sessionStorage.setItem('token', res.token);
         //请求用户信息包括权限等
-        await fetchUserInfo(res.token);
+        await fetchUserInfo();
         goto();
         return;
       }
       // 如果失败去设置用户错误信息
       setUserLoginState(res);
     } catch (error) {
+      console.log('xxxx', error)
       message.error('登录失败，请重试！');
     }
 

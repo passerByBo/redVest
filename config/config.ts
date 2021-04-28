@@ -5,7 +5,14 @@ import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const { REACT_APP_ENV } = process.env;
+const { REACT_APP_ENV, SERVE_ENV = 'idc' } = process.env;
+
+const serveUrlMap = {
+  dev: 'http://10.10.10.54:8088',
+  pre: '',
+  test: '',
+  idc: 'http://10.10.10.54:8088',
+};
 
 export default defineConfig({
   hash: true,
@@ -44,7 +51,17 @@ export default defineConfig({
   esbuild: {},
   title: false,
   ignoreMomentLocale: true,
-  proxy: proxy[REACT_APP_ENV || 'dev'],
+  proxy: {
+    '/prod-api': {
+      target: serveUrlMap[SERVE_ENV as string],
+      changeOrigin: true,
+    },
+    '/profile': {
+      target: serveUrlMap[SERVE_ENV as string],
+      changeOrigin: true,
+      pathRewrite: { '^/profile': '/prod-api/profile' }
+    },
+  }, //proxy[REACT_APP_ENV || 'dev']
   manifest: {
     basePath: '/',
   },

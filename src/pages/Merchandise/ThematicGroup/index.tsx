@@ -202,7 +202,7 @@ const handleAdd = async (fields) => {
 
   const uploadProps = {
     name: 'file',
-    action: 'http://10.10.10.54:8088/prod-api/mall/common/upload',
+    action: '/prod-api/mall/common/upload',
     headers: {
       Authorization: sessionStorage.getItem('token'),
     },

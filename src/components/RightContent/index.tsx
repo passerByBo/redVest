@@ -5,6 +5,8 @@ import { useModel, SelectLang } from 'umi';
 import Avatar from './AvatarDropdown';
 import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
+import NoticeList from '../NoticeIcon/NoticeList';
+import NoticeIconView from '../NoticeIcon';
 
 export type SiderTheme = 'light' | 'dark';
 
@@ -32,9 +34,21 @@ const GlobalHeaderRight: React.FC = () => {
       <HeaderSearch
         className={`${styles.action} ${styles.search}`}
         placeholder="站内搜索"
-        defaultValue="帮助中心"
+        defaultValue="首页"
         options={[
-          { label: <a href="/help">帮助中心</a>, value: 'help' },
+          { label: <a href="/">我的店铺</a>, value: '我的店铺' },
+          {
+            label: <a href="/">商品管理</a>,
+            value: '商品管理',
+          },
+          {
+            label: <a href="/">订单管理</a>,
+            value: '订单管理',
+          },
+          {
+            label: <a href="/">营销管理</a>,
+            value: '营销管理',
+          },
         ]}
         // onSearch={value => {
         //   console.log('input', value);
@@ -43,19 +57,13 @@ const GlobalHeaderRight: React.FC = () => {
       <span
         className={styles.action}
         onClick={() => {
-          //Xyyw!#hbx.81567
-          window.open('https://www.xyxayf.com:5606/portal/r/w');
+          window.open('https://pro.ant.design/docs/getting-started');
         }}
       >
         <QuestionCircleOutlined />
       </span>
+      <NoticeIconView/>
       <Avatar />
-      {REACT_APP_ENV && (
-        <span>
-          <Tag color={ENVTagColor[REACT_APP_ENV]}>{REACT_APP_ENV}</Tag>
-        </span>
-      )}
-      <SelectLang className={styles.action} />
     </Space>
   );
 };

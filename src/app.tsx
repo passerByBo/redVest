@@ -24,10 +24,29 @@ const noLoginRoute = () => {
     '/user/register',
     '/user/register-result',
   ]
-
   if (nologinArr.includes(pathname)) {
     return true;
   }
+  return false;
+}
+
+
+const noTokenByUrl = (url:string) => {
+  const uriPool = [
+    '/captchaImage',
+    '/login',
+    '/login/getAuthCode/{phoneNumber',
+    '/login/authCode',
+    '/login/account'
+  ]
+
+  for (let i = 0, length = uriPool.length; i < length; i++) {
+    let uri = uriPool[i];
+    if (url.endsWith(uri)) {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -39,14 +58,15 @@ export async function getInitialState(): Promise<{
   token?: string,
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
-  fetchUserInfo?: (token: string) => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
-  const fetchUserInfo = async (token: string) => {
+  const fetchUserInfo = async () => {
     try {
-      const currentUser = await queryCurrentUser(token);
+      const currentUser = await queryCurrentUser();
+    console.log('请求数据',currentUser)
       return currentUser;
     } catch (error) {
-      console.log('取失败')
+      console.error('请求用户数据baocu',error)
       //errorhander报出错误所以导致又回到了登陆
       //可能以任意链接的方式进入到登陆
       //获取用户信息失败跳转到登陆
@@ -63,7 +83,8 @@ export async function getInitialState(): Promise<{
     //不是登录页面从本地获取token，然后获取本地数据，需要根据返回的状态判断当前的token是否有效果
     //如果token失效跳转到登录页
     let token = sessionStorage.getItem('token') || '';
-    const currentUser = await fetchUserInfo(token);
+    const res = await fetchUserInfo();
+    const currentUser = res.data.user;
     return {
       fetchUserInfo,
       currentUser,
@@ -125,7 +146,6 @@ const codeMessage = {
  */
 const errorHandler = (error: ResponseError) => {
   const { response } = error;
-  console.log(JSON.stringify(error));
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
@@ -145,10 +165,11 @@ const errorHandler = (error: ResponseError) => {
   throw error;
 };
 
+
 const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   const authHeader: any = {};
   //给用户添加token
-  if (!noLoginRoute()) {
+  if (!noTokenByUrl(url)) {
     let token = sessionStorage.getItem('token');
     authHeader.Authorization = token;
   }
@@ -168,7 +189,8 @@ const resHeaderInterceptor = (response: Response, options: RequestOptionsInit) =
 
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
-  prefix: isDev ? 'http://10.10.10.54:8088/prod-api' : '',
+  // prefix: isDev ? 'http://10.10.10.54:8088/prod-api' : '',
+  prefix: '/prod-api',
   errorHandler,
   requestInterceptors: [authHeaderInterceptor],
   responseInterceptors: [resHeaderInterceptor],
