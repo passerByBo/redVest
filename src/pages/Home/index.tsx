@@ -59,13 +59,13 @@ const Home: React.FC = () => {
         style={{ marginBottom: 24 }}
       >
         <Col xl={16} lg={16} md={24} xs={24}>
-          <Suspense fallback={null}>
-            <OverviewData loading={false} />
+          <Suspense fallback={() => <div>loading...</div>}>
+            <OverviewData loading={loading} data={homeData && homeData.overviewData}/>
           </Suspense>
         </Col>
 
         <Col xl={8} lg={8} md={24} xs={24}>
-          <Suspense fallback>
+          <Suspense  fallback={() => <div>loading...</div>}>
             <CommissionWithdrawal loading={loading} />
           </Suspense>
         </Col>
@@ -76,13 +76,13 @@ const Home: React.FC = () => {
         style={{ marginBottom: 24 }}
       >
         <Col xl={16} lg={16} md={24} xs={24}>
-          <Suspense fallback={null}>
-            <PendingTransaction loading={loading} />
+          <Suspense  fallback={() => <div>loading...</div>}>
+            <PendingTransaction loading={loading} data={homeData && homeData.pendingTransaction}/>
           </Suspense>
         </Col>
 
         <Col xl={8} lg={8} md={24} xs={24}>
-          <Suspense fallback>
+          <Suspense  fallback={() => <div>loading...</div>}>
             <CommodityAnalysis loading={loading} />
           </Suspense>
         </Col>
@@ -90,7 +90,7 @@ const Home: React.FC = () => {
 
       <Row gutter={24}>
         <Col xl={24} lg={24} md={24} xs={24}>
-          <Suspense fallback={null}>
+          <Suspense  fallback={() => <div>loading...</div>}>
             <OrderStatistics
               rangePickerValue={null}
               isActive={isActive}

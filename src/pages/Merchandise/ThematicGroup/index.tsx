@@ -2,7 +2,7 @@ import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, Form, message, Upload } from 'antd';
+import { Button, Drawer, Form, message, Popconfirm, Upload } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import ProForm, {
   ModalForm,
@@ -14,16 +14,17 @@ import ProForm, {
   ProFormSwitch,
   ProFormDigit
 } from '@ant-design/pro-form';
-import { getThematicGroupList, addThematicGroup } from '@/services/merchandise/thematicGroup';
+import { getThematicGroupList, addThematicGroup, editThematicGroup, getThematicGroupDetail } from '@/services/merchandise/thematicGroup';
 import formatRequestListParams from '@/utils/formatRequestListParams';
+import ProDescriptions from '@ant-design/pro-descriptions';
 type ThematicGroupListItem = {
   id: string,
-  topicName: string,
-  productBrandId: string,
-  isEffective: string,
+  isValid: string,
+  endDate: string,
+  sort: number,
   isShow: string,
-  isRecommented: string,
-  updatedAt: string,
+  specialGroup: string,
+  specialGroupDescribe: string,
   [key: string]: string,
 }
 const waitTime = (time: number = 100) => {
@@ -34,6 +35,43 @@ const waitTime = (time: number = 100) => {
   });
 };
 
+const detailColumns = [
+  {
+    title: 'id',
+    key: 'id',
+    dataIndex: 'id',
+  },
+  {
+    title: '专题组名称',
+    key: 'specialGroup',
+    dataIndex: 'specialGroup',
+  },
+  {
+    title: '开始日期',
+    key: 'specialGroup',
+    dataIndex: 'specialGroup',
+  },
+  {
+    title: '结束日期',
+    key: 'endDate',
+    dataIndex: 'endDate',
+  },
+  {
+    title: '专题组描述',
+    key: 'specialGroupDescribe',
+    dataIndex: 'specialGroupDescribe',
+  },
+  {
+    title: '排序',
+    key: 'sort',
+    dataIndex: 'sort',
+  },
+  {
+    title: '是否有效',
+    key: 'isValid',
+    dataIndex: 'isValid',
+  }
+]
 
 /**
  * 删除节点
@@ -59,6 +97,9 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
   }
 };
 const ThematicGroup: React.FC = () => {
+
+  const [updateForm] = Form.useForm();
+
   /** 新建窗口的弹窗 */
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /** 分布更新窗口的弹窗 */
@@ -66,11 +107,55 @@ const ThematicGroup: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [selectedRowsState, setSelectedRows] = useState<ThematicGroupListItem[]>([]);
   //编辑商品
-  const [editProduct, setEditProduct] = useState<ThematicGroupListItem>();
+  const [editProduct, setEditProduct] = useState<ThematicGroupListItem | null>(null);
+
+  //选择
+  const [currentRow, setCurrentRow] = useState<ThematicGroupListItem | undefined>();
 
 
   const [fileList, setFileList] = useState([]);
 
+  useEffect(() => {
+    if (editProduct) {
+      updateForm.setFieldsValue({ ...initUpdateForm(editProduct) });
+    } else {
+      updateForm.resetFields();
+    }
+  }, [editProduct])
+
+
+  const initUpdateForm = (data: ThematicGroupListItem): object => {
+    if (!data) return {};
+    let newData = { ...data };
+    if (newData.isValid === 'Y') {
+      newData.isValid = true;
+    } else {
+      newData.isValid = false;
+    }
+    delete newData.specialGroupImgBig
+    return newData;
+  }
+
+  const handleDelete = async (data: any) => {
+    const hide = message.loading('正在删除');
+    try {
+      const res = await getThematicGroupDetail(data.id);
+      if (res.status === 200 && res.code === 200) {
+        hide();
+        message.success('删除成功！');
+        if (actionRef.current) {
+          actionRef.current.reload();
+        }
+        return;
+      }
+
+      hide();
+      message.error('删除失败请重试！');
+    } catch (error) {
+      hide();
+      message.error('删除失败请重试！');
+    }
+  }
 
   const columns: ProColumns<ThematicGroupListItem>[] = [
     {
@@ -78,7 +163,7 @@ const ThematicGroup: React.FC = () => {
       dataIndex: 'specialGroup',
       render: ((_, item) => {
         return (
-          <a onClick={() => { setEditProduct(item); setShowDetail(true) }}>{_}</a>
+          <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
         )
       })
     },
@@ -129,20 +214,27 @@ const ThematicGroup: React.FC = () => {
           key="editable"
           onClick={() => {
             // action.startEditable?.(record.id);
-            console.log(text);
+            console.log(record)
+            setEditProduct({ ...record });
+            handleModalVisible(true)
           }}
         >
           编辑
                 </a>,
-        <a
-          key="delete"
-          onClick={() => {
-            console.log(record);
-            // setDataSource(dataSource.filter((item) => item.id !== record.id));
-          }}
+        <Popconfirm
+          placement="topRight"
+          title={'确定要删除' + record.specialGroup + '吗？'}
+          onConfirm={() => { handleDelete(record) }}
+          okText="确认"
+          cancelText="取消"
         >
-          删除
-                </a>,
+          <a
+            key="delete"
+          >
+            删除
+                </a>
+        </Popconfirm>
+
       ],
     },
   ]
@@ -160,44 +252,63 @@ const ThematicGroup: React.FC = () => {
  * @param fields
  */
 
-const handleAdd = async (fields) => {
-  const hide = message.loading('正在添加');
+  const handleAdd = async (fields) => {
+    const hide = message.loading('正在添加');
 
-  if (fields.hasOwnProperty('isValid')) {
-    fields.isValid ? fields.isValid = 'Y' : fields.isValid = 'N'
-  }
+    if (fields.hasOwnProperty('isValid')) {
+      fields.isValid ? fields.isValid = 'Y' : fields.isValid = 'N'
+    }
 
-  //处理上传图片form数据
-  if (fields.hasOwnProperty('specialGroupImgBig')) {
-    const specialGroupImgBig = fields.specialGroupImgBig;
-    console.log(specialGroupImgBig)
-    let picArr:string[] = [];
-    specialGroupImgBig.forEach((proxy) => {
-      if(proxy.status === 'done') {
-        let res = proxy.response;
-        if(res.status === 200){
-          picArr.push(res.fileName)
+    //处理上传图片form数据
+    if (fields.hasOwnProperty('specialGroupImgBig')) {
+      const specialGroupImgBig = fields.specialGroupImgBig;
+      let picArr: string[] = [];
+      specialGroupImgBig.forEach((proxy) => {
+        if (proxy.status === 'done') {
+          let res = proxy.response;
+          if (res.status === 200) {
+            picArr.push(res.fileName)
+          }
         }
+      })
+      fields.specialGroupImgBig = picArr.join(',')
+    }
+    try {
+      let res = await addThematicGroup({ ...fields });
+      if (res.status === 200 && res.code !== 200) {
+        hide();
+        message.error('添加失败请重试！');
+        return false;
       }
-    })
-    fields.specialGroupImgBig = picArr.join(',')
-  }
-  try {
-    let res = await addThematicGroup({ ...fields });
-    if (res.status === 200 && res.code !== 200) {
+      hide();
+      message.success('添加成功');
+      return true;
+    } catch (error) {
       hide();
       message.error('添加失败请重试！');
       return false;
     }
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
+  };
+
+  const handleEdit = async (fields) => {
+    const hide = message.loading('正在编辑');
+    fields.id = (editProduct as any).id;
+    try {
+      let res = await editThematicGroup({ ...fields });
+      if (res.status === 200 && res.code !== 200) {
+        hide();
+        message.error('编辑失败请重试！');
+        return false;
+      }
+      hide();
+      message.success('编辑成功');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('编辑失败请重试！');
+      return false;
+    }
+  };
 
 
   const uploadProps = {
@@ -211,7 +322,7 @@ const handleAdd = async (fields) => {
   const uploadButton = (
     <div>
       <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
+      <div style={{ marginTop: 8 }}>上传</div>
     </div>
   );
 
@@ -243,7 +354,7 @@ const handleAdd = async (fields) => {
       >
       </ProTable>
       {
-        selectedRowsState?.length > 0 && (
+        false && selectedRowsState?.length > 0 && (
           <FooterToolbar
             extra={
               <div>
@@ -274,17 +385,26 @@ const handleAdd = async (fields) => {
         )
       }
       <ModalForm
-        omitNil={true}
-        initialValues={{ isValid: false }}
-        title='新建专题组'
+        form={updateForm}
+        // initialValues={editProduct || { isValid: false }}
+        title={editProduct ? editProduct.specialGroup : '新建专题组'}
         visible={createModalVisible}
-        onVisibleChange={handleModalVisible}
+        onVisibleChange={(visible) => {
+          if (!visible) {
+            setEditProduct(null);
+          }
+          handleModalVisible(visible)
+        }}
         onFinish={async (value) => {
-          const success = await handleAdd(value);
-
+          let success;
+          if (editProduct) {
+            success = await handleEdit(value);
+          } else {
+            success = await handleAdd(value);
+          }
           if (success) {
+            setEditProduct(null);
             handleModalVisible(false);
-
             if (actionRef.current) {
               actionRef.current.reload();
             }
@@ -308,7 +428,7 @@ const handleAdd = async (fields) => {
           extra="建议图片大小不超过250kb"
         >
           <Upload {...uploadProps}
-          showUploadList={{ showPreviewIcon: false }}
+            showUploadList={{ showPreviewIcon: false }}
             listType="picture-card"
             fileList={fileList}
             onChange={handleChange}>
@@ -327,55 +447,28 @@ const handleAdd = async (fields) => {
         </ProForm.Group>
       </ModalForm>
 
-
-
-      <DrawerForm
+      <Drawer
+      title={ '专题组详情'}
+        width={700}
         visible={showDetail}
-        title={editProduct ? editProduct.productName : '专题组'}
-        onVisibleChange={setShowDetail}
-        onFinish={async () => {
-          await waitTime(2000)
-          message.success('提交成功');
-          return true;
+        onClose={() => {
+          setCurrentRow(undefined);
+          setShowDetail(false);
         }}
-        submitter={{
-          render: (props, defaultDoms) => {
-            return [
-              <Button
-                key="save"
-                type="primary"
-                onClick={() => {
-                  props.submit();
-                }}
-              >
-                保存
-                             </Button>
-            ];
-          },
-        }}
+        closable={false}
       >
-        <ProForm.Group>
-          <ProFormText width="md" name="name" label="专题组" placeholder="请输入名称" />
-        </ProForm.Group>
-
-        <ProFormSwitch name="isShow" label="是否有效" />
-
-        <ProForm.Group>
-          <ProFormText width="md" name="contract" label="排序" placeholder="请输入名称" />
-        </ProForm.Group>
-
-        <ProFormUploadDragger max={4} label="专题组图片" name="productsPics" />
-
-        <ProForm.Group>
-          <ProFormDatePicker name="date" label="开始日期" />
-          <ProFormDatePicker name="date" label="结束日期" />
-        </ProForm.Group>
-
-        <ProForm.Group>
-          <ProFormTextArea width="xl" label="专题组描述" name="remark" />
-        </ProForm.Group>
-
-      </DrawerForm>
+        {currentRow?.specialGroup && (
+          <ProDescriptions<API.RuleListItem>
+            column={2}
+            title={currentRow?.specialGroup}
+            request={getThematicGroupDetail}
+            params={{
+              id: currentRow?.id,
+            }}
+            columns={detailColumns as ThematicGroupListItem[]}
+          />
+        )}
+      </Drawer>
     </PageContainer>
   )
 }

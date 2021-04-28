@@ -20,6 +20,9 @@ const loginOut = async () => {
   const { redirect } = query;
   // Note: There may be security issues, please note
   if (window.location.pathname !== '/user/login' && !redirect) {
+
+    sessionStorage.removeItem('token')
+
     history.replace({
       pathname: '/user/login',
       search: stringify({
@@ -67,7 +70,6 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu=true }) => {
   }
 
   const { currentUser } = initialState;
-  console.log(currentUser, '|')
 
   if (!currentUser || !currentUser.userName) {
     return loading;

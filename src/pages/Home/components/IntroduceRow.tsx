@@ -59,7 +59,6 @@ const IntroduceRow = ({ loading, data }: { loading: boolean; data: { [key: strin
     </Col>
     <Col {...topColResponsiveProps}>
       <SaleCard
-      isFloat={true}
         name='今日新增用户'
         total={data.newUsersToday}
         flag='up'

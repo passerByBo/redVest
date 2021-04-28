@@ -15,7 +15,17 @@ export interface OverviewDataProps {
 }
 
 
-const OverviewData: React.FC<OverviewDataProps> = () => {
+const OverviewData: React.FC<OverviewDataProps> = (props) => {
+
+  const { data , loading } = props;
+
+
+  let commodity, user;
+
+  if(data){
+    commodity = data.commodity;
+    user = data.user;
+  }
 
   return (
     <Card loading={false}
@@ -25,7 +35,6 @@ const OverviewData: React.FC<OverviewDataProps> = () => {
         height: '100%',
       }}
     >
-
       <div className={styles.overviewContent}>
         <div className={classnames(styles.overviewItem, styles.bottomLine)}>
           <div className={styles.overviewItemTitle}>
@@ -36,44 +45,44 @@ const OverviewData: React.FC<OverviewDataProps> = () => {
           </div>
           <div className={styles.overviewItemColumn}>
             <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <b className={styles.text}>{commodity && numeral(commodity.shelves).format('0,0')}</b>
           </div>
           <div className={styles.overviewItemColumn}>
-            <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <div className={styles.name}>下架商品</div>
+            <b className={styles.text}>{commodity &&numeral(commodity.soldOut).format('0,0')}</b>
           </div>
           <div className={styles.overviewItemColumn}>
-            <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <div className={styles.name}>库存紧张</div>
+            <b className={styles.text}>{commodity &&numeral(commodity.shortStock).format('0,0')}</b>
           </div>
           <div className={styles.overviewItemColumn}>
-            <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <div className={styles.name}>全部商品</div>
+            <b className={styles.text}>{commodity && numeral(commodity.all).format('0,0')}</b>
           </div>
         </div>
 
         <div className={styles.overviewItem}>
           <div className={styles.overviewItemTitle}>
             <IconBg color='#4DCB73, #84E7AB' size={32}>
-              <UserOutlined style={{ size: 25, color: 'white' }} />
+              <UserOutlined style={{ fontSize: 25, color: 'white' }} />
             </IconBg>
             <span style={{ marginLeft: 15 }}>用户总览</span>
           </div>
           <div className={styles.overviewItemColumn}>
-            <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <div className={styles.name}>今日新增</div>
+            <b className={styles.text}>{user && numeral(user.tody).format('0,0')}</b>
           </div>
           <div className={styles.overviewItemColumn}>
-            <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <div className={styles.name}>昨日新增</div>
+            <b className={styles.text}>{user && numeral(user.yesterday).format('0,0')}</b>
           </div>
           <div className={styles.overviewItemColumn}>
-            <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <div className={styles.name}>本月新增</div>
+            <b className={styles.text}>{user && numeral(user.currentMonth).format('0,0')}</b>
           </div>
           <div className={styles.overviewItemColumn}>
-            <div className={styles.name}>上架商品</div>
-            <b className={styles.text}>1000</b>
+            <div className={styles.name}>会员总数</div>
+            <b className={styles.text}>{user && numeral(user.all).format('0,0')}</b>
           </div>
         </div>
       </div>

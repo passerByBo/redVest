@@ -13,7 +13,8 @@ import numeral from 'numeral';
 import classnames from 'classnames';
 
 import styles from '../style.less';
-const PendingTransaction: React.FC = () => {
+const PendingTransaction: React.FC<{loading:boolean, data:{[key:string]: any}}> = (props) => {
+  const {loading, data} = props;
   return (
     <Card
       loading={false}
@@ -32,7 +33,7 @@ const PendingTransaction: React.FC = () => {
             </IconBg>
             <div className={classnames(styles.flexColumn, styles.wrap)}>
               <span className={styles.name}>待付款订单</span>
-              <b className={styles.text}>10</b>
+              <b className={styles.text}>{data && numeral(data.pendingPayOrder).format('0,0')}</b>
             </div>
           </div>
 
@@ -42,7 +43,7 @@ const PendingTransaction: React.FC = () => {
             </IconBg>
             <div className={classnames(styles.flexColumn, styles.wrap)}>
               <span className={styles.name}>待发货订单</span>
-              <b className={styles.text}>10</b>
+              <b className={styles.text}>{data && numeral(data.pendingShipOrder).format('0,0')}</b>
             </div>
           </div>
 
@@ -52,7 +53,7 @@ const PendingTransaction: React.FC = () => {
             </IconBg>
             <div className={classnames(styles.flexColumn, styles.wrap)}>
               <span className={styles.name}>已完成订单</span>
-              <b className={styles.text}>10</b>
+              <b className={styles.text}>{data && numeral(data.completedOrder).format('0,0')}</b>
             </div>
           </div>
         </div>
@@ -64,7 +65,7 @@ const PendingTransaction: React.FC = () => {
             </IconBg>
             <div className={classnames(styles.flexColumn, styles.wrap)}>
               <span className={styles.name}>新缺货登记</span>
-              <b className={styles.text}>10</b>
+              <b className={styles.text}>{data && numeral(data.outStockRegistration).format('0,0')}</b>
             </div>
           </div>
 
@@ -74,7 +75,7 @@ const PendingTransaction: React.FC = () => {
             </IconBg>
             <div className={classnames(styles.flexColumn, styles.wrap)}>
               <span className={styles.name}>待处理退款申请</span>
-              <b className={styles.text}>10</b>
+              <b className={styles.text}>{data && numeral(data.pendingRefund).format('0,0')}</b>
             </div>
           </div>
 
@@ -84,7 +85,7 @@ const PendingTransaction: React.FC = () => {
             </IconBg>
             <div className={classnames(styles.flexColumn, styles.wrap)}>
               <span className={styles.name}>待确认收货订单</span>
-              <b className={styles.text}>10</b>
+              <b className={styles.text}>{data && numeral(data.tobeConfirmedOrder).format('0,0')}</b>
             </div>
           </div>
         </div>
