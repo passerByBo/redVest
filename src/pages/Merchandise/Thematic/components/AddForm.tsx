@@ -1,17 +1,12 @@
-import React, { useEffect } from 'react';
-import { Form, Modal } from 'antd';
+import React from 'react';
+import { Form} from 'antd';
 import ProForm, {
-  ProFormSelect,
   ProFormText,
   ProFormTextArea,
-  StepsForm,
-  ProFormRadio,
-  ProFormDateTimePicker,
   ModalForm,
   ProFormSwitch,
   ProFormDigit,
 } from '@ant-design/pro-form';
-import { useIntl } from 'umi';
 
 export type FormValueType = {
   id?: string;
@@ -30,46 +25,31 @@ export type FormValueType = {
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (fiedls:FormValueType) => {};
-  updateModalVisible: boolean;
-  values: FormValueType | null;
+  addModalVisible: boolean;
 };
 
-const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
-  const [updateForm] = Form.useForm();
-  const { values, updateModalVisible, onSubmit, onCancel } = props;
-
-
-  if (values) {
-    //转换是否有效果
-    if (values.isValid === 'Y') {
-      values.isValid = true;
-    } else {
-      values.isValid = false;
-    }
-    updateForm.setFieldsValue(values)
-  }
-
-
+const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
+  const [addForm] = Form.useForm();
+  const {  addModalVisible, onSubmit, onCancel } = props;
 
   return (
     <ModalForm
-      form={updateForm}
-      title={values && values.specialName}
-      visible={updateModalVisible}
+      form={addForm}
+      title={'新增专题'}
+      visible={addModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
           onCancel(false)
         }
       }}
       onFinish={async (data) => {
-
-        const merge = { ...values, ...data }
-        if (merge.isValid === true) {
-          merge.isValid = 'Y';
+        const fields = {  ...data }
+        if (fields.isValid === true) {
+          fields.isValid = 'Y';
         } else {
-          merge.isValid = 'N';
+          fields.isValid = 'N';
         }
-        onSubmit(merge);
+        onSubmit(fields);
       }}
     >
       <ProForm.Group>
@@ -98,4 +78,4 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
   );
 });
 
-export default UpdateForm;
+export default AddForm;

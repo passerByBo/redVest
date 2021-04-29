@@ -50,3 +50,11 @@ export async function getThematicGroupDetail(params:{id:string},options?: { [key
   });
 }
 
+
+export async function deleteThematicGroup(id:string,options?: { [key: string]: any }){
+  return request(`/product/specialGroup/${id}`, {
+    method: 'DELETE',
+    ...(options || {}),
+  });
+}
+

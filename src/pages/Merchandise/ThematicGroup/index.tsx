@@ -1,8 +1,8 @@
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { EyeOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, Drawer, Form, message, Popconfirm, Upload } from 'antd';
+import { Button, Drawer, Form, message, Popconfirm, Upload,Image } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import ProForm, {
   ModalForm,
@@ -14,7 +14,7 @@ import ProForm, {
   ProFormSwitch,
   ProFormDigit
 } from '@ant-design/pro-form';
-import { getThematicGroupList, addThematicGroup, editThematicGroup, getThematicGroupDetail } from '@/services/merchandise/thematicGroup';
+import { getThematicGroupList, addThematicGroup, editThematicGroup, getThematicGroupDetail, deleteThematicGroup } from '@/services/merchandise/thematicGroup';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import ProDescriptions from '@ant-design/pro-descriptions';
 type ThematicGroupListItem = {
@@ -139,7 +139,7 @@ const ThematicGroup: React.FC = () => {
   const handleDelete = async (data: any) => {
     const hide = message.loading('正在删除');
     try {
-      const res = await getThematicGroupDetail(data.id);
+      const res = await deleteThematicGroup(data.id);
       if (res.status === 200 && res.code === 200) {
         hide();
         message.success('删除成功！');
@@ -183,7 +183,15 @@ const ThematicGroup: React.FC = () => {
       title: '专题组图片',
       dataIndex: 'specialGroupImgBig',
       search: false,
-      valueType: 'textarea',
+      render: (_, record) => {
+        return (
+          <Image
+            preview={{ mask: <EyeOutlined /> }}
+            width={40}
+            src={_ as string}
+          />
+        )
+      }
     },
     {
       title: '开始日期',
