@@ -32,7 +32,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         values,
     } = props;
 
-    const itemKey = { key: values.key };
+    const itemKey = { id: values.id };
 
     const [form] = Form.useForm();
 
@@ -66,13 +66,13 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                 {...formLayout}
                 form={form}
                 initialValues={{
-                    articleName: values.articleName,
-                    desc: values.desc,
+                    type: values.type,
+                    journalismDescribe: values.journalismDescribe,
                 }}
             >
                 <FormItem
                     label="分类名称"
-                    name="articleName"
+                    name="type"
                     rules={[
                         {
                             required: true, message: '请输入规则名称！'
@@ -83,7 +83,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                 </FormItem>
                 <FormItem
                     label="描述"
-                    name="desc"
+                    name="journalismDescribe"
                     rules={[{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }]}
                 >
                     <Input.TextArea rows={4} placeholder="请输入描述内容" />

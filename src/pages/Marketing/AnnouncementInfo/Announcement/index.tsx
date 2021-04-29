@@ -10,6 +10,9 @@ import { queryRule, updateRule, addRule, removeRule } from './service';
 import AddModal from './components/AddModal'
 import UpdateModal from './components/UpdateModal'
 
+import { getArticleSortList } from '@/services/marketing/announcement';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+
 /**
  * 添加节点
  *
@@ -180,7 +183,7 @@ const Announcement: React.FC = () => {
                         <PlusOutlined /> 新建
                     </Button>,
                 ]}
-                request={(params) => queryRule({ ...params })}
+                request={formatRequestListParams(getArticleSortList)}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => setSelectedRows(selectedRows),

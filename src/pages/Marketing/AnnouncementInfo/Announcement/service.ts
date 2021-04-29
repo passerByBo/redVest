@@ -2,8 +2,11 @@ import request from 'umi-request';
 import type { TableListParams } from './data.d';
 
 export async function queryRule(params?: TableListParams) {
-    return request('/api/announcement', {
-        params,
+    return request('/marketing/journalismType/list', {
+        method: 'GET',
+        params: {
+            ...params,
+        },
     });
 }
 

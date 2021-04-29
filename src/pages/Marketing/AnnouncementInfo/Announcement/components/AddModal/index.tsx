@@ -10,21 +10,12 @@ export interface AddModalProps {
     onFinish: Function;
 }
 
-const waitTime = (time: number = 100) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(true);
-        }, time);
-    });
-};
-
 const AddModal: React.FC<AddModalProps> = (props) => {
 
     const [form] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
 
     const handleFinish = async () => {
-        await waitTime(2000);
         const values = await form.validateFields();
         onFinish(values);
     }

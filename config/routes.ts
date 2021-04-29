@@ -159,7 +159,7 @@ export default [
     path: '/customer',
     name: '客户管理',
     icon: 'user',
-    access: 'canAdmin',
+    // access: 'canAdmin',
     routes: [
       {
         path: '/customer/certification',

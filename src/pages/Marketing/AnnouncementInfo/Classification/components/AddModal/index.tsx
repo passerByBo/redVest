@@ -51,7 +51,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
             >
                 <FormItem
                     label="分类名称"
-                    name="articleName"
+                    name="type"
                     rules={[
                         {
                             required: true
@@ -62,19 +62,19 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                 </FormItem>
                 <FormItem
                     label="上级分类名称"
-                    name="parentTypeName"
+                    name="parentType"
                 >
                     <Input placeholder="请输入上级分类名称" allowClear />
                 </FormItem>
                 <FormItem
                     label="级别"
-                    name="sortLevel"
+                    name="typeLevel"
                 >
                     <Input placeholder="请输入级别" allowClear />
                 </FormItem>
                 <FormItem
                     label="描述"
-                    name="desc"
+                    name="journalismDescribe"
                 >
                     <Input.TextArea rows={4} placeholder="请输入描述内容" />
                 </FormItem>
@@ -86,13 +86,13 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                 </FormItem>
                 <FormItem
                     label="关键字"
-                    name="keywords"
+                    name="keyword"
                 >
                     <Input placeholder="请输入关键字" allowClear />
                 </FormItem>
                 <FormItem
                     label="是否在导航栏显示"
-                    name="isShow"
+                    name="isRecommend"
                 >
                     <Select>
                         <Option value="0">是</Option>
