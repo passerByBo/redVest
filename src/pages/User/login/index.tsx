@@ -63,7 +63,8 @@ const Login: React.FC = () => {
         //保存session到本地
         sessionStorage.setItem('token', res.token);
         //请求用户信息包括权限等
-        await fetchUserInfo();
+       let a =  await fetchUserInfo();
+       console.log('aaaaaaaa', a)
         goto();
         return;
       }

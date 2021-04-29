@@ -31,7 +31,7 @@ const noLoginRoute = () => {
 }
 
 
-const noTokenByUrl = (url:string) => {
+const noTokenByUrl = (url: string) => {
   const uriPool = [
     '/captchaImage',
     '/login',
@@ -60,12 +60,12 @@ export async function getInitialState(): Promise<{
   currentUser?: API.CurrentUser;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
+
   const fetchUserInfo = async () => {
     try {
       const currentUser = await queryCurrentUser();
       return currentUser;
     } catch (error) {
-      console.error('请求用户数据baocu',error)
       //errorhander报出错误所以导致又回到了登陆
       //可能以任意链接的方式进入到登陆
       //获取用户信息失败跳转到登陆
@@ -73,7 +73,6 @@ export async function getInitialState(): Promise<{
       if (!noLoginRoute()) {
         history.push('/user/login');
       }
-
     }
     return undefined;
   };
@@ -82,8 +81,15 @@ export async function getInitialState(): Promise<{
     //不是登录页面从本地获取token，然后获取本地数据，需要根据返回的状态判断当前的token是否有效果
     //如果token失效跳转到登录页
     let token = sessionStorage.getItem('token') || '';
-    const res = await fetchUserInfo();
-    const currentUser = res.data.user;
+    let currentUser = null;
+    try {
+      const res = await fetchUserInfo();
+      currentUser = res.data.user;
+    } catch(e) {
+      console.log('e', e)
+      console.log('token失效后刷新某个非登录页面会走这里')
+    }
+
     return {
       fetchUserInfo,
       currentUser,
@@ -154,6 +160,9 @@ const errorHandler = (error: ResponseError) => {
       description: errorText,
     });
   }
+
+
+  console.log(response, 'response')
 
   if (!response) {
     notification.error({
