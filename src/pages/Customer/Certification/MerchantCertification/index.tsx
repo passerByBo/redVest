@@ -5,6 +5,8 @@ import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import { Modal, Input, Form, Select, Table, Card, Button } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
+import { getMerchantCertificateList } from '@/services/customer/index';
+import formatRequestListParams from '@/utils/formatRequestListParams';
 import type { MerchantCertificationListItem } from './data';
 import FlowStep from './components/FlowStep';
 import AddModal from './components/AddModal';
@@ -41,7 +43,7 @@ const MerchantCertification: React.FC = () => {
         },
         {
             title: '标题',
-            dataIndex: 'name',
+            dataIndex: 'title',
             valueType: 'textarea'
         },
         {
@@ -122,7 +124,7 @@ const MerchantCertification: React.FC = () => {
                             <PlusOutlined /> 新建
                         </Button>,
                     ]}
-                    request={rule}
+                    request={formatRequestListParams(getMerchantCertificateList)}
                     columns={columns}
                     rowSelection={{
                         onChange: (_, selectedRows) => {

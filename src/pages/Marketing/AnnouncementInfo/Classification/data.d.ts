@@ -1,18 +1,18 @@
 export type TableListItem = {
-    key: number;
-    articleName: string;
-    desc: string;
-    sortLevel: string;
-    parentTypeName: string;
+    id: string;
+    type: string;
+    journalismDescribe: string;
+    typeLevel: string;
+    parentType: string;
     sort: string;
-    isShow: string;
-    keywords: string;
+    isRecommend: string;
+    keyword: string;
 };
 
 export type TableListParams = {
     articleName?: string;
     desc?: string;
-    key?: number;
+    key?: string;
     pageSize?: number;
     currentPage?: number;
 };

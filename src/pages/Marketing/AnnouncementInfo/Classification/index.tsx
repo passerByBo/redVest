@@ -6,9 +6,10 @@ import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import type { TableListItem } from './data.d';
 import type { FormValueType } from './components/UpdateModal';
-import { queryRule, updateRule, addRule, removeRule } from './service';
 import AddModal from './components/AddModal'
 import UpdateModal from './components/UpdateModal'
+import { getArticleSortList, addArticleSortList, removeRule, updateRule } from '@/services/marketing/articleSort';
+import formatRequestListParams from '@/utils/formatRequestListParams';
 
 /**
  * 添加节点
@@ -18,13 +19,13 @@ import UpdateModal from './components/UpdateModal'
 const handleAdd = async (fields: TableListItem) => {
     const hide = message.loading('正在添加');
     try {
-        await addRule({ ...fields });
+        await addArticleSortList({ ...fields });
         hide();
         message.success('添加成功');
         return true;
     } catch (error) {
         hide();
-        message.error('添加失败请重试！');
+        message.error('添加失败！');
         return false;
     }
 };
@@ -35,19 +36,19 @@ const handleAdd = async (fields: TableListItem) => {
  * @param fields
  */
 const handleUpdate = async (fields: FormValueType) => {
-    const hide = message.loading('正在配置');
+    const hide = message.loading('正在更新');
     try {
         await updateRule({
-            articleName: fields.articleName,
-            desc: fields.desc,
-            key: fields.key,
+            type: fields.type,
+            journalismDescribe: fields.journalismDescribe,
+            id: fields.id,
         });
         hide();
-        message.success('配置成功');
+        message.success('更新成功');
         return true;
     } catch (error) {
         hide();
-        message.error('配置失败请重试！');
+        message.error('更新失败！');
         return false;
     }
 };
@@ -59,77 +60,61 @@ const handleUpdate = async (fields: FormValueType) => {
  */
 const handleRemove = async (selectedRows: TableListItem[]) => {
     const hide = message.loading('正在删除');
-    if (!selectedRows) return true;
     try {
         await removeRule({
-            key: selectedRows.map((row) => row.key),
+            ids: selectedRows.map((row) => row.id).join(','),
         });
         hide();
-        message.success('删除成功，即将刷新');
+        message.success('删除成功');
         return true;
     } catch (error) {
         hide();
-        message.error('删除失败，请重试');
+        message.error('删除失败！');
         return false;
     }
 };
 
 
 const Classification: React.FC = () => {
-
     const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-
     const [formValues, setFormValues] = useState({});
-
     const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
     const actionRef = useRef<ActionType>();
 
-    const onFinish = (newData: TableListItem) => {
-        handleAdd(newData);
-        if (actionRef.current) {
-            actionRef.current.reload();
-        }
+    const confirmAdd = (newData: TableListItem) => {
         setAddModalVisible(false);
+        handleAdd(newData);
+        actionRef.current?.reloadAndRest?.();
     };
 
-    const removeSingleRow = (itemData: TableListItem) => {
-        const keys: number[] = [itemData.key];
-        removeRule({
-            key: keys,
-        });
-        message.success('删除成功，即将刷新');
+    const removeSingleRow = (selectedRows: TableListItem[]) => {
+        handleRemove(selectedRows)
+        setSelectedRows([]);
         actionRef.current?.reloadAndRest?.();
     }
 
-
     const columns: ProColumns<TableListItem>[] = [
         {
-            title: '序号',
-            dataIndex: 'key',
-            valueType: 'index',
-            search: false,
-        },
-        {
             title: '文章分类名称',
-            dataIndex: 'articleName',
+            dataIndex: 'type',
             valueType: 'textarea',
         },
         {
             title: '描述',
-            dataIndex: 'desc',
+            dataIndex: 'journalismDescribe',
             valueType: 'textarea',
             search: false,
         },
         {
             title: '分类级别',
-            dataIndex: 'sortLevel',
+            dataIndex: 'typeLevel',
             valueType: 'textarea',
             search: false,
         },
         {
             title: '上级分类名称',
-            dataIndex: 'parentTypeName',
+            dataIndex: 'parentType',
             valueType: 'textarea',
         },
         {
@@ -140,13 +125,13 @@ const Classification: React.FC = () => {
         },
         {
             title: '是否显示在导航栏',
-            dataIndex: 'isShow',
+            dataIndex: 'isRecommend',
             valueType: 'textarea',
             search: false,
         },
         {
             title: '关键字',
-            dataIndex: 'keywords',
+            dataIndex: 'keyword',
             valueType: 'textarea',
         },
         {
@@ -158,7 +143,7 @@ const Classification: React.FC = () => {
                     setUpdateModalVisible(true);
                     setFormValues(record);
                 }}>编辑</a>,
-                <a onClick={() => removeSingleRow(record)}>删除</a>
+                <a onClick={() => removeSingleRow([record])}>删除</a>
             ],
         },
     ]
@@ -170,7 +155,8 @@ const Classification: React.FC = () => {
         >
             <ProTable<TableListItem>
                 actionRef={actionRef}
-                rowKey="key"
+                options={{ search: false, fullScreen: false, reload: true, setting: false, density: false }}
+                rowKey="id"
                 search={{
                     labelWidth: 120,
                 }}
@@ -185,7 +171,7 @@ const Classification: React.FC = () => {
                         <PlusOutlined /> 新建
                      </Button>,
                 ]}
-                request={(params) => queryRule({ ...params })}
+                request={formatRequestListParams(getArticleSortList)}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => setSelectedRows(selectedRows),
@@ -200,10 +186,8 @@ const Classification: React.FC = () => {
                     }
                 >
                     <Button
-                        onClick={async () => {
-                            await handleRemove(selectedRowsState);
-                            setSelectedRows([]);
-                            actionRef.current?.reloadAndRest?.();
+                        onClick={() => {
+                            removeSingleRow(selectedRowsState);
                         }}
                     >
                         批量删除
@@ -213,11 +197,10 @@ const Classification: React.FC = () => {
             )}
             <AddModal
                 visible={addModalVisible}
-                onFinish={onFinish}
+                onFinish={confirmAdd}
                 onCancel={() => setAddModalVisible(false)} />
             <UpdateModal
                 onSubmit={async (value) => {
-                    console.log('UpdateModal', value);
                     const success = await handleUpdate(value);
                     if (success) {
                         setUpdateModalVisible(false);
