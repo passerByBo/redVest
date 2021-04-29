@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
-import { notification } from 'antd';
+import { Modal, notification } from 'antd';
 import { RequestConfig, RunTimeLayoutConfig, useModel } from 'umi';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
@@ -9,7 +9,9 @@ import Footer from '@/components/Footer';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
 import { queryCurrentUser } from '@/services/user/userInfo';
 import logo from '../public/logo_white.png';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 const isDev = process.env.NODE_ENV === 'development';
+import { stringify } from 'querystring'
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -85,9 +87,8 @@ export async function getInitialState(): Promise<{
     try {
       const res = await fetchUserInfo();
       currentUser = res.data.user;
-    } catch(e) {
-      console.log('e', e)
-      console.log('token失效后刷新某个非登录页面会走这里')
+    } catch (e) {
+      //console.log('token失效后刷新某个非登录页面会走这里')
     }
 
     return {
@@ -145,13 +146,41 @@ const codeMessage = {
   504: '网关超时。',
 };
 
+const pageLoginExpired = () => {
+  Modal.confirm({
+    title: '重新登录',
+    icon: <ExclamationCircleOutlined />,
+    content: '当前登陆状态已经过期是否重新登录？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk: () => {
+      const { query = {}, pathname } = history.location;
+      const { redirect } = query;
+      if (window.location.pathname !== '/user/login' && !redirect) {
+        sessionStorage.removeItem('token')
+        history.replace({
+          pathname: '/user/login',
+          search: stringify({
+            redirect: pathname,
+          }),
+        });
+      }
+    },
+  });
+}
+
+
 /** 异常处理程序
  * @see https://beta-pro.ant.design/docs/request-cn
  * 目前存在的问题是只要出现这类错误都会将页面跳转到登录页，需要排查
  */
 const errorHandler = (error: ResponseError) => {
   const { response } = error;
-  if (response && response.status) {
+  if (response && response.status === 401 && !response.url.includes('/prod-api/getInfo')) {
+    //代表是请求用户信息接口出错已经处理直接跳转
+    //其他接口401提醒用户是否重新登陆
+    pageLoginExpired();
+  } else if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
 
@@ -161,8 +190,7 @@ const errorHandler = (error: ResponseError) => {
     });
   }
 
-
-  console.log(response, 'response')
+  console.log('res', response)
 
   if (!response) {
     notification.error({
@@ -189,6 +217,9 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
 
 
 const resHeaderInterceptor = (response: Response, options: RequestOptionsInit) => {
+  //处理401登陆过期问题
+  if (response.status === 401) { }
+  console.log('response', response)
   return response;
 }
 
