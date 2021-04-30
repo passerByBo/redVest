@@ -1,15 +1,52 @@
 import { getThematicDetail } from '@/services/merchandise/thematic';
 import ProDescriptions from '@ant-design/pro-descriptions';
-import { Drawer, Image } from 'antd';
-import React from 'react';
+import { Drawer, Image, Table } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { ProductListItem } from '..';
 import { useRequest } from 'umi';
 import { EyeOutlined } from '@ant-design/icons';
+import { ProColumns } from '@ant-design/pro-table';
 interface IDetailDrawerProps {
   detailVisible?: boolean;
   data?: ProductListItem | null
   onCancel: () => void
 }
+
+export interface IProduct {
+  productBrand: string;
+  shopname: string;
+  productStatus: string;
+  productNo: string;
+  productName: string;
+  specialId: string;
+}
+
+type productArr = {
+  specialProductInfoList: IProduct[];
+}
+
+const tableColumns:ProColumns<IProduct>[] = [
+  {
+    title: '商铺名称',
+    dataIndex: 'shopname',
+  },
+  {
+    title: '商品名称',
+    dataIndex: 'productName',
+  },
+  {
+    title: '商品货号',
+    dataIndex: 'productNo',
+  },
+  {
+    title: '商品品牌',
+    dataIndex: 'productBrand',
+  },
+  {
+    title: '商品状态',
+    dataIndex: 'productStatus',
+  }
+]
 
 const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
 
@@ -97,14 +134,24 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
     },
   ]
 
-  const { detailVisible, data ,onCancel} = props;
+  const { detailVisible, data, onCancel } = props;
+  const [dataSource, setDataSource] = useState<(ProductListItem & productArr) | null>()
+  const { loading, run } = useRequest(getThematicDetail.bind(null, { id: (data as ProductListItem).id }), {
+    manual: true,
+    onSuccess: (result, params) => {
+      setDataSource(result)
+    }
+  })
 
-  //由于上个页面已经执行了初始化操作，在上个页面这里未显示的情况下会导致提前执行
-  //不可使用useMemo+React.memo的方式进行初始化，因为React.memo里面不能使用useRequest
-  //现有问题每次进来不重新请求
-  const { data: dataSource, error, loading } = useRequest(() => {
-    return getThematicDetail({ id: (data as ProductListItem).id });
-  });
+
+  useEffect(() => {
+    if (detailVisible) {
+      run();
+    }
+  }, [detailVisible])
+
+
+
 
 
   return (
@@ -125,6 +172,14 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
         columns={detailColumns}
       />
 
+      <Table
+        columns={tableColumns}
+        rowKey={record => record.specialId}
+        dataSource={dataSource?.specialProductInfoList}
+        pagination={false}
+        loading={loading}
+        bordered
+      />
 
     </Drawer>
   )

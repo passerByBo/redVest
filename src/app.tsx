@@ -217,9 +217,6 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
 
 
 const resHeaderInterceptor = (response: Response, options: RequestOptionsInit) => {
-  //处理401登陆过期问题
-  if (response.status === 401) { }
-  console.log('response', response)
   return response;
 }
 
