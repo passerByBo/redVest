@@ -3,8 +3,8 @@ import { Form, Button, Input, Modal } from 'antd';
 import type { TableListItem } from '../../data.d';
 
 export type FormValueType = {
-    articleName?: string;
-    articleTitle?: string;
+    type?: string;
+    title?: string;
 } & Partial<TableListItem>;
 
 export type UpdateFormProps = {
@@ -32,7 +32,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         values,
     } = props;
 
-    const itemKey = { key: values.key };
+    const itemKey = { id: values.id };
 
     const [form] = Form.useForm();
 
@@ -66,13 +66,13 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                 {...formLayout}
                 form={form}
                 initialValues={{
-                    articleName: values.articleName,
-                    desc: values.articleTitle,
+                    type: values.type,
+                    title: values.title,
                 }}
             >
                 <FormItem
-                    label="分类名称"
-                    name="articleName"
+                    label="文章分类名称"
+                    name="type"
                     rules={[
                         {
                             required: true, message: '请输入规则名称！'
@@ -82,11 +82,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                     <Input placeholder="请输入分类名称" allowClear />
                 </FormItem>
                 <FormItem
-                    label="描述"
-                    name="articleTitle"
-                    rules={[{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }]}
+                    label="文章标题"
+                    name="title"
+                    rules={[{ required: true, message: '请输入文章标题！', min: 5 }]}
                 >
-                    <Input.TextArea rows={4} placeholder="请输入描述内容" />
+                    <Input.TextArea rows={4} placeholder="请输入文章标题！" />
                 </FormItem>
             </Form>
         </Modal>

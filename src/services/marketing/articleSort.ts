@@ -8,14 +8,12 @@ export async function getArticleSortList(
         pageSize?: number;
         pageNum?: number;
     },
-    options?: { [id: string]: any },
 ) {
     return request('/marketing/journalismType/list', {
         method: 'GET',
         params: {
             ...params,
-        },
-        ...(options || {}),
+        }
     });
 }
 

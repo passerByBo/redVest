@@ -10,7 +10,7 @@ export async function getArticleSortList(
     },
 
 ) {
-    return request('/marketing/journalismInfo/list', {
+    return request('/marketing/consumerCoupon/list', {
         method: 'get',
         params: {
             ...params,
@@ -22,7 +22,7 @@ export async function getArticleSortList(
  * 新建
  */
 export async function addArticleSortList(body: any) {
-    return request('/marketing/journalismInfo', {
+    return request('/marketing/consumerCoupon', {
         method: 'post',
         data: {
             ...body,
@@ -34,7 +34,7 @@ export async function addArticleSortList(body: any) {
  * 删除
  */
 export async function removeRule(params: { ids: string }) {
-    return request(`/marketing/journalismInfo/${params.ids}`, {
+    return request(`/marketing/consumerCoupon/${params.ids}`, {
         method: 'delete',
     });
 }
@@ -43,7 +43,7 @@ export async function removeRule(params: { ids: string }) {
  * 更新
  */
 export async function updateRule(params: any) {
-    return request('/marketing/journalismInfo', {
+    return request('/marketing/consumerCoupon', {
         method: 'put',
         data: {
             ...params,
