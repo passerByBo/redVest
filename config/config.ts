@@ -59,7 +59,7 @@ export default defineConfig({
     '/profile': {
       target: serveUrlMap[SERVE_ENV as string],
       changeOrigin: true,
-      pathRewrite: { '^/profile': '/prod-api/profile' }
+      pathRewrite: { '^/profile': '/prod-api/profile/' }
     },
   }, //proxy[REACT_APP_ENV || 'dev']
   manifest: {
