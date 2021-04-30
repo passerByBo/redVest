@@ -135,7 +135,7 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
   ]
 
   const { detailVisible, data, onCancel } = props;
-  const [dataSource, setDataSource] = useState<(ProductListItem & productArr) | null>()
+  const [dataSource, setDataSource] = useState<(ProductListItem & productArr) | null>(null)
   const { loading, run } = useRequest(getThematicDetail.bind(null, { id: (data as ProductListItem).id }), {
     manual: true,
     onSuccess: (result, params) => {
@@ -164,11 +164,11 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
       }}
       closable={false}
     >
-      <ProDescriptions<API.RuleListItem>
+      <ProDescriptions
         loading={loading}
         column={2}
         title={data?.specialGroup}
-        dataSource={dataSource}
+        dataSource={ dataSource}
         columns={detailColumns}
       />
 
