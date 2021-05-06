@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
 import styles from './style.less'
-import { Link, history, useModel } from 'umi';
+import { Link } from 'umi';
 import { Form, Input, Radio, Cascader, Upload, Row, Col, Button } from 'antd';
+import { getProvinceList } from '@/services/user/register';
+// import chinaDivisions from '@/utils/china-divisions'
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const layout = {
@@ -34,6 +36,11 @@ const Register: React.FC = () => {
       }
     }, 1000);
   };
+
+  const submit = () => {
+
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.lang}></div>
@@ -52,10 +59,13 @@ const Register: React.FC = () => {
           {/* <h3> 注册</h3> */}
           <Form
             {...layout}
+            onFinish={(values) => {
+              console.log('values', values)
+            }}
           >
             <FormItem
               label='企业名称'
-              name="company"
+              name="compName"
               rules={[
                 {
                   required: true,
@@ -68,19 +78,38 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            <Form.Item name="companyType" label="企业类型">
+            <Form.Item
+              name="companytype"
+              label="企业类型"
+              rules={[
+                {
+                  required: true,
+                  message: '请选择企业类型'
+                }
+              ]}
+            >
               <Radio.Group>
-                <Radio value="a">供方</Radio>
+                <Radio value="供方">供方</Radio>
+                <Radio value="需方">需方</Radio>
               </Radio.Group>
             </Form.Item>
 
-            <Form.Item name="business" label="主营业务">
+            <Form.Item
+              name="mainBusiness"
+              label="主营业务"
+              rules={[
+                {
+                  required: true,
+                  message: "请输入主营业务"
+                }
+              ]}
+            >
               <TextArea />
             </Form.Item>
 
             <FormItem
               label='纳税人识别号'
-              name="company"
+              name="companyregnum"
               rules={[
                 {
                   required: true,
@@ -93,7 +122,7 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            <Form.Item label="所在省市"
+            {/* <Form.Item name='divisions' label="所在省市区"
               rules={[
                 {
                   required: true,
@@ -102,24 +131,14 @@ const Register: React.FC = () => {
               ]}
             >
               <Cascader
-                options={[
-                  {
-                    value: '陕西省',
-                    label: '陕西省',
-                    children: [
-                      {
-                        value: '西安市',
-                        label: '西安市',
-                      },
-                    ],
-                  },
-                ]}
+                placeholder="请选择所在省市区"
+                options={chinaDivisions}
               />
-            </Form.Item>
+            </Form.Item> */}
 
             <FormItem
               label='详细地址'
-              name="address"
+              name="adressOffice"
               rules={[
                 {
                   required: true,
@@ -132,16 +151,21 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            <FormItem label="营业执照">
-              <FormItem name="dragger" valuePropName="fileList" noStyle
+            <FormItem
+              label="营业执照"
+
+            >
+              <FormItem
+                name="dragger"
+                valuePropName="fileList"
+                noStyle
                 rules={[
                   {
                     required: true,
-                    message: '营业执照不能为空！',
+                    message: '请上传营业执照'
                   }
-                ]}
-              >
-                <Upload.Dragger name="files" action="/upload.do">
+                ]}>
+                <Upload.Dragger name="businesslicense" action="/upload.do">
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                   </p>
@@ -150,14 +174,22 @@ const Register: React.FC = () => {
                 </Upload.Dragger>
               </FormItem>
             </FormItem>
-
-            <Form.Item name="business" label="企业简介">
+            <Form.Item
+              name="companyprofile"
+              label="企业简介"
+              rules={[
+                {
+                  required: true,
+                  message: '请输入企业简介'
+                }
+              ]}
+            >
               <TextArea />
             </Form.Item>
 
             <FormItem
               label='商家名称'
-              name="company"
+              name="shopname"
               rules={[
                 {
                   required: true,
@@ -172,7 +204,7 @@ const Register: React.FC = () => {
 
             <FormItem
               label='商家手机号'
-              name="company"
+              name="shopmobile"
               rules={[
                 {
                   required: true,
@@ -187,7 +219,7 @@ const Register: React.FC = () => {
 
             <FormItem
               label='授权联系人姓名'
-              name="company"
+              name="authorizedUsername"
               rules={[
                 {
                   required: true,
@@ -202,7 +234,7 @@ const Register: React.FC = () => {
 
             <FormItem
               label='授权联系人电话'
-              name="company"
+              name="authorizedUserTel"
               rules={[
                 {
                   required: true,
@@ -217,7 +249,7 @@ const Register: React.FC = () => {
 
             <FormItem
               label='授权联系人邮箱'
-              name="company"
+              name="authorizedUserMail"
               rules={[
                 {
                   required: true,
@@ -232,7 +264,7 @@ const Register: React.FC = () => {
 
             <FormItem
               label='办公电话'
-              name="company"
+              name="officeTel"
               rules={[
                 {
                   required: true,
@@ -245,7 +277,7 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            <FormItem label="合同附件">
+            {/* <FormItem label="合同附件">
               <FormItem name="dragger" valuePropName="fileList" noStyle
                 rules={[
                   {
@@ -262,11 +294,11 @@ const Register: React.FC = () => {
                   <p className="ant-upload-hint">支持单次或批量上传</p>
                 </Upload.Dragger>
               </FormItem>
-            </FormItem>
+            </FormItem> */}
 
             <FormItem
               label='开户行'
-              name="company"
+              name="bankDeposit"
               rules={[
                 {
                   required: true,
@@ -281,7 +313,7 @@ const Register: React.FC = () => {
 
             <FormItem
               label='开户名'
-              name="company"
+              name="accountName"
               rules={[
                 {
                   required: true,
@@ -296,7 +328,7 @@ const Register: React.FC = () => {
 
             <FormItem
               label='银行账户'
-              name="company"
+              name="bankAccount"
               rules={[
                 {
                   required: true,
@@ -315,7 +347,7 @@ const Register: React.FC = () => {
               <Col span={17}>
                 <FormItem
                   labelCol={{ span: 10, offset: 0 }}
-                  label='银行账户'
+                  label='验证码'
                   name="captcha"
                   rules={[
                     {
@@ -346,12 +378,11 @@ const Register: React.FC = () => {
               <Col span={24} offset={7}>
                 <FormItem>
                   <Button
-                    onClick={() => {history.push('/user/register-result')}}
+                    htmlType="submit"
                     size="large"
                     loading={submitting}
                     className={styles.submit}
                     type="primary"
-                    htmlType="submit"
                   >
                     注册
               </Button>

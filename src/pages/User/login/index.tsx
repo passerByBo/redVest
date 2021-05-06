@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCheckbox, ProFormText, ProFormCaptcha } from '@ant-design/pro-form';
 import { Link, history, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login } from '@/services/user/login';
+import { login, getAuthCode, authCode } from '@/services/user/login';
 import styles from './index.less';
 
 const LoginMessage: React.FC<{
@@ -48,7 +48,7 @@ const Login: React.FC = () => {
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
-      setInitialState({ ...initialState, currentUser: userInfo.data.user});
+      setInitialState({ ...initialState, currentUser: userInfo.data.user });
     }
   };
 
@@ -56,17 +56,17 @@ const Login: React.FC = () => {
     setSubmitting(true);
 
     try {
-      // 登录
       const res = await login({ ...values, type });
       if (res.status == '200' && res.token) {
         message.success('登录成功！');
         //保存session到本地
         sessionStorage.setItem('token', res.token);
         //请求用户信息包括权限等
-       let a =  await fetchUserInfo();
-       console.log('aaaaaaaa', a)
+        await fetchUserInfo();
         goto();
         return;
+      } else {
+        message.error(res.msg)
       }
       // 如果失败去设置用户错误信息
       setUserLoginState(res);
@@ -89,7 +89,7 @@ const Login: React.FC = () => {
               <span className={styles.title}>红背心商城</span>
             </Link>
           </div>
-          {/* <div className={styles.desc}>Ant Design 是西湖区最具影响力的 Web 设计规范</div> */}
+          {/* <div className={styles.desc}>描述信息可以填写在这里</div> */}
         </div>
 
         <div className={styles.main}>
@@ -99,7 +99,7 @@ const Login: React.FC = () => {
             }}
             submitter={{
               searchConfig: {
-                submitText: '登录',
+                submitText: '登陆',
               },
               render: (_, dom) => dom.pop(),
               submitButtonProps: {
@@ -172,7 +172,7 @@ const Login: React.FC = () => {
                     size: 'large',
                     prefix: <MobileOutlined className={styles.prefixIcon} />,
                   }}
-                  name="mobile"
+                  name="phoneNumber"
                   placeholder='手机号'
                   rules={[
                     {
@@ -201,7 +201,8 @@ const Login: React.FC = () => {
 
                     return '获取验证码'
                   }}
-                  name="captcha"
+                  phoneName="phoneNumber"
+                  name="authCode"
                   rules={[
                     {
                       required: true,
@@ -209,15 +210,21 @@ const Login: React.FC = () => {
                     },
                   ]}
                   onGetCaptcha={async (phone) => {
-                    const result = await getFakeCaptcha({
+                    const result = await getAuthCode({
                       phone,
                     });
 
-                    if (result === false) {
+                    if (result.status !== 200 || result.code !== 200) {
+                      switch (result.code) {
+                        case 900001:
+                          message.error(`${phone}${result.msg}请先注册！`);
+                          return;
+                      }
+                      message.error(`获取验证码失败,${result.msg}`);
                       return;
                     }
 
-                    message.success('获取验证码成功！验证码为：1234');
+                    message.success('获取验证码成功！');
                   }}
                 />
               </>

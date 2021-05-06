@@ -1,365 +1,265 @@
-import { PlusOutlined } from '@ant-design/icons';
-import React, { useState, useRef } from 'react';
+import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import React, { useState, useRef, useCallback } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Input, Drawer } from 'antd';
+import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import ProForm, {
-    ModalForm,
-    ProFormText,
-    ProFormTextArea,
-    ProFormSelect,
-    ProFormDateRangePicker,
-    DrawerForm,
-    ProFormRadio,
-    ProFormDatePicker,
-    ProFormUploadDragger,
-    ProFormSwitch
-} from '@ant-design/pro-form';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
+import { addBrand, deleteBrand, getBrandList, updateBrand } from '@/services/merchandise/product';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+import DetailDrawer from './components/DetailDrawer';
 import UpdateForm from './components/UpdateForm';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
-import { getBrandList } from '@/services/merchandise/product';
-/**
- * 添加节点
- *
- * @param fields
- */
+import AddForm from './components/AddForm';
 
-const handleAdd = async (fields: API.RuleListItem) => {
-    const hide = message.loading('正在添加');
-
-    try {
-        await addRule({ ...fields });
-        hide();
-        message.success('添加成功');
-        return true;
-    } catch (error) {
-        hide();
-        message.error('添加失败请重试！');
-        return false;
-    }
+const isvalidEnum = {
+  pass: { text: '通过', status: 'Y' },
+  Fail: { text: '不通过', status: 'N' },
 };
-/**
- * 更新节点
- *
- * @param fields
- */
-const waitTime = (time: number = 100) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(true);
-        }, time);
-    });
-};
-const handleUpdate = async (fields: FormValueType) => {
-    const hide = message.loading('正在配置');
 
-    try {
-        await updateRule({
-            name: fields.name,
-            desc: fields.desc,
-            key: fields.key,
-        });
-        hide();
-        message.success('配置成功');
-        return true;
-    } catch (error) {
-        hide();
-        message.error('配置失败请重试！');
-        return false;
-    }
-};
-/**
- * 删除节点
- *
- * @param selectedRows
- */
-
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-    const hide = message.loading('正在删除');
-    if (!selectedRows) return true;
-
-    try {
-        await removeRule({
-            key: selectedRows.map((row) => row.key),
-        });
-        hide();
-        message.success('删除成功，即将刷新');
-        return true;
-    } catch (error) {
-        hide();
-        message.error('删除失败，请重试');
-        return false;
-    }
-};
-type ProductListItem = {
-    id: string,
-    topicName: string,
-    productBrandId: string,
-    isEffective: string,
-    isShow: string,
-    isRecommented: string,
-    [key: string]: string,
+export interface IBrand {
+  id: string;
+  brandDescribe: string;
+  productBrand: string;
+  brandNo: string;
+  logo: string;
+  brandImg: string;
+  isvalid: string;
+  sort: string;
+  isShow: string;
+  isRecommend: string;
+  status: string;
 }
+
+
 const Brand: React.FC = () => {
-    /** 新建窗口的弹窗 */
-    const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-    /** 分布更新窗口的弹窗 */
-    const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-    const [showDetail, setShowDetail] = useState<boolean>(false);
-    const actionRef = useRef<ActionType>();
-    const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-    const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  /** 分布更新窗口的弹窗 */
+  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
+  //新增窗口
+  const [addModalVisible, handleAddModalVisible] = useState<boolean>(false);
 
-    //编辑商品
-    const [editProduct, setEditProduct] = useState<ProductListItem>()
+  const [showDetail, setShowDetail] = useState<boolean>(false);
+  const actionRef = useRef<ActionType>();
+  //编辑和新增选择的数据都保存在这里
+  const [currentRow, setCurrentRow] = useState<IBrand | null>(null);
+  const [selectedRowsState, setSelectedRows] = useState<IBrand[]>([]);
 
-    const columns: ProColumns<ProductListItem>[] = [
-        {
-            title: '商品品牌',
-            dataIndex: 'id',
-            render: ((_, item) => {
-                return (
-                    <a onClick={() => { setEditProduct(item); setShowDetail(true) }}>{_}</a>
-                )
-            })
-        },
-        {
-            title: '品牌编号',
-            dataIndex: 'productBrandId',
-            valueType: 'textarea',
-        },
-        {
-            title: '品牌logo',
-            dataIndex: 'id',
-            valueType: 'textarea',
-            search: false,
-        },
-        {
-            title: '品牌专区大图',
-            dataIndex: 'imageType',
-            search: false,
-            valueType: 'textarea',
-        },
-        {
-            title: '排序',
-            sorter: true,
-            search: false,
-            dataIndex: 'productBrandId',
-            valueType: 'textarea',
-        },
-        {
-            title: '是否推荐',
-            search: false,
-            dataIndex: 'isRecommented',
-            valueType: 'textarea',
-        },
-        {
-            title: '是否展示',
-            search: false,
-            dataIndex: 'isShow',
-            valueType: 'textarea',
-        },
-        {
-            title: '是否有效',
-            dataIndex: 'isEffective',
-            search: false,
-            valueType: 'textarea',
-        },
-        {
-            title: '是否审核通过',
-            dataIndex: 'isEffective',
-            valueType: 'textarea',
+
+  const columns: ProColumns<IBrand>[] = [
+    {
+      title: '商品品牌',
+      dataIndex: 'productBrand',
+      render: ((_, item:IBrand) => {
+        return (
+          <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
+        )
+      })
+    },
+    {
+      title: '品牌编号',
+      dataIndex: 'brandNo',
+      valueType: 'textarea',
+    },
+    {
+      title: '品牌logo',
+      dataIndex: 'logo',
+      search: false,
+      render: (_, record) => {
+        return (
+          <Image
+            preview={{ mask: <EyeOutlined /> }}
+            width={40}
+            src={_ as string}
+          />
+        )
+      }
+    },
+    {
+      title: '品牌专区大图',
+      dataIndex: 'brandImg',
+      search: false,
+      render: (_, record) => {
+        return (
+          <Image
+            preview={{ mask: <EyeOutlined /> }}
+            width={40}
+            src={_ as string}
+          />
+        )
+      }
+    },
+    {
+      title: '排序',
+      sorter: true,
+      search: false,
+      dataIndex: 'sort',
+      valueType: 'digit',
+    },
+    {
+      title: '是否推荐',
+      search: false,
+      dataIndex: 'isRecommend',
+    },
+    {
+      title: '是否展示',
+      search: false,
+      dataIndex: 'isShow',
+    },
+    {
+      title: '是否有效',
+      dataIndex: 'isvalid',
+      search: false,
+    },
+    {
+      title: '是否审核通过',
+      dataIndex: 'status',
+      valueType: 'select',
+      valueEnum: isvalidEnum,
+    },
+    {
+      title: '操作',
+      dataIndex: 'option',
+      valueType: 'option',
+      search: false,
+      width: 200,
+      render: (text, record, _, action) => [
+        <a
+          key="editable"
+          onClick={() => {
+            setCurrentRow(record);
+            handleUpdateModalVisible(true)
+          }}
+        >
+          编辑
+        </a>,
+        <Popconfirm
+          placement="topRight"
+          title={'确定要删除' + '吗？'}
+          onConfirm={() => { handleDelete(record) }}
+          okText="确认"
+          cancelText="取消"
+        >
+          <a
+            key="delete"
+          >
+            删除
+                </a>
+        </Popconfirm>
+
+      ],
+    }
+  ]
+
+
+  const handleUpdateCancel = useCallback(() => {
+    handleUpdateModalVisible(false)
+  }, [])
+
+  const handleDelete = async (data: any) => {
+    const hide = message.loading('正在删除');
+    try {
+      const res = await deleteBrand(data.id);
+      if (res.status === 200 && res.code === 200) {
+        hide();
+        message.success('删除成功！');
+        if (actionRef.current) {
+          actionRef.current.reload();
         }
-    ]
+        return;
+      }
+
+      hide();
+      message.error('删除失败请重试！');
+    } catch (error) {
+      hide();
+      message.error('删除失败请重试！');
+    }
+  }
+
+  const handleUpdateSubmit = useCallback(async (fields) => {
+    const hide = message.loading('正在编辑');
+    try {
+      let res = await updateBrand({ ...fields });
+      if (res.status === 200 && res.code !== 200) {
+        hide();
+        message.error('编辑失败请重试！');
+      }
+      hide();
+      message.success('编辑成功');
+    } catch (error) {
+      hide();
+      message.error('编辑失败请重试！');
+    }
+
+    handleUpdateModalVisible(false);
+
+    if (actionRef.current) {
+      actionRef.current.reload();
+    }
+
+  }, [])
+
+  const handleAddCancel = useCallback(() => {
+    handleAddModalVisible(false)
+  }, [])
+
+  const handleAddSubmit = useCallback(async (fields) => {
+    const hide = message.loading('正在增加');
+    try {
+      let res = await addBrand({ ...fields });
+      if (res.status === 200 && res.code !== 200) {
+        hide();
+        message.error('新增失败请重试！');
+      }
+      hide();
+      message.success('新增成功');
+    } catch (error) {
+      hide();
+      message.error('新增失败请重试！');
+    }
+
+    handleAddModalVisible(false);
+
+    if (actionRef.current) {
+      actionRef.current.reload();
+    }
+
+  }, [])
 
 
-    return (
-        <PageContainer>
-            <ProTable<API.RuleListItem, API.PageParams>
-                actionRef={actionRef}
-                rowKey="key"
-                search={{ labelWidth: 120 }}
-                toolBarRender={() => [
-                    <Button type="primary" key="primary" onClick={() => { handleModalVisible(true) }}>
-                        <PlusOutlined />新建
+
+  return (
+    <PageContainer>
+      <ProTable
+        actionRef={actionRef}
+        rowKey="id"
+        search={{ labelWidth: 120 }}
+        toolBarRender={() => [
+          <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>
+            <PlusOutlined />新建
                     </Button>
-                ]}
-                request={getBrandList}
-                columns={columns}
-                rowSelection={{
-                    onChange: (_, selectedRows) => {
-                        setSelectedRows(selectedRows);
-                    },
-                }}
-            >
+        ]}
+        request={formatRequestListParams(getBrandList)}
+        columns={columns}
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows);
+          },
+        }}
+      >
 
-            </ProTable>
-            {
-                selectedRowsState?.length > 0 && (
-                    <FooterToolbar
-                        extra={
-                            <div>
-                                已选择{''}
-                                <a style={{
-                                    fontWeight: 600,
-                                }}>
-                                    {selectedRowsState.length}
-                                </a>
-                                    项 &nbsp;&nbsp;
-                                    <span>
-                                    这里可以统计已选项的一些参数{selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)} 万
-                                    </span>
-                            </div>
-                        }
-                    >
-                        <Button
-                            onClick={async () => {
-                                await handleRemove(selectedRowsState);
-                                setSelectedRows([]);
-                                actionRef.current?.reloadAndRest?.();
-                            }}
-                        >
-                            批量删除
-                            </Button>
-                        <Button type="primary">批量审批</Button>
-                    </FooterToolbar>
-                )
-            }
-            <ModalForm
-                title='新建专题组'
-                visible={createModalVisible}
-                onVisibleChange={handleModalVisible}
-                onFinish={async (value) => {
-                    const success = await handleAdd(value as API.RuleListItem);
+      </ProTable>
 
-                    if (success) {
-                        handleModalVisible(false);
+      <AddForm onCancel={handleAddCancel}
+        onSubmit={handleAddSubmit}
+        addModalVisible={addModalVisible} />
 
-                        if (actionRef.current) {
-                            actionRef.current.reload();
-                        }
-                    }
-                }}
-            >
-                 <ProForm.Group>
-                    <ProFormText width="md" name="name" label="专题组" placeholder="请输入名称" />
-                </ProForm.Group>
+      <UpdateForm onCancel={handleUpdateCancel}
+        onSubmit={handleUpdateSubmit}
+        values={currentRow}
+        updateModalVisible={updateModalVisible} />
 
-                <ProForm.Group>
-                    <ProFormText width="md" name="name" label="专题名称" placeholder="请输入名称" />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="name" label="专题副标题" placeholder="请输入名称" />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="contract" label="标签" placeholder="请输入名称" />
-                </ProForm.Group>
-
-                <ProFormUploadDragger max={4} label="专题组图片" name="productsPics" />
-
-                <ProForm.Group>
-                    <ProFormTextArea width="xl" label="专题组描述" name="remark" />
-                </ProForm.Group>
-
-                <ProFormSwitch name="isShow" label="是否有效" />
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="contract" label="排序" placeholder="请输入名称" />
-                </ProForm.Group>
-            </ModalForm>
-            <DrawerForm
-                visible={showDetail}
-                title={editProduct ? editProduct.productName : '商品基础信息'}
-                onVisibleChange={setShowDetail}
-                onFinish={async () => {
-                    await waitTime(2000)
-                    message.success('提交成功');
-                    return true;
-                }}
-                submitter={{
-                    render: (props, defaultDoms) => {
-                        return [
-                            <Button
-                                key="save"
-                                type="primary"
-                                onClick={() => {
-                                    props.submit();
-                                }}
-                            >
-                                保存
-              </Button>
-                        ];
-                    },
-                }}
-            >
-                <ProForm.Group title='商品基本信息'>
-                    <ProFormText width="md" name="sortWeights" label="排序" placeholder="请填排序权重！" />
-                    <ProFormText width="md" name="categories" label="商品分类" placeholder="请填写商品分类！" rules={[{ required: true, message: '请填写商品分类！' }]} />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="sortWeights" label="专题名称" placeholder="请填专题名称！" rules={[{ required: true, message: '请填专题名称！' }]} />
-                    <ProFormText width="md" name="categories" label="商品名称" placeholder="请填写商品名称！" rules={[{ required: true, message: '请填写商品名称！' }]} />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="sortWeights" label="商品简称" placeholder="请填写商品简称！" />
-                    <ProFormText width="md" name="categories" label="商品修饰语" placeholder="请填写商品修饰语！" />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="sortWeights" label="商品品牌" placeholder="请填写商品品牌！" />
-                    <ProFormText width="md" name="categories" label="商品规格" placeholder="请填写商品规格！" rules={[{ required: true, message: '请填写商品规格！' }]} />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormRadio.Group
-                        name="radio"
-                        label="状态"
-                        options={[
-                            {
-                                label: '上架',
-                                value: '上架',
-                            },
-                            {
-                                label: '下架',
-                                value: '下架',
-                            }
-                        ]}
-                    />
-
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="categories" label="商品介绍" placeholder="请填写商品介绍！" />
-                    <ProFormText width="md" name="sortWeights" label="商品货号" placeholder="请填商品货号！" rules={[{ required: true, message: '请填商品货号！' }]} />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="categories" label="库存数量" placeholder="请填写库存数量！" />
-                    <ProFormText width="md" name="sortWeights" label="本店售价" placeholder="请填本店售价！" />
-                </ProForm.Group>
-
-                <ProForm.Group>
-                    <ProFormText width="md" name="categories" label="市场售价" placeholder="请填写市场售价！" />
-                    <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
-                </ProForm.Group>
-
-                <ProForm.Group title='营销信息'>
-                    <ProFormText width="md" name="categories" label="市场售价" placeholder="请填写市场售价！" />
-                    <ProFormText width="md" name="sortWeights" label="返现比例" placeholder="请填返现比例！" />
-                </ProForm.Group>
-
-
-            </DrawerForm>
-        </PageContainer>
-    )
+      {currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => setShowDetail(false)} />}
+    </PageContainer>
+  )
 }
 
 export default Brand;

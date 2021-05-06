@@ -6,11 +6,10 @@ import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import type { FormValueType } from './components/UpdateForm';
 import formatRequestListParams from '@/utils/formatRequestListParams';
-import { addThematic, deleteThematic, getThematicDetail, getThematicList, updateThematic } from '@/services/merchandise/thematic';
+import { addThematic, deleteThematic,  getThematicList, updateThematic } from '@/services/merchandise/thematic';
 import UpdateForm from './components/UpdateForm'
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
-import { useRequest } from 'umi';
 export type ProductListItem = {
   id?: string;
   specialGroupId?: string;
@@ -25,39 +24,6 @@ export type ProductListItem = {
   specialTypeImg?: string;
 };
 
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
-
-//编辑商品
-// const [editProduct, setEditProduct] = useState<ProductListItem>();
-/**
- * 添加节点
- *
- * @param fields
- */
-
-const handleAdd = async (fields) => {
-  const hide = message.loading('正在添加');
-
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
-
-
-
 const Thematic: React.FC = () => {
 
   /** 分布更新窗口的弹窗 */
@@ -71,32 +37,13 @@ const Thematic: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<ProductListItem | null>(null);
   const [selectedRowsState, setSelectedRows] = useState<ProductListItem[]>([]);
 
-  const handleDelete = async (data: any) => {
-    console.log('data', data)
-    const hide = message.loading('正在删除');
-    try {
-      const res = await deleteThematic(data.id);
-      if (res.status === 200 && res.code === 200) {
-        hide();
-        message.success('删除成功！');
-        if (actionRef.current) {
-          actionRef.current.reload();
-        }
-        return;
-      }
 
-      hide();
-      message.error('删除失败请重试！');
-    } catch (error) {
-      hide();
-      message.error('删除失败请重试！');
-    }
-  }
 
   const columns: ProColumns<ProductListItem>[] = [
     {
-      title: '专题组',
-      dataIndex: 'specialGroup',
+      title: '专题名称',
+      dataIndex: 'specialName',
+      valueType: 'textarea',
       render: (dom, entity) => {
         return (
           <a
@@ -111,9 +58,8 @@ const Thematic: React.FC = () => {
       },
     },
     {
-      title: '专题名称',
-      dataIndex: 'specialName',
-      valueType: 'textarea',
+      title: '专题组',
+      dataIndex: 'specialGroup',
     },
     {
       title: '标签',
@@ -212,7 +158,26 @@ const Thematic: React.FC = () => {
     handleUpdateModalVisible(false)
   }, [])
 
+  const handleDelete = async (data: any) => {
+    const hide = message.loading('正在删除');
+    try {
+      const res = await deleteThematic(data.id);
+      if (res.status === 200 && res.code === 200) {
+        hide();
+        message.success('删除成功！');
+        if (actionRef.current) {
+          actionRef.current.reload();
+        }
+        return;
+      }
 
+      hide();
+      message.error('删除失败请重试！');
+    } catch (error) {
+      hide();
+      message.error('删除失败请重试！');
+    }
+  }
 
   const handleUpdateSubmit = useCallback(async (fields) => {
     const hide = message.loading('正在编辑');

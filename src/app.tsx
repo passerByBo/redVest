@@ -37,14 +37,16 @@ const noTokenByUrl = (url: string) => {
   const uriPool = [
     '/captchaImage',
     '/login',
-    '/login/getAuthCode/{phoneNumber',
+    '/login/getAuthCode/',
     '/login/authCode',
-    '/login/account'
+    '/login/account',
+    '/customer/shopInfo',
+    '/operations/provinces/getProvinceList'
   ]
 
   for (let i = 0, length = uriPool.length; i < length; i++) {
     let uri = uriPool[i];
-    if (url.endsWith(uri)) {
+    if (url.includes(uri)) {
       return true;
     }
   }
@@ -78,8 +80,9 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  // 如果是登录页面，不执行
-  if (history.location.pathname !== '/user/login') {
+  // 如果是登录页面，不执行,注册页面也不需要走这里
+  // if (history.location.pathname !== '/user/login') {!noLoginRoute()
+  if (!noLoginRoute()) {
     //不是登录页面从本地获取token，然后获取本地数据，需要根据返回的状态判断当前的token是否有效果
     //如果token失效跳转到登录页
     let token = sessionStorage.getItem('token') || '';

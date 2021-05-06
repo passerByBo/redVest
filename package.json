@@ -61,6 +61,7 @@
     "bizcharts": "^4.1.9",
     "bizcharts-plugin-slider": "^3.0.1",
     "braft-editor": "^2.3.9",
+    "china-division": "^2.3.1",
     "classnames": "^2.2.6",
     "lodash": "^4.17.11",
     "lodash.debounce": "^4.0.8",
