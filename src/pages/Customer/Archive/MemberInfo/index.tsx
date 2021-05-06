@@ -7,6 +7,11 @@ import ProCard from '@ant-design/pro-card';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
+
+import type { TableListItem } from './data.d';
+import { getList } from '@/services/customer/memberInfo';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+
 const MemberInfo: React.FC = () => {
   const actionRef = useRef<ActionType>();
 
@@ -92,7 +97,7 @@ const MemberInfo: React.FC = () => {
             <ExportOutlined /> 导出
           </Button>,
         ]}
-        request={rule}
+        request={formatRequestListParams(getList)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => { },

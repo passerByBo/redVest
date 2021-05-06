@@ -1,7 +1,7 @@
 import { request } from 'umi';
 
 /**
- * 查询列表
+ * 查询
  */
 export async function getArticleSortList(
     params: {

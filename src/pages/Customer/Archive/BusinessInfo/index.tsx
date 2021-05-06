@@ -7,6 +7,9 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 
+import { getList } from '@/services/customer/merchantInfo';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+
 const BusinessInfo: React.FC = () => {
   const [statusKey, setStatusKey] = useState<string>('1');
 
@@ -74,38 +77,38 @@ const BusinessInfo: React.FC = () => {
     },
     {
       title: '商户名称',
-      dataIndex: 'name',
+      dataIndex: 'shopName',
       valueType: 'textarea',
       sorter: (a, b) => 2 - 1,
     },
     {
       title: '申请时间',
-      dataIndex: 'createdAt',
+      dataIndex: 'applydate',
       valueType: 'textarea',
       search: false,
       sorter: (a, b) => 2 - 1,
     },
     {
       title: '企业名称',
-      dataIndex: 'name',
+      dataIndex: 'compName',
       valueType: 'textarea',
       sorter: (a, b) => 2 - 1,
     },
     {
       title: '授权联系人',
-      dataIndex: 'status',
+      dataIndex: 'authorizedUsername',
       valueType: 'textarea',
       sorter: (a, b) => 2 - 1,
     },
     {
       title: '授权联系人电话',
-      dataIndex: 'callNo',
+      dataIndex: 'authorizedUserTel',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '授权联系人邮箱',
-      dataIndex: 'callNo',
+      dataIndex: 'authorizedUserMail',
       valueType: 'textarea',
       search: false,
     },
@@ -115,7 +118,7 @@ const BusinessInfo: React.FC = () => {
       valueType: 'textarea',
       search: false,
       render: (dom, entity) => {
-        return <a onClick={() => setProductsListVisible(true)}>{dom}</a>;
+        return <a onClick={() => setProductsListVisible(true)}>商品列表</a>;
       },
     },
     {
@@ -124,7 +127,7 @@ const BusinessInfo: React.FC = () => {
       valueType: 'textarea',
       search: false,
       render: (dom, entity) => {
-        return <a onClick={() => setOrdersListVisible(true)}>{dom}</a>;
+        return <a onClick={() => setOrdersListVisible(true)}>订单列表</a>;
       },
     },
     {
@@ -165,7 +168,7 @@ const BusinessInfo: React.FC = () => {
             <ExportOutlined /> 导出
           </Button>,
         ]}
-        request={rule}
+        request={formatRequestListParams(getList)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => { },

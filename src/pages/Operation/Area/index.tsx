@@ -16,7 +16,7 @@ const Area: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
 
-  const [addFormVisible, setModalVisit] = useState(true);
+  const [addFormVisible, setModalVisit] = useState(false);
   const [selectedRowsState, setSelectedRows] = useState([]);
 
   const columns: ProColumns<API.RuleListItem>[] = [

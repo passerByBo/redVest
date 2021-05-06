@@ -1,22 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { PlusOutlined } from '@ant-design/icons';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import { Modal, Input, Form, Select, Table, Card, Button } from 'antd';
+import { message, Button } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
-import { getMerchantCertificateList } from '@/services/customer/index';
-import formatRequestListParams from '@/utils/formatRequestListParams';
-import type { MerchantCertificationListItem } from './data';
+
 import FlowStep from './components/FlowStep';
 import AddModal from './components/AddModal';
 
+import { getMerchantCertificateList, saveApply } from '@/services/customer/index';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+import type { TableListItem, TableListParams } from './data';
+
+/**
+ * 添加节点
+ *
+ * @param fields
+ */
+const handleAdd = async (fields: TableListParams) => {
+    const hide = message.loading('正在添加');
+    try {
+        await saveApply({ ...fields });
+        hide();
+        message.success('添加成功');
+        return true;
+    } catch (error) {
+        hide();
+        message.error('添加失败！');
+        return false;
+    }
+};
+
+/**
+ * 更新节点
+ *
+ * @param fields
+ */
+// const handleUpdate = async (fields: FormValueType) => {
+// const hide = message.loading('正在更新');
+// try {
+//     await updateRule({
+//         type: fields.type,
+//         journalismDescribe: fields.journalismDescribe,
+//         id: fields.id,
+//     });
+//     hide();
+//     message.success('更新成功');
+//     return true;
+// } catch (error) {
+//     hide();
+//     message.error('更新失败！');
+//     return false;
+// }
+// };
+
+/**
+ * 删除节点
+ *
+ * @param selectedRows
+ */
+const handleRemove = async (selectedRows: TableListItem[]) => {
+    // const hide = message.loading('正在删除');
+    // try {
+    //     await removeRule({
+    //         ids: selectedRows.map((row) => row.id).join(','),
+    //     });
+    //     hide();
+    //     message.success('删除成功');
+    //     return true;
+    // } catch (error) {
+    //     hide();
+    //     message.error('删除失败！');
+    //     return false;
+    // }
+};
 
 const MerchantCertification: React.FC = () => {
     const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
     const [flowStepVisible, setFlowStepVisible] = useState<boolean>(false);
     const [statusKey, setStatusKey] = useState<string>('1');
     const [btnIndex, setBtnIndex] = useState<number>(0);
+    const actionRef = useRef<ActionType>();
+
+    const confirmAdd = (newData: TableListParams) => {
+        setAddModalVisible(false);
+        handleAdd(newData);
+        actionRef.current?.reloadAndRest?.();
+    };
+
+
     const onTabChange = (key: string) => {
         setStatusKey(key)
     };
@@ -30,7 +102,7 @@ const MerchantCertification: React.FC = () => {
         setFlowStepVisible(false);
     };
 
-    const columns: ProColumns<MerchantCertificationListItem>[] = [
+    const columns: ProColumns<TableListItem>[] = [
         {
             title: '序号',
             dataIndex: 'index',
@@ -134,7 +206,7 @@ const MerchantCertification: React.FC = () => {
             </PageContainer>
             <AddModal
                 visible={addModalVisible}
-                onFinish={() => { }}
+                onFinish={confirmAdd}
                 onCancel={() => setAddModalVisible(false)}
             />
             <FlowStep visible={flowStepVisible} onCancel={onCancel} btnIndex={btnIndex} />

@@ -1,5 +1,6 @@
-import React from 'react';
-import { Modal, Input, Form, Select } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
+import { Modal, Input, Form, Select, DatePicker, Upload } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -18,8 +19,23 @@ const waitTime = (time: number = 100) => {
     });
 };
 
+const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+        return e;
+    }
+    return e && e.fileList;
+};
+
 const AddModal: React.FC<AddModalProps> = (props) => {
 
+    const nowTime = new Date();
+    const timePoint = nowTime.getFullYear() + "" + (nowTime.getMonth() + 1) + nowTime.getDay();
+    const [fileList, setFileList] = useState([{
+        uid: '-1',
+        name: 'image.png',
+        status: 'done',
+        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    }]);
     const [form] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
 
@@ -34,9 +50,27 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         wrapperCol: { span: 14 },
     };
 
+
+    const uploadProps = {
+        name: 'file',
+        action: '/prod-api/mall/common/upload',
+    }
+
+    const uploadButton = (
+        <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>上传</div>
+        </div>
+    );
+
+
+    const handleChange = ({ fileList }: any) => {
+        setFileList(fileList);
+    }
+
     return (
         <Modal
-            title="文章分类维护单"
+            title="商家认证申请"
             visible={visible}
             centered
             onOk={() => handleFinish()}
@@ -47,57 +81,236 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                 {...formItemLayout}
                 hideRequiredMark
                 form={form}
-                name="basic"
+                initialValues={{
+                    billno: `RZ-` + timePoint,
+                }}
             >
                 <FormItem
-                    label="分类名称"
-                    name="articleName"
+                    label="单据编号"
+                    name="billno"
                     rules={[
                         {
                             required: true
                         },
                     ]}
                 >
-                    <Input placeholder="请输入分类名称" allowClear />
+                    <Input placeholder="请输入单据编号" allowClear disabled />
                 </FormItem>
+
                 <FormItem
-                    label="上级分类名称"
-                    name="parentTypeName"
+                    label="申请时间"
+                    name="applydate"
                 >
-                    <Input placeholder="请输入上级分类名称" allowClear />
+                    <DatePicker
+                        style={{ width: '100%' }}
+                        showTime
+                        format="YYYY-MM-DD HH:mm:ss"
+                        placeholder="选择发布时间"
+                    />
                 </FormItem>
+
                 <FormItem
-                    label="级别"
-                    name="sortLevel"
+                    label="企业名称"
+                    name="compName"
                 >
-                    <Input placeholder="请输入级别" allowClear />
+                    <Input placeholder="请输入企业名称" allowClear />
                 </FormItem>
+
                 <FormItem
-                    label="描述"
-                    name="desc"
+                    label="企业类型"
+                    name="companytype"
                 >
-                    <Input.TextArea rows={4} placeholder="请输入描述内容" />
+                    <Select>
+                        <Option value="供方">供方</Option>
+                        <Option value="需方">需方</Option>
+                    </Select>
                 </FormItem>
+
                 <FormItem
-                    label="排序"
-                    name="sort"
+                    label="主营业务"
+                    name="mainBusiness"
                 >
-                    <Input placeholder="请输入排序" allowClear />
+                    <Input.TextArea rows={4} placeholder="请输入主营业务" />
                 </FormItem>
+
                 <FormItem
-                    label="关键字"
-                    name="keywords"
+                    label="纳税人识别号"
+                    name="companyregnum"
                 >
-                    <Input placeholder="请输入关键字" allowClear />
+                    <Input placeholder="请输入纳税人识别号" allowClear />
                 </FormItem>
+
                 <FormItem
-                    label="是否在导航栏显示"
-                    name="isShow"
+                    label="所在省"
+                    name="inprovinces"
                 >
                     <Select>
                         <Option value="0">是</Option>
                         <Option value="1">否</Option>
                     </Select>
+                </FormItem>
+
+                <FormItem
+                    label="所在市"
+                    name="incities"
+                >
+                    <Select>
+                        <Option value="0">是</Option>
+                        <Option value="1">否</Option>
+                    </Select>
+                </FormItem>
+
+                <FormItem
+                    label="所在区"
+                    name="region"
+                >
+                    <Select>
+                        <Option value="0">是</Option>
+                        <Option value="1">否</Option>
+                    </Select>
+                </FormItem>
+
+                <FormItem
+                    label="详细地址"
+                    name="adressOffice"
+                >
+                    <Input placeholder="请输入详细地址" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="营业执照"
+                    name="businesslicense"
+                    valuePropName="fileList"
+                    getValueFromEvent={normFile}
+                    extra="建议图片大小不超过250kb"
+                >
+                    <Upload
+                        {...uploadProps}
+                        showUploadList={{ showPreviewIcon: false }}
+                        listType="picture-card"
+                        fileList={fileList}
+                        onChange={handleChange}>
+                        {fileList.length >= 8 ? null : uploadButton}
+                    </Upload>
+                </FormItem>
+
+                <FormItem
+                    label="企业简介"
+                    name="companyprofile"
+                >
+                    <Input.TextArea rows={4} placeholder="请输入企业简介" />
+                </FormItem>
+
+                <FormItem
+                    label="商家名称"
+                    name="shopname"
+                >
+                    <Input placeholder="请输入商家名称" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="是否自营"
+                    name="selfSupport"
+                >
+                    <Input placeholder="请输入商家名称" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="商家手机号"
+                    name="shopmobile"
+                >
+                    <Input placeholder="请输入商家手机号" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="所属代理商"
+                    name="nameAgent"
+                >
+                    <Input placeholder="请输入所属代理商" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="公司授权书"
+                    name="authorizedFile"
+                >
+                    <Upload
+                        {...uploadProps}
+                        showUploadList={{ showPreviewIcon: false }}
+                        listType="picture-card"
+                        fileList={fileList}
+                        onChange={handleChange}>
+                        {fileList.length >= 8 ? null : uploadButton}
+                    </Upload>
+                </FormItem>
+
+                <FormItem
+                    label="授权联系人姓名"
+                    name="authorizedUsername"
+                >
+                    <Input placeholder="请输入授权联系人姓名" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="授权联系人电话"
+                    name="authorizedUserTel"
+                >
+                    <Input placeholder="请输入授权联系人电话" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="授权联系人邮箱"
+                    name="authorizedUserMail"
+                >
+                    <Input placeholder="请输入授权联系人邮箱" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="办公电话"
+                    name="officeTel"
+                >
+                    <Input placeholder="请输入办公电话" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="合同附件"
+                    name="contaccessory"
+                >
+                    <Upload
+                        {...uploadProps}
+                        showUploadList={{ showPreviewIcon: false }}
+                        listType="picture-card"
+                        fileList={fileList}
+                        onChange={handleChange}>
+                        {fileList.length >= 8 ? null : uploadButton}
+                    </Upload>
+                </FormItem>
+
+                <FormItem
+                    label="开户行"
+                    name="bankDeposit"
+                >
+                    <Input placeholder="请输入开户行" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="开户名"
+                    name="accountName"
+                >
+                    <Input placeholder="请输入开户名" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="银行账户"
+                    name="bankAccount"
+                >
+                    <Input placeholder="请输入银行账户" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="结算类型"
+                    name="settlementtype"
+                >
+                    <Input placeholder="请输入结算类型" allowClear />
                 </FormItem>
             </Form>
         </Modal>

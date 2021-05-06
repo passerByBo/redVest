@@ -130,7 +130,7 @@ export default [
     name: 'SKU台账',
     icon: 'orderedList',
     hideChildrenInMenu: true,
-    routes:[
+    routes: [
       {
         path: '/sku',
         redirect: '/sku/list'
@@ -139,7 +139,7 @@ export default [
         path: '/sku/list',
         name: 'SKU台账列表',
         component: './SKULedger/List',
-        routes:[
+        routes: [
           {
             path: '/sku/list/stock-logger',
             name: '库存日志',
@@ -328,12 +328,12 @@ export default [
       {
         path: '/system/login-log',
         name: '登录日志',
-        component: './Welcome',
+        component: './System/LoginLog',
       },
       {
         path: '/system/operation-log',
         name: '操作日志',
-        component: './Welcome',
+        component: './System/OperationLog',
       },
     ],
   },
