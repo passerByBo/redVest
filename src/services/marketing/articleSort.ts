@@ -1,21 +1,19 @@
 import { request } from 'umi';
 
 /**
- * 查询列表
+ * 查询
  */
 export async function getArticleSortList(
     params: {
         pageSize?: number;
         pageNum?: number;
     },
-    options?: { [id: string]: any },
 ) {
     return request('/marketing/journalismType/list', {
         method: 'GET',
         params: {
             ...params,
-        },
-        ...(options || {}),
+        }
     });
 }
 

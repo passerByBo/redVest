@@ -1,18 +1,18 @@
 export type TableListItem = {
-    key: number;
-    articleName: string;
-    articleTitle: string;
-    articleLevel: string;
-    outerLink: string;
-    author: string;
+    id: string;
+    type: string;
+    title: string;
+    isRecommend: string;
     isShow: string;
-    releaseTime: string;
+    urladdress: string;
+    author: string;
+    releaseDate: string;
 };
 
 export type TableListParams = {
-    articleName?: string;
-    articleTitle?: string;
-    key?: number;
+    type?: string;
+    title?: string;
+    key?: string;
     pageSize?: number;
     currentPage?: number;
 };

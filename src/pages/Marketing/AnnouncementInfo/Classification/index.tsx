@@ -4,10 +4,12 @@ import { Button, message } from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import type { TableListItem } from './data.d';
+
 import type { FormValueType } from './components/UpdateModal';
 import AddModal from './components/AddModal'
 import UpdateModal from './components/UpdateModal'
+
+import type { TableListItem } from './data.d';
 import { getArticleSortList, addArticleSortList, removeRule, updateRule } from '@/services/marketing/articleSort';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 

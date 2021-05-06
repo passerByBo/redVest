@@ -7,6 +7,10 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { rule } from '@/services/ant-design-pro/rule';
 import AddPackageModal from './components/AddPackageModal'
 
+import type { TableListItem } from './data.d';
+import { getArticleSortList, addArticleSortList, removeRule, updateRule } from '@/services/marketing/packageMaintenance';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+
 const PackageMaintenance: React.FC = () => {
 
     const [addCouponModalVisible, setAddCouponModalVisible] = useState<boolean>(false);
@@ -48,36 +52,60 @@ const PackageMaintenance: React.FC = () => {
         },
         {
             title: '单据编号',
-            dataIndex: 'name',
+            dataIndex: 'billno',
             valueType: 'textarea',
         },
         {
             title: '套餐名称',
-            dataIndex: 'desc',
+            dataIndex: 'mealName',
             valueType: 'textarea',
         },
         {
             title: '套餐标识',
-            dataIndex: 'name',
+            dataIndex: 'mealId',
             valueType: 'textarea',
             search: false,
         },
         {
             title: '是否发布',
-            dataIndex: 'status',
+            dataIndex: 'isrelease',
             valueType: 'textarea',
         },
         {
-            title: '维护时间',
-            dataIndex: 'createAt',
+            title: '创建人',
+            dataIndex: 'applyman',
             valueType: 'textarea',
         },
         {
-            title: '维护人',
-            dataIndex: 'name',
+            title: '创建时间',
+            dataIndex: 'applyDate',
+            valueType: 'textarea',
+        },
+        {
+            title: '时效状态',
+            dataIndex: 'mealId',
             valueType: 'textarea',
             search: false,
-        }, {
+        },
+        {
+            title: '审核状态',
+            dataIndex: 'mealId',
+            valueType: 'textarea',
+            search: false,
+        },
+        {
+            title: '有效起始日期',
+            dataIndex: 'startDate',
+            valueType: 'textarea',
+            search: false,
+        },
+        {
+            title: '有效截止日期',
+            dataIndex: 'endDate',
+            valueType: 'textarea',
+            search: false,
+        },
+        {
             title: '操作',
             dataIndex: 'option',
             valueType: 'option',
@@ -115,7 +143,7 @@ const PackageMaintenance: React.FC = () => {
                     defaultCollapsed: false
                 }}
                 toolbar={{ actions: toolBarRenderList }}
-                request={rule}
+                request={formatRequestListParams(getArticleSortList)}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {

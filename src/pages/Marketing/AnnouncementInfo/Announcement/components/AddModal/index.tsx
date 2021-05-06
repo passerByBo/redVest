@@ -42,7 +42,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
             >
                 <FormItem
                     label="文章分类名称"
-                    name="articleName"
+                    name="type"
                     rules={[
                         {
                             required: true
@@ -54,7 +54,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
 
                 <FormItem
                     label="文章标题"
-                    name="articleTitle"
+                    name="title"
                     rules={[
                         {
                             required: true
@@ -66,21 +66,21 @@ const AddModal: React.FC<AddModalProps> = (props) => {
 
                 <FormItem
                     label="文章重要性"
-                    name="articleLevel"
+                    name="isRecommend"
                 >
                     <Input placeholder="请选择文章重要性" allowClear />
                 </FormItem>
 
                 <FormItem
                     label="外部链接"
-                    name="outerLink"
+                    name="urladdress"
                 >
                     <Input placeholder="请输入外部链接" allowClear />
                 </FormItem>
 
                 <FormItem
                     label="是否展示"
-                    name="desc"
+                    name="isShow"
                     rules={[
                         {
                             required: true
@@ -102,7 +102,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
 
                 <FormItem
                     label="发布时间"
-                    name="releaseTime"
+                    name="releaseDate"
                     rules={[{ required: true, message: '请选择开始时间！' }]}
                 >
                     <DatePicker

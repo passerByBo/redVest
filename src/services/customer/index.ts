@@ -38,13 +38,44 @@ export async function getMerchantCertificateList(
         current?: number;
         pageSize?: number;
     },
-    options?: { [key: string]: any },
 ) {
     return request('/customer/shopInfo/applyList', {
         method: 'GET',
         params: {
             ...params,
         },
-        ...(options || {}),
+    });
+}
+
+/**
+ * 新建（保存）
+ */
+export async function saveApply(body: any) {
+    return request('/customer/shopInfo', {
+        method: 'POST',
+        data: {
+            ...body,
+        }
+    });
+}
+
+/**
+ * 删除
+ */
+export async function removeRule(params: { ids: string }) {
+    return request(`/customer/journalismType/${params.ids}`, {
+        method: 'delete',
+    });
+}
+
+/**
+ * 更新
+ */
+export async function updateRule(params: any) {
+    return request('/customer/journalismType', {
+        method: 'put',
+        data: {
+            ...params,
+        },
     });
 }

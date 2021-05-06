@@ -1,14 +1,40 @@
-export type MerchantCertificationListItem = {
-    key?: number;
-    disabled?: boolean;
-    href?: string;
-    avatar?: string;
-    name?: string;
-    owner?: string;
-    desc?: string;
-    callNo?: number;
-    status?: number;
-    updatedAt?: string;
-    createdAt?: string;
-    progress?: number;
+export type TableListItem = {
+    id: string;
+    shopName: string;
+    userName: string;
+    title: string;
+    updatedate: string;
+    status: string;
+};
+
+export type TableListParams = {
+    billno?: string;
+    applydate?: string;
+    compName?: string;
+    companytype?: string;
+    mainBusiness?: string;
+    companyregnum?: string;
+    inprovinces?: string;
+    incities?: string;
+    region?: string;
+    adressOffice?: string;
+    businesslicense?: string;
+    companyprofile?: string;
+    shopname?: string;
+    selfSupport?: string;
+    shopmobile?: string;
+    nameAgent?: string;
+    authorizedFile?: string;
+    authorizedUsername?: string;
+    authorizedUserTel?: string;
+    authorizedUserMail?: string;
+    officeTel?: string;
+    contaccessory?: string;
+    bankDeposit?: string;
+    accountName?: string;
+    bankAccount?: string;
+    settlementtype?: string;
+    status?: string;
+    pageSize?: number;
+    currentPage?: number;
 };

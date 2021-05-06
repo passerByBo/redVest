@@ -4,8 +4,11 @@ import { Button } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { rule } from '@/services/ant-design-pro/rule';
 import AddCouponModal from './components/AddCouponModal';
+
+import type { TableListItem } from './data.d';
+import { getArticleSortList, addArticleSortList, removeRule, updateRule } from '@/services/marketing/couponProduction';
+import formatRequestListParams from '@/utils/formatRequestListParams';
 
 const CouponProduction: React.FC = () => {
   const [addCouponModalVisible, setAddCouponModalVisible] = useState<boolean>(false);
@@ -34,60 +37,54 @@ const CouponProduction: React.FC = () => {
       <PlusOutlined />
       新建
     </Button>,
-    <Button key="delete" danger onClick={() => {}}>
+    <Button key="delete" danger onClick={() => { }}>
       <DeleteOutlined />
       删除
     </Button>,
-    <Button key="export" onClick={() => {}}>
+    <Button key="export" onClick={() => { }}>
       <ExportOutlined />
       导出
     </Button>,
   ];
 
-  const columns: ProColumns<API.RuleListItem>[] = [
-    {
-      title: '序号',
-      dataIndex: 'index',
-      valueType: 'index',
-      search: false,
-    },
+  const columns: ProColumns<TableListItem>[] = [
     {
       title: '单据编号',
-      dataIndex: 'name',
+      dataIndex: 'billno',
       valueType: 'textarea',
     },
     {
       title: '卡券名称',
-      dataIndex: 'desc',
+      dataIndex: 'cardName',
       valueType: 'textarea',
     },
     {
       title: '使用类型',
-      dataIndex: 'name',
+      dataIndex: 'useType',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '卡券数量',
-      dataIndex: 'status',
+      dataIndex: 'cardCount',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '单一卡券金额',
-      dataIndex: 'callNo',
+      dataIndex: 'cardMoney',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '采购总金额',
-      dataIndex: 'status',
+      dataIndex: 'totalMoneyLower',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '时效状态',
-      dataIndex: 'status',
+      dataIndex: 'cardStatus',
       valueType: 'textarea',
     },
     {
@@ -98,31 +95,31 @@ const CouponProduction: React.FC = () => {
     },
     {
       title: '有效期开始日期',
-      dataIndex: 'createdAt',
+      dataIndex: 'startDate',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '有效期结束日期',
-      dataIndex: 'createdAt',
+      dataIndex: 'endDate',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '创建人',
-      dataIndex: 'createdAt',
+      dataIndex: 'applyman',
       valueType: 'textarea',
     },
     {
       title: '创建时间',
-      dataIndex: 'createdAt',
+      dataIndex: 'applyDate',
       valueType: 'textarea',
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [<a onClick={() => {}}>编辑</a>, <a onClick={() => {}}>下架</a>],
+      render: (_, record) => [<a onClick={() => { }}>编辑</a>, <a onClick={() => { }}>下架</a>],
     },
   ];
   return (
@@ -142,7 +139,7 @@ const CouponProduction: React.FC = () => {
       ]}
       onTabChange={onTabChange}
     >
-      <ProTable<API.RuleListItem, API.PageParams>
+      <ProTable<TableListItem>
         headerTitle="卡券制作"
         actionRef={actionRef}
         rowKey="key"
@@ -151,10 +148,10 @@ const CouponProduction: React.FC = () => {
           defaultCollapsed: false,
         }}
         toolbar={{ actions: toolBarRenderList }}
-        request={rule}
+        request={formatRequestListParams(getArticleSortList)}
         columns={columns}
         rowSelection={{
-          onChange: (_, selectedRows) => {},
+          onChange: (_, selectedRows) => { },
         }}
       />
       <AddCouponModal
