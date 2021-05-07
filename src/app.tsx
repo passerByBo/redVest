@@ -45,7 +45,7 @@ const noTokenByUrl = (url: string) => {
 
   for (let i = 0, length = uriPool.length; i < length; i++) {
     let uri = uriPool[i];
-    if (url.includes(uri)) {
+    if (url.endsWith(uri)) {
       return true;
     }
   }

@@ -1,13 +1,13 @@
 //商家信息管理
 import React, { useState, useRef } from 'react';
 import { ExportOutlined } from '@ant-design/icons';
-import { Button, Drawer, Descriptions, Modal, Table, Card } from 'antd';
+import { Button, Drawer, Modal, Table, } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProDescriptions from '@ant-design/pro-descriptions';
 
-import { getList, getDetail, getMerchantList } from '@/services/customer/merchantInfo';
+import { getList, getDetail, getMerchantList, getOrderList } from '@/services/customer/merchantInfo';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 type ThematicGroupListItem = {
@@ -22,7 +22,6 @@ const BusinessInfo: React.FC = () => {
   const [ordersListVisible, setOrdersListVisible] = useState<boolean>(false);
   const [detailVisible, setDetailVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<ThematicGroupListItem>();
-  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const actionRef = useRef<ActionType>();
   const onTabChange = (key: string) => {
@@ -32,19 +31,77 @@ const BusinessInfo: React.FC = () => {
 
   const columnProducts = [
     {
-      title: '范围类别（专题组名称）',
-      dataIndex: 'name',
-      key: 'name',
+      title: '商品货号',
+      dataIndex: 'productNo',
+      key: 'productNo',
     },
     {
-      title: '范围名称（专题名称）',
-      dataIndex: 'age',
-      key: 'age',
+      title: '商品名称',
+      dataIndex: 'productName',
     },
     {
-      title: '备注',
-      dataIndex: 'address',
-      key: 'address',
+      title: '商品类型',
+      dataIndex: 'typeName',
+    },
+    {
+      title: '商品品牌',
+      dataIndex: 'productBrand',
+    },
+    {
+      title: '销售模式',
+      dataIndex: 'saleModel',
+    },
+    {
+      title: '销售价格',
+      dataIndex: 'salePrice',
+    },
+    {
+      title: '库存数量',
+      dataIndex: 'inventory',
+    },
+    {
+      title: '商品状态',
+      dataIndex: 'productStatus',
+    },
+  ];
+
+  const columnOrder = [
+    {
+      title: '订单号',
+      dataIndex: 'orderNo',
+      key: 'orderNo',
+    },
+    {
+      title: '下单时间',
+      dataIndex: 'placeorDate',
+    },
+    {
+      title: '收货人',
+      dataIndex: 'consignee',
+    },
+    {
+      title: '收货地址',
+      dataIndex: 'shippingAddress',
+    },
+    {
+      title: '支付方式',
+      dataIndex: 'payType',
+    },
+    {
+      title: '来源',
+      dataIndex: 'source',
+    },
+    {
+      title: '总金额',
+      dataIndex: 'orderTotalPrice',
+    },
+    {
+      title: '应付金额',
+      dataIndex: 'amountPayable',
+    },
+    {
+      title: '订单状态',
+      dataIndex: 'orderStatus',
     },
   ];
 
@@ -294,7 +351,6 @@ const BusinessInfo: React.FC = () => {
           }}
           columns={detailColumns}
         >
-
         </ProDescriptions>
       </Drawer>
 
@@ -307,24 +363,12 @@ const BusinessInfo: React.FC = () => {
       >
         <ProTable
           bordered
-          rowSelection={{
-            onChange: (selectedRowKeys, selectedRows) => console.log(selectedRowKeys, selectedRows)
-          }}
           rowKey='id'
           request={formatRequestListParams(getMerchantList)}
           columns={columnProducts}
           toolBarRender={false}
           search={false}
         />
-        {/* <Table
-          pagination={{ pageSize: 5, current: currentPage, onChange: (page: number, pageSize?: number) => { console.log(page) } }}
-          columns={columnProducts}
-          dataSource={data}
-          bordered
-          rowSelection={{
-            onChange: (selectedRowKeys, selectedRows) => console.log(selectedRowKeys, selectedRows)
-          }}
-          rowKey='key' /> */}
       </Modal>
 
       <Modal
@@ -334,14 +378,14 @@ const BusinessInfo: React.FC = () => {
         footer={null}
         onCancel={() => setOrdersListVisible(false)}
       >
-        <Table
-          columns={columnProducts}
-          dataSource={data}
+        <ProTable
           bordered
-          rowSelection={{
-            onChange: (selectedRowKeys, selectedRows) => console.log(selectedRowKeys, selectedRows)
-          }}
-          rowKey='key' />
+          rowKey='id'
+          request={formatRequestListParams(getOrderList)}
+          columns={columnOrder}
+          toolBarRender={false}
+          search={false}
+        />
       </Modal>
 
     </PageContainer>

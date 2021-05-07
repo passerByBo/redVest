@@ -37,3 +37,17 @@ export async function getMerchantList(
         }
     });
 }
+
+export async function getOrderList(
+    params: {
+        pageSize?: number;
+        pageNum?: number;
+    },
+) {
+    return request('/order/list', {
+        method: 'get',
+        params: {
+            ...params,
+        }
+    });
+}
