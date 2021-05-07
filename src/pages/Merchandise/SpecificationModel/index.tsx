@@ -7,7 +7,7 @@ import { Button, message, Switch } from 'antd';
 import ProTable from '@ant-design/pro-table';
 
 import formatRequestListParams from '@/utils/formatRequestListParams';
-import { getSpecModelList, addSpecModelList, deleteSpecMode, updateSpecMode } from '@/services/merchandise/model';
+import { getSpecModelList, addSpecModel, deleteSpecMode, updateSpecMode } from '@/services/merchandise/model';
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
@@ -129,7 +129,7 @@ const SpecificationModel: React.FC = () => {
   const handleAddSubmit = useCallback(async (fields) => {
     const hide = message.loading('正在增加');
     try {
-      let res = await addSpecMode({ ...fields });
+      let res = await addSpecModel({ ...fields });
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('新增失败请重试！');
@@ -198,7 +198,4 @@ const SpecificationModel: React.FC = () => {
 }
 
 export default SpecificationModel;
-function addSpecMode(arg0: any) {
-  throw new Error('Function not implemented.');
-}
 

@@ -11,7 +11,7 @@ export async function getSpecModelList(
   });
 }
 
-export async function addSpecModelList(
+export async function addSpecModel(
   body: { [key: string]: unknown },
   options?: { [key: string]: any },
 ) {

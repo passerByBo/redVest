@@ -1,85 +1,47 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { ExportOutlined, PlusOutlined, StopOutlined, UpCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ExportOutlined, PlusOutlined, StopOutlined, UpCircleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, Divider, message } from 'antd';
-import { addLabel, deleteLabel, getLabelList, updateLabel, validLabel } from '@/services/merchandise/label';
+import { Button, Divider, message, Popconfirm } from 'antd';
+
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import AddForm from './component/AddForm';
 import UpdateForm from './component/UpdateForm';
+import DetailDrawer from './component/DetailDrawer';
+import { addUnit, deleteUnit, getUnitList, updateUnit } from '@/services/merchandise/unit';
 
-export interface ILabel {
+export interface IUnit {
   id: string;
-  labelname: string;
-  isValid: string;
+  productUnit: string;
 }
 
 
 
-const Label: React.FC = () => {
+const Unit: React.FC = () => {
 
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   //新增窗口
   const [addModalVisible, handleAddModalVisible] = useState<boolean>(false);
 
-  const [showDetail, setShowDetail] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   //编辑和新增选择的数据都保存在这里
-  const [currentRow, setCurrentRow] = useState<ILabel | null>(null);
-  const [selectedRowsState, setSelectedRows] = useState<ILabel[]>([]);
+  const [currentRow, setCurrentRow] = useState<IUnit | null>(null);
+  const [selectedRowsState, setSelectedRows] = useState<IUnit[]>([]);
 
-  const parseBody = (data: ILabel | ILabel[], flag: boolean) => {
-    let body = { ids: '', flag };
-    if (Array.isArray(data)) {
-      let idsArr: string[] = [];
-      idsArr = data.map(item=> item.id)
-      body.ids = idsArr.join(',')
-    } else {
-      body.ids = data.id;
-    }
-    return body;
-  }
 
-  const handleValid = useCallback(async (data: ILabel | ILabel[], flag: boolean) => {
-    const valid = flag;
-    const tap = valid ? '启用' : '禁用'
-    const hide = message.loading(`正在${tap}`);
-    try {
-      const body = parseBody(data, valid)
-      const res = await validLabel(body);
-      if (res.status === 200 && res.code === 200) {
-        hide();
-        message.success(`${tap}成功！`);
-        if (actionRef.current) {
-          actionRef.current.reload();
-        }
-      } else {
-        hide();
-        message.error(`${tap}失败,${res.msg}！`);
-      }
-    } catch {
-      hide();
-      message.error(`${tap}失败请重试！`);
-    }
-  }, [])
 
-  const columns: ProColumns<ILabel>[] = [
+
+  const columns: ProColumns<IUnit>[] = [
     {
       title: '序号',
       dataIndex: 'index',
-      valueType: 'indexBorder',
+      valueType: 'index',
     },
     {
-      title: '标签名称',
-      dataIndex: 'labelname',
+      title: '单位名称',
+      dataIndex: 'productUnit',
       valueType: 'textarea',
-      tip: '规则名称是唯一的 key',
-    },
-    {
-      title: '是否有效',
-      dataIndex: 'isValid',
-      search: false
     },
     {
       title: '操作',
@@ -97,9 +59,19 @@ const Label: React.FC = () => {
             编辑
         </a>
           <Divider type="vertical" />
-          <a key="subscribeAlert" onClick={() => handleValid(record, record.isValid !== 'Y')}>
-            {record.isValid === 'Y' ? '启用' : '禁用'}
-          </a>
+          <Popconfirm
+            placement="topRight"
+            title={'确定要删除' + record.productUnit + '吗？'}
+            onConfirm={() => { handleDelete(record) }}
+            okText="确认"
+            cancelText="取消"
+          >
+            <a
+              key="delete"
+            >
+              删除
+                </a>
+          </Popconfirm>
         </>
       )
     },
@@ -109,10 +81,22 @@ const Label: React.FC = () => {
     handleUpdateModalVisible(false)
   }, [])
 
-  const handleDelete = async (data: any) => {
+  const parseIds = (data: IUnit | IUnit[]) => {
+    let ids = '';
+    if (Array.isArray(data)) {
+      let idArr = data.map(item => item.id);
+      ids = idArr.join(',');
+    } else {
+      ids = data.id;
+    }
+
+    return ids;
+  }
+
+  const handleDelete = async (data: IUnit | IUnit[]) => {
     const hide = message.loading('正在删除');
     try {
-      const res = await deleteLabel(data.id);
+      const res = await deleteUnit(parseIds(data));
       if (res.status === 200 && res.code === 200) {
         hide();
         message.success('删除成功！');
@@ -133,7 +117,7 @@ const Label: React.FC = () => {
   const handleUpdateSubmit = useCallback(async (fields) => {
     const hide = message.loading('正在编辑');
     try {
-      let res = await updateLabel({ ...fields });
+      let res = await updateUnit({ ...fields });
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('编辑失败请重试！');
@@ -160,7 +144,7 @@ const Label: React.FC = () => {
   const handleAddSubmit = useCallback(async (fields) => {
     const hide = message.loading('正在增加');
     try {
-      let res = await addLabel({ ...fields });
+      let res = await addUnit({ ...fields });
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('新增失败请重试！');
@@ -188,7 +172,7 @@ const Label: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: '标签管理',
+        title: '单位管理',
       }}>
       <ProTable
         actionRef={actionRef}
@@ -197,6 +181,22 @@ const Label: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
+
+
+          <Popconfirm
+            placement="topRight"
+            title={'确定要删除选中的所有单位' + '吗？'}
+            onConfirm={() => { handleDelete(selectedRowsState) }}
+            okText="确认"
+            cancelText="取消"
+          >
+            <Button
+              key="delete"
+              danger
+            >
+              <DeleteOutlined />删除
+        </Button>
+          </Popconfirm>,
           <Button
             key="primary"
             onClick={() => {
@@ -205,22 +205,6 @@ const Label: React.FC = () => {
             <ExportOutlined /> 导出
           </Button>,
           <Button
-            key="primary1"
-            onClick={() => {
-              handleValid(selectedRowsState, false)
-            }}
-          >
-            <StopOutlined />禁用
-         </Button>,
-          <Button
-            key="primary1"
-            onClick={() => {
-              handleValid(selectedRowsState, true)
-            }}
-          >
-            <UpCircleOutlined />启用
-      </Button>,
-          <Button
             onClick={() => { handleAddModalVisible(true) }}
             key="primary2"
             type="primary"
@@ -228,7 +212,7 @@ const Label: React.FC = () => {
             <PlusOutlined /> 新建
         </Button>,
         ]}
-        request={formatRequestListParams(getLabelList)}
+        request={formatRequestListParams(getUnitList)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -249,4 +233,4 @@ const Label: React.FC = () => {
   )
 }
 
-export default Label;
+export default Unit;

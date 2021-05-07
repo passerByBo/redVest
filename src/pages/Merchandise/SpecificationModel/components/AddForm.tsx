@@ -53,6 +53,8 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
 
   const [specifyInputs, setSpecifyInputs] = useState<string[]>([]);
 
+  const [addSpecifyVisible, setAddSpecifyVisible] = useState(false);
+
 
   function specifyChange(e, key: string) {
     setSpecify({ ...specify, [key]: e.target.value })
@@ -113,6 +115,11 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
     setSpecifyInputs(arr);
   }
 
+  const clearData = () => {
+    setSpecify({ name: '', value: '' })
+    setAddSpecifyVisible(false);
+  }
+
 
   return (
     <ModalForm
@@ -122,30 +129,36 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       visible={addModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
+          clearData();
+          setSpecifiesMap(new Map())
           onCancel(false)
         }
       }}
       onFinish={async (data) => {
         const fields = { ...data }
-
+        clearData();
+        fields.specInfo = Object.fromEntries(specifiesMap.entries())
         onSubmit(fields);
+        setSpecifiesMap(new Map())
       }}
     >
       <Form.Item
+        name='specModelName'
         label='模板名称'
       >
         <Input placeholder="请输入模板名称" />
       </Form.Item>
 
       <Form.Item
+       name='specModelDescribe'
         label='模板描述'
       >
         <TextArea placeholder="请输入模板描述" rows={4} />
       </Form.Item>
 
-      <Button type='primary'>添加新规格</Button>
+      <Button type='primary' onClick={() => { setAddSpecifyVisible(true) }}>添加新规格</Button>
 
-      <Row className={styles.addModalWrap} gutter={24}>
+      {addSpecifyVisible && <Row className={styles.addModalWrap} gutter={24}>
         <Col className={styles.addModalCol} span={9}>
           <span className={styles.label60} >规格:</span>
           <Input onChange={(e) => specifyChange(e, 'name')} value={specify.name} placeholder='请输入规格'></Input>
@@ -156,11 +169,11 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         </Col>
         <Col className={styles.addModalCol} span={6}>
           <Space>
-            <Button size="small">取消</Button>
-            <Button size="small" type='primary' onClick={() => { addSpecify(specify) }}>确认</Button>
+            <Button size="small" onClick={clearData}>取消</Button>
+            <Button size="small" type='primary' onClick={() => { clearData(); addSpecify(specify) }}>确认</Button>
           </Space>
         </Col>
-      </Row>
+      </Row>}
 
 
 
