@@ -23,3 +23,17 @@ export async function getDetail(params: { id: string }, options?: { [key: string
         ...(options || {}),
     });
 }
+
+export async function getMerchantList(
+    params: {
+        pageSize?: number;
+        pageNum?: number;
+    },
+) {
+    return request('/product/info/list', {
+        method: 'get',
+        params: {
+            ...params,
+        }
+    });
+}

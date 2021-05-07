@@ -1,4 +1,4 @@
-export default function formatRequestListParams(request: Function, other: any) {
+export default function formatRequestListParams(request: Function, other?: any) {
   return async (params: any, sort: any, filter: any) => {
     const current = params.current;
     delete params.current;

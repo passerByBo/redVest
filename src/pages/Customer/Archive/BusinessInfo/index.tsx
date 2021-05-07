@@ -7,7 +7,7 @@ import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProDescriptions from '@ant-design/pro-descriptions';
 
-import { getList, getDetail } from '@/services/customer/merchantInfo';
+import { getList, getDetail, getMerchantList } from '@/services/customer/merchantInfo';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 type ThematicGroupListItem = {
@@ -16,16 +16,18 @@ type ThematicGroupListItem = {
 }
 
 const BusinessInfo: React.FC = () => {
-  const [statusKey, setStatusKey] = useState<string>('passed');
+  const [statusKey, setStatusKey] = useState<string>('审核通过');
 
   const [productsListVisible, setProductsListVisible] = useState<boolean>(false);
   const [ordersListVisible, setOrdersListVisible] = useState<boolean>(false);
   const [detailVisible, setDetailVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<ThematicGroupListItem>();
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const actionRef = useRef<ActionType>();
   const onTabChange = (key: string) => {
     setStatusKey(key)
+    actionRef.current?.reloadAndRest?.();
   };
 
   const columnProducts = [
@@ -58,6 +60,66 @@ const BusinessInfo: React.FC = () => {
       name: 'Jim Green',
       age: 42,
       address: 'London No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
     },
     {
       key: '3',
@@ -163,7 +225,7 @@ const BusinessInfo: React.FC = () => {
       dataIndex: 'callNo',
       valueType: 'textarea',
       search: false,
-      hideInTable: statusKey !== 'passed',
+      hideInTable: statusKey !== '审核通过',
       render: (dom, entity) => {
         return <a onClick={() => setProductsListVisible(true)}>商品列表</a>;
       },
@@ -173,7 +235,7 @@ const BusinessInfo: React.FC = () => {
       dataIndex: 'callNo',
       valueType: 'textarea',
       search: false,
-      hideInTable: statusKey !== 'passed',
+      hideInTable: statusKey !== '审核通过',
       render: (dom, entity) => {
         return <a onClick={() => setOrdersListVisible(true)}>订单列表</a>;
       },
@@ -194,11 +256,11 @@ const BusinessInfo: React.FC = () => {
       tabList={[
         {
           tab: '审核通过商家',
-          key: 'passed',
+          key: '审核通过',
         },
         {
           tab: '审核未通过商家',
-          key: 'unpassed',
+          key: '审核未通过',
         }
       ]}
       onTabChange={onTabChange}
@@ -216,7 +278,7 @@ const BusinessInfo: React.FC = () => {
             <ExportOutlined /> 导出
           </Button>,
         ]}
-        request={formatRequestListParams(getList, { status: '审核通过' })}
+        request={formatRequestListParams(getList, { status: statusKey })}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => { },
@@ -243,14 +305,26 @@ const BusinessInfo: React.FC = () => {
         footer={null}
         onCancel={() => setProductsListVisible(false)}
       >
-        <Table
+        <ProTable
+          bordered
+          rowSelection={{
+            onChange: (selectedRowKeys, selectedRows) => console.log(selectedRowKeys, selectedRows)
+          }}
+          rowKey='id'
+          request={formatRequestListParams(getMerchantList)}
+          columns={columnProducts}
+          toolBarRender={false}
+          search={false}
+        />
+        {/* <Table
+          pagination={{ pageSize: 5, current: currentPage, onChange: (page: number, pageSize?: number) => { console.log(page) } }}
           columns={columnProducts}
           dataSource={data}
           bordered
           rowSelection={{
             onChange: (selectedRowKeys, selectedRows) => console.log(selectedRowKeys, selectedRows)
           }}
-          rowKey='key' />
+          rowKey='key' /> */}
       </Modal>
 
       <Modal
