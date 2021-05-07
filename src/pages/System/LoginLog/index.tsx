@@ -15,13 +15,11 @@ const OperationLog: React.FC = () => {
             title: '登录地址',
             dataIndex: 'ipaddr',
             valueType: 'textarea',
-            search: false,
         },
         {
             title: '登录地点',
             dataIndex: 'loginLocation',
             valueType: 'textarea',
-            search: false,
         },
         {
             title: '访问时间',
@@ -46,8 +44,10 @@ const OperationLog: React.FC = () => {
         {
             title: '登录状态',
             dataIndex: 'status',
-            valueType: 'textarea',
-            search: false,
+            valueEnum: {
+                0: { text: '成功' },
+                1: { text: '失败' },
+            },
         }
     ]
     return (
@@ -57,7 +57,6 @@ const OperationLog: React.FC = () => {
             }}
         >
             <ProTable
-                search={false}
                 headerTitle="操作日志"
                 rowKey="id"
                 toolBarRender={false}

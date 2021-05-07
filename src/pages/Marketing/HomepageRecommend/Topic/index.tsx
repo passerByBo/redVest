@@ -4,7 +4,7 @@ import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { addBrand, deleteBrand, getBrandList, updateBrand } from '@/services/merchandise/product';
+import { addTopic, deleteTopic, getTopicList } from '@/services/marketing/topic';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import DetailDrawer from './components/DetailDrawer';
 import UpdateForm from './components/UpdateForm';
@@ -45,8 +45,8 @@ const Brand: React.FC = () => {
 
     const columns: ProColumns<IBrand>[] = [
         {
-            title: '商品品牌',
-            dataIndex: 'productBrand',
+            title: '专题名称',
+            dataIndex: 'specialName',
             render: ((_, item: IBrand) => {
                 return (
                     <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
@@ -54,13 +54,13 @@ const Brand: React.FC = () => {
             })
         },
         {
-            title: '品牌编号',
-            dataIndex: 'brandNo',
+            title: '专题描述',
+            dataIndex: 'specialDescribe',
             valueType: 'textarea',
         },
         {
-            title: '品牌logo',
-            dataIndex: 'logo',
+            title: '专题图片',
+            dataIndex: 'specialImg',
             search: false,
             render: (_, record) => {
                 return (
@@ -73,18 +73,9 @@ const Brand: React.FC = () => {
             }
         },
         {
-            title: '品牌专区大图',
-            dataIndex: 'brandImg',
+            title: '是否有效',
+            dataIndex: 'isValid',
             search: false,
-            render: (_, record) => {
-                return (
-                    <Image
-                        preview={{ mask: <EyeOutlined /> }}
-                        width={40}
-                        src={_ as string}
-                    />
-                )
-            }
         },
         {
             title: '排序',
@@ -94,42 +85,12 @@ const Brand: React.FC = () => {
             valueType: 'digit',
         },
         {
-            title: '是否推荐',
-            search: false,
-            dataIndex: 'isRecommend',
-        },
-        {
-            title: '是否展示',
-            search: false,
-            dataIndex: 'isShow',
-        },
-        {
-            title: '是否有效',
-            dataIndex: 'isvalid',
-            search: false,
-        },
-        {
-            title: '是否审核通过',
-            dataIndex: 'status',
-            valueType: 'select',
-            valueEnum: isvalidEnum,
-        },
-        {
             title: '操作',
             dataIndex: 'option',
             valueType: 'option',
             search: false,
             width: 200,
             render: (text, record, _, action) => [
-                <a
-                    key="editable"
-                    onClick={() => {
-                        setCurrentRow(record);
-                        handleUpdateModalVisible(true)
-                    }}
-                >
-                    编辑
-        </a>,
                 <Popconfirm
                     placement="topRight"
                     title={'确定要删除' + '吗？'}
@@ -141,13 +102,12 @@ const Brand: React.FC = () => {
                         key="delete"
                     >
                         删除
-                </a>
+                      </a>
                 </Popconfirm>
 
             ],
         }
     ]
-
 
     const handleUpdateCancel = useCallback(() => {
         handleUpdateModalVisible(false)
@@ -156,7 +116,7 @@ const Brand: React.FC = () => {
     const handleDelete = async (data: any) => {
         const hide = message.loading('正在删除');
         try {
-            const res = await deleteBrand(data.id);
+            const res = await deleteTopic(data.id);
             if (res.status === 200 && res.code === 200) {
                 hide();
                 message.success('删除成功！');
@@ -204,7 +164,7 @@ const Brand: React.FC = () => {
     const handleAddSubmit = useCallback(async (fields) => {
         const hide = message.loading('正在增加');
         try {
-            let res = await addBrand({ ...fields });
+            let res = await addTopic({ ...fields });
             if (res.status === 200 && res.code !== 200) {
                 hide();
                 message.error('新增失败请重试！');
@@ -237,7 +197,7 @@ const Brand: React.FC = () => {
                         <PlusOutlined />新建
                     </Button>
                 ]}
-                request={formatRequestListParams(getBrandList)}
+                request={formatRequestListParams(getTopicList)}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {

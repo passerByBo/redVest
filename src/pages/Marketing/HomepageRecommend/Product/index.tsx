@@ -5,6 +5,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { addBrand, deleteBrand, getBrandList, updateBrand } from '@/services/merchandise/product';
+import { addProduct, deleteProduct, getProductList } from '@/services/marketing/product';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import DetailDrawer from './components/DetailDrawer';
 import UpdateForm from './components/UpdateForm';
@@ -44,47 +45,31 @@ const Brand: React.FC = () => {
 
 
   const columns: ProColumns<IBrand>[] = [
+
     {
-      title: '商品品牌',
-      dataIndex: 'productBrand',
-      render: ((_, item:IBrand) => {
-        return (
-          <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
-        )
-      })
-    },
-    {
-      title: '品牌编号',
+      title: '商品名称',
       dataIndex: 'brandNo',
       valueType: 'textarea',
     },
     {
-      title: '品牌logo',
-      dataIndex: 'logo',
-      search: false,
-      render: (_, record) => {
-        return (
-          <Image
-            preview={{ mask: <EyeOutlined /> }}
-            width={40}
-            src={_ as string}
-          />
-        )
-      }
+      title: '商品货号',
+      dataIndex: 'brandNo',
+      valueType: 'textarea',
     },
     {
-      title: '品牌专区大图',
-      dataIndex: 'brandImg',
+      title: '推荐开始时间',
+      dataIndex: 'brandNo',
+      valueType: 'textarea',
+    },
+    {
+      title: '推荐结束日期',
+      dataIndex: 'brandNo',
+      valueType: 'textarea',
+    },
+    {
+      title: '是否推荐',
       search: false,
-      render: (_, record) => {
-        return (
-          <Image
-            preview={{ mask: <EyeOutlined /> }}
-            width={40}
-            src={_ as string}
-          />
-        )
-      }
+      dataIndex: 'isRecommend',
     },
     {
       title: '排序',
@@ -94,42 +79,12 @@ const Brand: React.FC = () => {
       valueType: 'digit',
     },
     {
-      title: '是否推荐',
-      search: false,
-      dataIndex: 'isRecommend',
-    },
-    {
-      title: '是否展示',
-      search: false,
-      dataIndex: 'isShow',
-    },
-    {
-      title: '是否有效',
-      dataIndex: 'isvalid',
-      search: false,
-    },
-    {
-      title: '是否审核通过',
-      dataIndex: 'status',
-      valueType: 'select',
-      valueEnum: isvalidEnum,
-    },
-    {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       search: false,
       width: 200,
       render: (text, record, _, action) => [
-        <a
-          key="editable"
-          onClick={() => {
-            setCurrentRow(record);
-            handleUpdateModalVisible(true)
-          }}
-        >
-          编辑
-        </a>,
         <Popconfirm
           placement="topRight"
           title={'确定要删除' + '吗？'}

@@ -35,7 +35,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   return (
     <ModalForm
       form={addForm}
-      title={'新增品牌'}
+      title={'新增专题'}
       visible={addModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
@@ -68,23 +68,23 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
     >
       <ProForm.Group>
-        <ProFormText width="md" name="productBrand" label="商品品牌" placeholder="请输入商品品牌" />
-        {/* 接口中没有 */}
-        <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
+        <ProFormText width="md" name="specialName" label="专题名称" placeholder="请输入专题名称" />
       </ProForm.Group>
 
       {/* 缺少图片选择器 */}
 
       <ProForm.Group>
-        <ProFormTextArea width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
-        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
+        <ProFormTextArea width="md" name="specialDescribe" label="专题描述" placeholder="请输入专题描述" />
+
       </ProForm.Group>
 
       <ProForm.Group>
-        <ProFormSwitch name="isRecommend" label="是否推荐" />
-        <ProFormSwitch name="isShow" label="是否展示" />
-        <ProFormSwitch name="isvalid" label="是否有效" />
-        <ProFormSwitch name="status" label="是否审核通过" />
+        <ProFormSwitch name="isValid" label="是否有效" />
+      </ProForm.Group>
+
+
+      <ProForm.Group>
+        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
       </ProForm.Group>
 
     </ModalForm >

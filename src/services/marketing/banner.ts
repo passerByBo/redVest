@@ -1,10 +1,10 @@
 import { request } from 'umi';
 
-export async function getBrandList(
+export async function getBannerList(
     params: { [key: string]: unknown },
     options?: { [key: string]: any },
 ) {
-    return request('/product/brand/list', {
+    return request('/mall/recommendRotation/list', {
         method: 'GET',
         params: { ...params },
         ...(options || {}),
@@ -12,11 +12,11 @@ export async function getBrandList(
 }
 
 
-export async function updateBrand(
+export async function updateBanner(
     data: { [key: string]: unknown },
     options?: { [key: string]: any },
 ) {
-    return request('/product/brand', {
+    return request('/mall/recommendRotation', {
         method: 'PUT',
         data: {
             ...data,
@@ -25,11 +25,11 @@ export async function updateBrand(
     });
 }
 
-export async function addBrand(
+export async function addBanner(
     data: { [key: string]: unknown },
     options?: { [key: string]: any },
 ) {
-    return request('/product/brand', {
+    return request('/mall/recommendRotation', {
         method: 'POST',
         data: {
             ...data,
@@ -38,19 +38,19 @@ export async function addBrand(
     });
 }
 
-export async function getBrandDetail(
+export async function getBannerDetail(
     params: { [key: string]: unknown },
     options?: { [key: string]: unknown },
 ) {
     console.log('params', params)
-    return request(`/product/brand/${params.id}`, {
+    return request(`/mall/recommendRotation/${params.id}`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
-export async function deleteBrand(id: string, options?: { [key: string]: any }) {
-    return request(`/product/brand/${id}`, {
+export async function deleteBanner(id: string, options?: { [key: string]: any }) {
+    return request(`/mall/recommendRotation/${id}`, {
         method: 'DELETE',
         ...(options || {}),
     });

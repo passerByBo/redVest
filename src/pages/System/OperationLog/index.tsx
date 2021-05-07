@@ -15,19 +15,16 @@ const OperationLog: React.FC = () => {
             title: '操作人',
             dataIndex: 'operName',
             valueType: 'textarea',
-            search: false,
         },
         {
             title: '操作日期',
             dataIndex: 'operTime',
             valueType: 'textarea',
-            search: false,
         },
         {
             title: 'IP地址',
             dataIndex: 'operUrl',
             valueType: 'textarea',
-            search: false,
         },
         {
             title: '操作记录',
@@ -43,7 +40,6 @@ const OperationLog: React.FC = () => {
             }}
         >
             <ProTable
-                search={false}
                 headerTitle="操作日志"
                 rowKey="id"
                 toolBarRender={false}

@@ -1,10 +1,10 @@
 import { request } from 'umi';
 
-export async function getBrandList(
+export async function getTopicList(
     params: { [key: string]: unknown },
     options?: { [key: string]: any },
 ) {
-    return request('/product/brand/list', {
+    return request('/mall/recommendSubject/list', {
         method: 'GET',
         params: { ...params },
         ...(options || {}),
@@ -12,11 +12,11 @@ export async function getBrandList(
 }
 
 
-export async function updateBrand(
+export async function updateTopic(
     data: { [key: string]: unknown },
     options?: { [key: string]: any },
 ) {
-    return request('/product/brand', {
+    return request('/mall/recommendSubject', {
         method: 'PUT',
         data: {
             ...data,
@@ -25,11 +25,11 @@ export async function updateBrand(
     });
 }
 
-export async function addBrand(
+export async function addTopic(
     data: { [key: string]: unknown },
     options?: { [key: string]: any },
 ) {
-    return request('/product/brand', {
+    return request('/mall/recommendSubject', {
         method: 'POST',
         data: {
             ...data,
@@ -38,19 +38,19 @@ export async function addBrand(
     });
 }
 
-export async function getBrandDetail(
+export async function getTopicDetail(
     params: { [key: string]: unknown },
     options?: { [key: string]: unknown },
 ) {
     console.log('params', params)
-    return request(`/product/brand/${params.id}`, {
+    return request(`/mall/recommendSubject/${params.id}`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
-export async function deleteBrand(id: string, options?: { [key: string]: any }) {
-    return request(`/product/brand/${id}`, {
+export async function deleteTopic(id: string, options?: { [key: string]: any }) {
+    return request(`/mall/recommendSubject/${id}`, {
         method: 'DELETE',
         ...(options || {}),
     });
