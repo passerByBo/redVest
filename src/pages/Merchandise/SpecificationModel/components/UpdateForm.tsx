@@ -1,32 +1,48 @@
-import React, { useEffect } from 'react';
-import { Form, Modal } from 'antd';
-import ProForm, {
-  ProFormText,
-  ProFormTextArea,
+import React, {  useState } from 'react';
+import styles from '../style.less';
+import { Button, Col, Form, Input, Row, Space } from 'antd';
+import  {
   ModalForm,
-  ProFormSwitch,
-  ProFormDigit,
 } from '@ant-design/pro-form';
+import { Specify, SpecifyItem } from '../../components/Specify';
+import { CheckOutlined } from '@ant-design/icons';
 
 export type FormValueType = {
-  id: string;
-  brandDescribe: string;
-  productBrand: string;
-  brandNo: string;
-  logo: string;
-  brandImg: string;
-  isvalid: string | boolean;
-  sort: string;
-  isShow: string | boolean;
-  isRecommend: string | boolean;
-  status: string | boolean;
+  id?: string;
+  isValid?: string | boolean;
+  specModelName?: string;
+  specModelDescribe?: string;
+  shopId?: string;
+  specInfo?: string;
+  createuser?: string;
+  updatedate?: string;
+};
+
+
+const { TextArea } = Input;
+export interface AddFormModalProps {
+  visible: boolean;
+  onOk(): void;
+  onCancel(): void;
+}
+
+export interface ISpecify {
+  name: string;
+  value: string;
+}
+
+const formItemLayoutWithOutLabel = {
+  wrapperCol: {
+    xs: { span: 24, offset: 0 },
+    sm: { span: 23, offset: 1 },
+  },
 };
 
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (fiedls: FormValueType) => {};
   updateModalVisible: boolean;
-  values: FormValueType | null;
+  values:FormValueType;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
@@ -34,90 +50,161 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const { values, updateModalVisible, onSubmit, onCancel } = props;
 
 
+  const [specify, setSpecify] = useState<ISpecify>({ name: '', value: '' });
+  const [specifies, setSpecifies] = useState<string[]>([]);
+  const [specifiesMap, setSpecifiesMap] = useState<Map<string, string[]>>(new Map());
+
+  const [specifyInputs, setSpecifyInputs] = useState<string[]>([]);
+
+  const [addSpecifyVisible, setAddSpecifyVisible] = useState(false);
+
+
   if (values) {
-    //转换是否有效果
-    if (values.isvalid === 'Y') {
-      values.isvalid = true;
-    } else {
-      values.isvalid = false;
-    }
-    if (values.isShow === 'Y') {
-      values.isShow = true;
-    } else {
-      values.isShow = false;
-    }
-    if (values.isRecommend === 'Y') {
-      values.isRecommend = true;
-    } else {
-      values.isRecommend = false;
-    }
-    if (values.status === 'Y') {
-      values.status = true;
-    } else {
-      values.status = false;
-    }
     updateForm.setFieldsValue(values)
   }
+
+  function specifyChange(e, key: string) {
+    setSpecify({ ...specify, [key]: e.target.value })
+  }
+
+  function addSpecify(data: ISpecify) {
+    const { name, value } = data;
+    setSpecifies([...specifies, name]);
+    setSpecifiesMap(specifiesMap.set(name, [value]));
+
+  }
+
+  function specifyValueChange(e, index: number) {
+    let arr = [...specifyInputs];
+    arr[index] = e.target.value;
+    setSpecifyInputs(arr);
+  }
+
+  function addSpecifyValue(name: string, index: number) {
+    let value = specifyInputs[index];
+
+    //将新的数据加入到Map中
+    let valueArr = [...(specifiesMap.get(name) || [])];
+    valueArr.push(value);
+    setSpecifiesMap(specifiesMap.set(name, valueArr));
+
+    //每次添加完数据后清空原来的输入框
+    let arr = [...specifyInputs];
+    arr[index] = '';
+    setSpecifyInputs(arr);
+
+  }
+
+  /**
+   * 删除规格值
+   * @param name 规格名称
+   * @param index 当前规格值所在位置
+   */
+  function deleteSpecifyValue(name: string, index: number): void {
+    let valueArr = [...(specifiesMap.get(name) || [])];
+    valueArr.splice(index, 1);
+    specifiesMap.set(name, valueArr)
+    let newMap = new Map(specifiesMap);
+    setSpecifiesMap(newMap);
+  }
+
+  /**
+   * 删除规格
+   * @param name 规格名称
+   */
+  function deleteSpecify(name: string, index: number): void {
+    specifiesMap.delete(name)
+    setSpecifiesMap(specifiesMap);
+
+    //删除保存的新增规格值的数组
+    let arr = [...specifyInputs];
+    arr.splice(index, 1);
+    setSpecifyInputs(arr);
+  }
+
+  const clearData = () => {
+    setSpecify({ name: '', value: '' })
+    setAddSpecifyVisible(false);
+  }
+
 
 
 
   return (
     <ModalForm
+      {...formItemLayoutWithOutLabel}
       form={updateForm}
-      title={values && values.productBrand}
+      title={'编辑规格模板'}
       visible={updateModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
+          clearData();
+          setSpecifiesMap(new Map())
           onCancel(false)
         }
       }}
       onFinish={async (data) => {
-
-        const merge = { ...values, ...data }
-        if (merge.isRecommend === true) {
-          merge.isRecommend = 'Y';
-        } else {
-          merge.isRecommend = 'N';
-        }
-        if (merge.isShow === true) {
-          merge.isShow = 'Y';
-        } else {
-          merge.isShow = 'N';
-        }
-        if (merge.isvalid === true) {
-          merge.isvalid = 'Y';
-        } else {
-          merge.isvalid = 'N';
-        }
-        if (merge.status === true) {
-          merge.status = 'Y';
-        } else {
-          merge.status = 'N';
-        }
-        onSubmit(merge);
+        const fields = { ...data }
+        clearData();
+        fields.specInfo = Object.fromEntries(specifiesMap.entries())
+        onSubmit(fields);
+        setSpecifiesMap(new Map())
       }}
     >
-      <ProForm.Group>
-        <ProFormText width="md" name="productBrand" label="商品品牌" placeholder="请输入商品品牌" />
-        {/* 接口中没有 */}
-        <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
-      </ProForm.Group>
+      <Form.Item
+        name='specModelName'
+        label='模板名称'
+      >
+        <Input placeholder="请输入模板名称" />
+      </Form.Item>
 
-      {/* 缺少图片选择器 */}
+      <Form.Item
+       name='specModelDescribe'
+        label='模板描述'
+      >
+        <TextArea placeholder="请输入模板描述" rows={4} />
+      </Form.Item>
 
-      <ProForm.Group>
-        <ProFormTextArea width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
-        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
-      </ProForm.Group>
+      <Button type='primary' onClick={() => { setAddSpecifyVisible(true) }}>添加新规格</Button>
 
-      <ProForm.Group>
-        <ProFormSwitch name="isRecommend" label="是否推荐" />
-        <ProFormSwitch name="isShow" label="是否展示" />
-        <ProFormSwitch name="isvalid" label="是否有效" />
-        <ProFormSwitch name="status" label="是否审核通过" />
-      </ProForm.Group>
+      {addSpecifyVisible && <Row className={styles.addModalWrap} gutter={24}>
+        <Col className={styles.addModalCol} span={9}>
+          <span className={styles.label60} >规格:</span>
+          <Input onChange={(e) => specifyChange(e, 'name')} value={specify.name} placeholder='请输入规格'></Input>
+        </Col>
+        <Col className={styles.addModalCol} span={9}>
+          <span className={styles.label80}>规格值:</span>
+          <Input onChange={(e) => specifyChange(e, 'value')} value={specify.value} placeholder='请输入规格值'></Input>
+        </Col>
+        <Col className={styles.addModalCol} span={6}>
+          <Space>
+            <Button size="small" onClick={clearData}>取消</Button>
+            <Button size="small" type='primary' onClick={() => { clearData(); addSpecify(specify) }}>确认</Button>
+          </Space>
+        </Col>
+      </Row>}
+
+
+
+      {
+        [...specifiesMap.keys()].map((name, i) => (
+          <Specify name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
+            {
+              (specifiesMap.get(name) || []).map((value: string, index: number) => (
+                <SpecifyItem value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
+              ))
+            }
+
+            <Input.Group compact style={{ width: 162, marginTop: 10 }}>
+              <Input style={{ width: 120 }} value={specifyInputs[i]} onChange={(e) => { specifyValueChange(e, i) }} />
+              <Button onClick={() => { addSpecifyValue(name, i) }} icon={<CheckOutlined />} type='primary'></Button>
+            </Input.Group>
+          </Specify>
+        ))
+      }
 
     </ModalForm >
+
 
   );
 });

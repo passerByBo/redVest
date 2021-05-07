@@ -104,6 +104,11 @@ export default [
         component: './Merchandise/Label',
       },
       {
+        path: '/merchandise/unit',
+        name: '单位管理',
+        component: './Merchandise/Unit',
+      },
+      {
         path: '/merchandise/recycle',
         name: '商品回收站',
         component: './Merchandise/Recycle',
