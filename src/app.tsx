@@ -40,7 +40,6 @@ const noTokenByUrl = (url: string) => {
     '/login/getAuthCode/',
     '/login/authCode',
     '/login/account',
-    '/customer/shopInfo',
     '/operations/provinces/getProvinceList'
   ]
 
