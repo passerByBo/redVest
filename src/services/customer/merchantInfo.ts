@@ -16,3 +16,10 @@ export async function getList(
         }
     });
 }
+
+export async function getDetail(params: { id: string }, options?: { [key: string]: any }) {
+    return request(`/customer/shopInfo/${params.id}`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
