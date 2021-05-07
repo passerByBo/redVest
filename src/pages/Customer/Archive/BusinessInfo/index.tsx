@@ -1,3 +1,4 @@
+//商家信息管理
 import React, { useState, useRef } from 'react';
 import { ExportOutlined } from '@ant-design/icons';
 import { Button, Drawer, Descriptions, Modal, Table, Card } from 'antd';
@@ -5,17 +6,22 @@ import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProDescriptions from '@ant-design/pro-descriptions';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 
-import { getList } from '@/services/customer/merchantInfo';
+import { getList, getDetail } from '@/services/customer/merchantInfo';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
+type ThematicGroupListItem = {
+  id: string,
+  compName: string,
+}
+
 const BusinessInfo: React.FC = () => {
-  const [statusKey, setStatusKey] = useState<string>('1');
+  const [statusKey, setStatusKey] = useState<string>('passed');
 
   const [productsListVisible, setProductsListVisible] = useState<boolean>(false);
   const [ordersListVisible, setOrdersListVisible] = useState<boolean>(false);
   const [detailVisible, setDetailVisible] = useState<boolean>(false);
+  const [currentRow, setCurrentRow] = useState<ThematicGroupListItem>();
 
   const actionRef = useRef<ActionType>();
   const onTabChange = (key: string) => {
@@ -61,8 +67,48 @@ const BusinessInfo: React.FC = () => {
     },
   ];
 
+  const detailColumns = [
+    {
+      title: '单据编号',
+      key: 'billno',
+      dataIndex: 'billno',
+    },
+    {
+      title: '申请时间',
+      dataIndex: 'applydate',
+    },
+    {
+      title: '企业名称',
+      dataIndex: 'compName',
+    },
+    {
+      title: '企业类型',
+      dataIndex: 'companytype',
+    },
+    {
+      title: '主营业务',
+      dataIndex: 'mainBusiness',
+    },
+    {
+      title: '纳税人识别号',
+      dataIndex: 'companyregnum',
+    },
+    {
+      title: '所在省',
+      dataIndex: 'inprovinces',
+    },
+    {
+      title: '所在市',
+      dataIndex: 'incities',
+    },
+    {
+      title: '详细地址',
+      dataIndex: 'adressOffice',
+    },
+  ]
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+
+  const columns: ProColumns<ThematicGroupListItem>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -117,6 +163,7 @@ const BusinessInfo: React.FC = () => {
       dataIndex: 'callNo',
       valueType: 'textarea',
       search: false,
+      hideInTable: statusKey !== 'passed',
       render: (dom, entity) => {
         return <a onClick={() => setProductsListVisible(true)}>商品列表</a>;
       },
@@ -126,6 +173,7 @@ const BusinessInfo: React.FC = () => {
       dataIndex: 'callNo',
       valueType: 'textarea',
       search: false,
+      hideInTable: statusKey !== 'passed',
       render: (dom, entity) => {
         return <a onClick={() => setOrdersListVisible(true)}>订单列表</a>;
       },
@@ -135,7 +183,7 @@ const BusinessInfo: React.FC = () => {
       key: 'option',
       width: 120,
       valueType: 'option',
-      render: (_, record) => [<a key="link" onClick={() => setDetailVisible(true)}>查看详情</a>],
+      render: (_, record) => [<a key="link" onClick={() => { setDetailVisible(true); setCurrentRow(record) }}>查看详情</a>],
     },
   ];
   return (
@@ -155,7 +203,7 @@ const BusinessInfo: React.FC = () => {
       ]}
       onTabChange={onTabChange}
     >
-      <ProTable<API.RuleListItem, API.PageParams>
+      <ProTable
         headerTitle="商家信息管理"
         actionRef={actionRef}
         options={{ search: false, fullScreen: false, reload: true, setting: false, density: false }}
@@ -168,24 +216,23 @@ const BusinessInfo: React.FC = () => {
             <ExportOutlined /> 导出
           </Button>,
         ]}
-        request={formatRequestListParams(getList)}
+        request={formatRequestListParams(getList, { status: '审核通过' })}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => { },
         }}
       />
 
-      <Drawer title="查看详情" width={600} onClose={() => setDetailVisible(false)} visible={detailVisible}>
-        <ProDescriptions column={1}  >
-          <ProDescriptions.Item label="单据编号">这是一段文本</ProDescriptions.Item>
-          <ProDescriptions.Item label="申请时间">这是一段文本</ProDescriptions.Item>
-          <ProDescriptions.Item label="企业名称">这是一段文本</ProDescriptions.Item>
-          <ProDescriptions.Item label="企业类型">这是一段文本</ProDescriptions.Item>
-          <ProDescriptions.Item label="主营业务">这是一段文本</ProDescriptions.Item>
-          <ProDescriptions.Item label="纳税人识别号">这是一段文本</ProDescriptions.Item>
-          <ProDescriptions.Item label="所在省">这是一段文本</ProDescriptions.Item>
-          <ProDescriptions.Item label="所在市" valueType="money">100</ProDescriptions.Item>
-          <ProDescriptions.Item label="详细地址" valueType="percent">100</ProDescriptions.Item>
+      <Drawer title="查看详情" width={800} onClose={() => setDetailVisible(false)} visible={detailVisible}>
+        <ProDescriptions
+          column={2}
+          request={getDetail}
+          params={{
+            id: currentRow?.id,
+          }}
+          columns={detailColumns}
+        >
+
         </ProDescriptions>
       </Drawer>
 
