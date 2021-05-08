@@ -75,7 +75,6 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
 
       <ProForm.Group>
         <ProFormTextArea width="md" name="specialDescribe" label="专题描述" placeholder="请输入专题描述" />
-
       </ProForm.Group>
 
       <ProForm.Group>
@@ -86,7 +85,6 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       <ProForm.Group>
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
       </ProForm.Group>
-
     </ModalForm >
 
   );

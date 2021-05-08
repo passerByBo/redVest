@@ -1,12 +1,14 @@
-import React from 'react';
-import { Form } from 'antd';
+import React, { useState } from 'react';
 import ProForm, {
   ProFormText,
-  ProFormTextArea,
   ModalForm,
   ProFormSwitch,
-  ProFormDigit,
+  ProFormDigit, ProFormDatePicker
 } from '@ant-design/pro-form';
+
+import { Form, Input } from 'antd';
+
+import OperationLog from './ProductList';
 
 export type FormValueType = {
   id?: string;
@@ -31,11 +33,21 @@ export type UpdateFormProps = {
 const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addForm] = Form.useForm();
   const { addModalVisible, onSubmit, onCancel } = props;
+  const [tableVisible, setTableVisible] = useState<boolean>(false);
+  const onSearch = () => { setTableVisible(!tableVisible) };
+
+  const useData = (useData: any) => {
+    console.log(useData);
+    addForm.setFieldsValue({
+      productName: useData.loginTime,
+    });
+    setTableVisible(false);
+  };
 
   return (
     <ModalForm
       form={addForm}
-      title={'新增品牌'}
+      title={'新增产品'}
       visible={addModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
@@ -68,27 +80,39 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
     >
       <ProForm.Group>
-        <ProFormText width="md" name="productBrand" label="商品品牌" placeholder="请输入商品品牌" />
-        {/* 接口中没有 */}
-        <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
+        <Form.Item name="productName" label="商品名称" rules={[{ required: true }]}>
+          <Input.Search onSearch={onSearch} style={{ width: 328 }} />
+        </Form.Item>
       </ProForm.Group>
+
+      {/* <ProForm.Group>
+        <ProFormText width="md" name="productName" label="商品名称" placeholder="请输入商品名称" />
+        <Input.Search placeholder="input search text" style={{ width: 200 }} />
+      </ProForm.Group> */}
 
       {/* 缺少图片选择器 */}
 
       <ProForm.Group>
-        <ProFormTextArea width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
-        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
+        <ProFormText width="md" name="productNo" label="商品货号" placeholder="请输入商品货号" initialValue={Date.now()} />
       </ProForm.Group>
 
       <ProForm.Group>
-        <ProFormSwitch name="isRecommend" label="是否推荐" />
-        <ProFormSwitch name="isShow" label="是否展示" />
-        <ProFormSwitch name="isvalid" label="是否有效" />
-        <ProFormSwitch name="status" label="是否审核通过" />
+        <ProFormSwitch name="isValid" label="是否推荐" />
       </ProForm.Group>
 
-    </ModalForm >
+      <ProForm.Group>
+        <ProFormDatePicker name="startDate" label="推荐开始日期" />
+      </ProForm.Group>
 
+      <ProForm.Group>
+        <ProFormDatePicker name="endDate" label="推荐结束日期" />
+      </ProForm.Group>
+
+      <ProForm.Group>
+        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
+      </ProForm.Group>
+      {tableVisible && <OperationLog useData={useData} />}
+    </ModalForm>
   );
 });
 

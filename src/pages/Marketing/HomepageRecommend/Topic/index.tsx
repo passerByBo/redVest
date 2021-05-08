@@ -76,6 +76,11 @@ const Brand: React.FC = () => {
             title: '是否有效',
             dataIndex: 'isValid',
             search: false,
+            valueEnum: {
+                true: { text: '是' },
+                false: { text: '否' },
+            },
+
         },
         {
             title: '排序',

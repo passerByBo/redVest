@@ -4,19 +4,16 @@ import { Button } from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { rule } from '@/services/ant-design-pro/rule';
+
+import { getExpressList } from '@/services/operation/index';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+
 const ExpressModel: React.FC = () => {
 
     const actionRef = useRef<ActionType>();
     const [selectedRowsState, setSelectedRows] = useState([]);
 
     const columns: ProColumns<API.RuleListItem>[] = [
-        {
-            title: '序号',
-            dataIndex: 'index',
-            valueType: 'index',
-            search: false,
-        },
         {
             title: '单据编号',
             dataIndex: 'callNo',
@@ -60,7 +57,7 @@ const ExpressModel: React.FC = () => {
                         <ExportOutlined />导出
                     </Button>,
                 ]}
-                request={rule}
+                request={formatRequestListParams(getExpressList)}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {

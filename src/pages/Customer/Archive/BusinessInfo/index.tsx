@@ -380,7 +380,7 @@ const BusinessInfo: React.FC = () => {
       >
         <ProTable
           bordered
-          rowKey='id'
+          rowKey='applydate'
           request={formatRequestListParams(getOrderList)}
           columns={columnOrder}
           toolBarRender={false}

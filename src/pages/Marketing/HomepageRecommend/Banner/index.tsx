@@ -4,17 +4,12 @@ import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { addBrand, deleteBrand, getBrandList, updateBrand } from '@/services/merchandise/product';
+import { updateBrand } from '@/services/merchandise/product';
 import { addBanner, deleteBanner, getBannerList } from '@/services/marketing/banner';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import DetailDrawer from './components/DetailDrawer';
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
-
-const isvalidEnum = {
-    pass: { text: '通过', status: 'Y' },
-    Fail: { text: '不通过', status: 'N' },
-};
 
 export interface IBrand {
     id: string;
@@ -29,7 +24,6 @@ export interface IBrand {
     isRecommend: string;
     status: string;
 }
-
 
 const Brand: React.FC = () => {
     /** 分布更新窗口的弹窗 */
@@ -47,12 +41,12 @@ const Brand: React.FC = () => {
     const columns: ProColumns<IBrand>[] = [
         {
             title: '名称',
-            dataIndex: 'brandNo',
+            dataIndex: 'specialName',
             valueType: 'textarea',
         },
         {
             title: '类型',
-            dataIndex: 'brandNo',
+            dataIndex: 'type',
             valueType: 'textarea',
         },
         {
@@ -73,6 +67,10 @@ const Brand: React.FC = () => {
             title: '是否有效',
             dataIndex: 'isValid',
             search: false,
+            valueEnum: {
+                true: { text: '是' },
+                false: { text: '否' },
+            },
         },
         {
             title: '排序',
@@ -114,7 +112,7 @@ const Brand: React.FC = () => {
     const handleDelete = async (data: any) => {
         const hide = message.loading('正在删除');
         try {
-            const res = await deleteBrand(data.id);
+            const res = await deleteBanner(data.id);
             if (res.status === 200 && res.code === 200) {
                 hide();
                 message.success('删除成功！');
@@ -162,7 +160,7 @@ const Brand: React.FC = () => {
     const handleAddSubmit = useCallback(async (fields) => {
         const hide = message.loading('正在增加');
         try {
-            let res = await addBrand({ ...fields });
+            let res = await addBanner({ ...fields });
             if (res.status === 200 && res.code !== 200) {
                 hide();
                 message.error('新增失败请重试！');
@@ -195,7 +193,7 @@ const Brand: React.FC = () => {
                         <PlusOutlined />新建
                     </Button>
                 ]}
-                request={formatRequestListParams(getBrandList)}
+                request={formatRequestListParams(getBannerList)}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {
