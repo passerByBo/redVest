@@ -11,7 +11,8 @@ import ProForm, {
 
 } from '@ant-design/pro-form'
 
-import { rule } from '@/services/ant-design-pro/rule';
+import { getAreaList } from '@/services/operation/index';
+import formatRequestListParams from '@/utils/formatRequestListParams';
 const Area: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
@@ -21,56 +22,50 @@ const Area: React.FC = () => {
 
   const columns: ProColumns<API.RuleListItem>[] = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      valueType: 'index',
-      search: false,
-    },
-    {
       title: '代码',
-      dataIndex: 'callNo',
+      dataIndex: 'itemno',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '上级代码',
-      dataIndex: 'callNo',
+      dataIndex: 'pno',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '中文名称',
-      dataIndex: 'name',
+      dataIndex: 'cnname',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '省级名称',
-      dataIndex: 'name',
+      dataIndex: 'exttext1',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '地级市名称',
-      dataIndex: 'status',
+      dataIndex: 'exttext2',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '县级名称',
-      dataIndex: 'name',
+      dataIndex: 'exttext3',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '邮政编码',
-      dataIndex: 'callNo',
+      dataIndex: 'exttext4',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '有效性',
-      dataIndex: 'status',
+      dataIndex: 'isactive',
       valueType: 'textarea',
       search: false,
     },
@@ -105,7 +100,7 @@ const Area: React.FC = () => {
             <ImportOutlined />数据导入
           </Button>,
         ]}
-        request={rule}
+        request={formatRequestListParams(getAreaList)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

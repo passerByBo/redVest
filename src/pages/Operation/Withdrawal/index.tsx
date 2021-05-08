@@ -6,6 +6,9 @@ import ProCard from '@ant-design/pro-card';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
+
+import { getWithdrawList } from '@/services/operation/index';
+import formatRequestListParams from '@/utils/formatRequestListParams';
 const Withdrawal: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
@@ -100,7 +103,7 @@ const Withdrawal: React.FC = () => {
             <ExportOutlined /> 导出
           </Button>,
         ]}
-        request={rule}
+        request={formatRequestListParams(getWithdrawList)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

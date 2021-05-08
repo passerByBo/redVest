@@ -42,7 +42,6 @@ const OperationLog: React.FC = () => {
             <ProTable
                 headerTitle="操作日志"
                 rowKey="id"
-                toolBarRender={false}
                 request={formatRequestListParams(getOperationList)}
                 columns={columnsOperation}
             />
