@@ -6,7 +6,8 @@ import {
 } from '@ant-design/pro-form';
 
 export interface RefundModelProps {
-  code: string;
+  id?:string;
+  code?: string;
   visible: boolean;
   onCancel(): void;
   onFinish(): void;

@@ -1,69 +1,108 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
+import React, { useRef } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Form, Divider } from 'antd';
+import { Image, Divider, Popconfirm, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { getProductList } from '@/services/merchandise/product';
-import { history } from 'umi';
+import { deleteRecycle, getProductList, resetRecycle } from '@/services/merchandise/product';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+import { EyeOutlined } from '@ant-design/icons';
 type ProductListItem = {
   id: string,
-  productName: string,
-  shopId: string,
-  shopName: string,
-  topicName: string,
+  shopname: string,
   productNo: string,
-  categories: string,
-  productSpecify: string,
-  productBrand: string,
-  productBrandId: string,
-  shelfOnDate: string,
-  salePrice: string,
-  shareRatio: string,
+  skuHurryCount: string,
+  skuCount: string,
+  proLogoImg1: string,
+  label: string,
+  typeName: string,
+  productName: string,
+  productStatus: string,
+  spuSalesVolume: string,
   [key: string]: string,
 }
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
+
 const Recycle: React.FC = () => {
   const actionRef = useRef<ActionType>();
+
+  const resetProduct = async (data: ProductListItem) => {
+    const hide = message.loading('正在还原');
+    try {
+      const res = await resetRecycle(data.id);
+      if (res.status === 200 && res.code === 200) {
+        hide();
+        message.success('删除成功！');
+        if (actionRef.current) {
+          actionRef.current.reload();
+        }
+        return;
+      }
+
+      hide();
+      message.error('删除失败请重试！');
+    } catch (error) {
+      hide();
+      message.error('删除失败，'+ error.msg);
+    }
+  }
+
+  const handleDelete = async (data: any) => {
+    const hide = message.loading('正在删除');
+    try {
+      const res = await deleteRecycle(data.id);
+      if (res.status === 200 && res.code === 200) {
+        hide();
+        message.success('删除成功！');
+        if (actionRef.current) {
+          actionRef.current.reload();
+        }
+        return;
+      }
+
+      hide();
+      message.error('删除失败请重试！');
+    } catch (error) {
+      hide();
+      message.error('删除失败请重试！');
+    }
+  }
+
   const columns: ProColumns<ProductListItem>[] = [
     {
       title: '商品编码',
-      dataIndex: 'code',
+      dataIndex: 'productNo',
     },
     {
-      title: '商品分类名称',
-      dataIndex: 'code',
+      title: '商品图片',
+      dataIndex: 'imgUrl',
+      search: false,
+      render: (_, record) => {
+        return (
+          <Image
+            preview={{ mask: <EyeOutlined /> }}
+            width={40}
+            src={_ as string}
+          />
+        )
+      }
     },
     {
       title: '商品名称',
       dataIndex: 'productName',
       valueType: 'textarea',
-      width: 300,
-      render: ((_, item) => {
-        return (
-          <a onClick={() => { }}>{_}</a>
-        )
-      })
-    },
-    {
-      title: '商品主图',
-      dataIndex: 'imgUrl',
-      search: false
-    },
-    {
-      title: '商品副标题',
-      dataIndex: 'subTitle',
-      search: false
     },
     {
       title: '商铺名称',
-      dataIndex: 'shopName',
+      dataIndex: 'shopname',
       valueType: 'textarea',
+    },
+    {
+      title: '专题名称',
+      dataIndex: 'xxxxxxx',
+      valueType: 'textarea',
+    },
+    {
+      title: '商品分类',
+      dataIndex: 'typeName',
     },
     {
       title: '商品品牌',
@@ -71,29 +110,14 @@ const Recycle: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: '标签',
-      dataIndex: '',
+      title: 'SKU库存',
+      dataIndex: 'xxxxxxx',
       search: false,
     },
+
     {
-      title: '包含SKU数',
-      dataIndex: 'productBrand',
-      search: false,
-    },
-    {
-      title: 'SKU告急库存',
-      dataIndex: 'productBrand',
-      search: false,
-    },
-    {
-      title: '销售价格',
-      dataIndex: 'salePrice',
-      valueType: 'textarea',
-      search: false,
-    },
-    {
-      title: 'SPU销量',
-      dataIndex: 'bbb',
+      title: '销量',
+      dataIndex: 'spuSalesVolume',
       search: false,
     },
     {
@@ -102,9 +126,21 @@ const Recycle: React.FC = () => {
       valueType: 'option',
       render: (_, record) => (
         <>
-          <a>还原</a>
+          <a onClick={() => { resetProduct(record) }}>还原</a>
           <Divider type="vertical" />
-          <a >删除</a>
+          <Popconfirm
+            placement="topRight"
+            title={<p>确定要彻底删除商品编号{record.productNo}的商品吗吗？<br />彻底删除后不可还原</p>}
+            onConfirm={() => { }}
+            okText="确认"
+            cancelText="取消"
+          >
+            <a
+              key="delete"
+            >
+              删除
+                </a>
+          </Popconfirm>
         </>
       )
     }
@@ -119,7 +155,7 @@ const Recycle: React.FC = () => {
         actionRef={actionRef}
         rowKey="key"
         search={{ labelWidth: 120 }}
-        request={getProductList}
+        request={formatRequestListParams(getProductList)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
