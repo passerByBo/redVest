@@ -208,7 +208,7 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   const authHeader: any = {};
   //给用户添加token
   if (!noTokenByUrl(url)) {
-    let token = sessionStorage.getItem('token');
+    let token = sessionStorage.getItem('token') || '';
     authHeader.Authorization = token;
   }
   return {

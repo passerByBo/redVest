@@ -5,6 +5,7 @@ import styles from './style.less'
 import { Link, history } from 'umi';
 import { Form, Input, Radio, Cascader, Upload, Row, Col, Button, message } from 'antd';
 import { getProvinceList, register } from '@/services/user/register';
+import { getAuthCode } from '@/services/user/login';
 // import chinaDivisions from '@/utils/china-divisions'
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -40,6 +41,7 @@ const initData = {
   "accountName": "科技信息公司",
   "bankAccount": "621010101010101010",
 }
+
 
 
 interface IOptions {
@@ -81,42 +83,61 @@ const Register: React.FC = () => {
 
     //获取验证码以前需要校验表单输入
     try {
-      await form.validateFields();
+      await form.validateFields(['shopmobile']);
     } catch (error) {
-      message.error('请先输入表单信息')
+      message.error('请先输入商家手机号然后再获取验证码');
+      return;
+    }
+    const hide = message.loading('请求玩命发送中！')
+    try {
+      const res = await getAuthCode({
+        phone: form.getFieldValue('shopmobile')
+      });
+      if (res.status === 200 && res.code === 200) {
+        message.success('验证码已经发送，请在手机上查看');
+        hide()
+        let counts = 59;
+        setcount(counts);
+        interval = window.setInterval(() => {
+          counts -= 1;
+          setcount(counts);
+          if (counts === 0) {
+            clearInterval(interval);
+          }
+        }, 1000);
+        return;
+      }
+      hide()
+      message.error(res.msg)
+    } catch (error) {
+      hide()
+      message.error('发送验证码失败，请重试')
     }
 
-    let counts = 59;
-    setcount(counts);
-    interval = window.setInterval(() => {
-      counts -= 1;
-      setcount(counts);
-      if (counts === 0) {
-        clearInterval(interval);
-      }
-    }, 1000);
+
   };
 
   const submit = async (fields) => {
     fields.region = fields.region.pop();
     fields.contaccessory = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
     fields.businesslicense = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
+    fields.authorizedFile = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
     let hide = message.loading('正在注册中！')
     try {
       let res = await register(fields);
-      if (res.status === '200' && res.code !== 200) {
+      if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('注册失败，' + res.msg);
         return false;
       }
-      message.success('注册成功');
+      hide();
+      return true;
     } catch (error) {
       hide();
       message.error('注册失败请重试！');
       return false;
     }
 
-    return true;
   }
 
   const loadDivisionsData = async selectedOptions => {
@@ -160,7 +181,7 @@ const Register: React.FC = () => {
             onFinish={async (values) => {
               let success = await submit(values);
               if (success) {
-                history.push('/user/register-result')
+                history.push('/user/register-result?name=' + form.getFieldValue('compName'))
               }
             }}
           >
@@ -205,7 +226,7 @@ const Register: React.FC = () => {
                 }
               ]}
             >
-              <TextArea />
+              <TextArea rows={8} />
             </Form.Item>
 
             <FormItem
@@ -287,7 +308,7 @@ const Register: React.FC = () => {
                 }
               ]}
             >
-              <TextArea />
+              <TextArea rows={8} />
             </Form.Item>
 
             <FormItem
@@ -451,7 +472,7 @@ const Register: React.FC = () => {
                 <FormItem
                   labelCol={{ span: 10, offset: 0 }}
                   label='验证码'
-                  name="captcha"
+                  name="authCode"
                   rules={[
                     {
                       required: true,

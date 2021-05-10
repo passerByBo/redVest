@@ -1,5 +1,5 @@
 import { Button, Result } from 'antd';
-import { Link } from 'umi';
+import { Link, history } from 'umi';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 
@@ -7,18 +7,20 @@ import styles from './style.less';
 
 const actions = (
   <div className={styles.actions}>
-    <a href="">
+    <a href="/">
       <Button size="large" type="primary">
-        查看邮箱
+        查看表单
       </Button>
     </a>
     <Link to="/">
       <Button size="large">
-       返回首页
+        返回首页
       </Button>
     </Link>
   </div>
 );
+
+const name = history?.location?.query?.name;
 
 const RegisterResult: React.FC<RouteChildrenProps> = ({ location }) => (
   <Result
@@ -26,10 +28,10 @@ const RegisterResult: React.FC<RouteChildrenProps> = ({ location }) => (
     status="success"
     title={
       <div className={styles.title}>
-        你的账号：XXXXXXXXX已经注册等待审核
+        你的账户：{name}，已经提交申请等待审核
       </div>
     }
-    subTitle={'等待审核通过后可以登陆拔了巴拉巴拉巴拉巴拉巴拉巴拉巴拉巴拉。'}
+    subTitle={'请耐心等待审核通过后，即可拥有权限登录平台'}
     extra={actions}
   />
 );
