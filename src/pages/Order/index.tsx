@@ -1,34 +1,39 @@
 import React, { useRef, useState } from 'react';
-import { ImportOutlined, ExportOutlined, EllipsisOutlined, InboxOutlined } from '@ant-design/icons';
-import { Button, Drawer, Progress, Tag, Table, Modal, Upload } from 'antd';
+import { ImportOutlined, ExportOutlined, InboxOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Modal, Upload, message } from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { orderList } from '@/services/order';
-import ProCard from '@ant-design/pro-card';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import { history } from 'umi';
+import { goShip, orderList } from '@/services/order';
+import { history, useModel } from 'umi';
 import Detail from './Detail';
-import { RemarkOrderModel, RefundModel,ShipModel,ModifyExpressModel } from './components/Model'
+import { RemarkOrderModel, RefundModel } from './components/Model'
+import formatRequestListParams from '@/utils/formatRequestListParams';
 
 const { Dragger } = Upload;
 //订单数据类型
-interface OrderListItem {
+
+export interface OrderListItem {
   id: string,
-  orderNumber: string,
-  orderTime: string,
-  userName: string,
-  receiver: string,
-  consigneePhone: string,
-  province: string,
-  city: string,
-  area: string,
-  address: string,
-  paymentMethod: string,
-  ownedBusiness: string,
-  totalAmount: string,
-  amountsPayable: string,
-  status: string,
+  orderNo: string,
+  orderStatus: string,
+  payType: string,
+  paymStatus: string,
+  placeorDate: string,
+  payTime: string,
+  shopName: string,
+  consignee: string,
+  receiverPhone: string,
+  shippingAddress: string,
+  inprovinces: string,
+  incities: string,
+  receiverRegion: string,
+  orderCount: string,
+  orderTotalPrice: string,
+  amountPayable: string,
+  username: string,
+  userid: string,
+  userTel: string,
 }
 
 ['待付款', '待发货', '待收货', '已完成', '已关闭'];
@@ -80,44 +85,8 @@ const payStatusEnum = {
   },
 }
 
-const data = [
-  '语雀的天空',
-  'Ant Design',
-  '蚂蚁金服体验科技',
-  'TechUI',
-  'TechUI 2.0',
-  'Bigfish',
-  'Umi',
-].map((item) => ({
-  title: item,
-  subTitle: <Tag color="#5BD8A6">语雀专栏</Tag>,
-  actions: [
-    <a>邀请</a>,
-    <a>操作</a>,
-    <a>
-      <EllipsisOutlined />
-    </a>,
-  ],
-  avatar: 'https://gw.alipayobjects.com/zos/antfincdn/UCSiy1j6jx/xingzhuang.svg',
-  content: (
-    <div
-      style={{
-        flex: 1,
-        display: 'flex',
-        justifyContent: 'flex-end',
-      }}
-    >
-      <div
-        style={{
-          width: 200,
-        }}
-      >
-        <div>发布中</div>
-        <Progress percent={80} />
-      </div>
-    </div>
-  ),
-}));
+
+let callbackDetail: Function | null = null;
 
 const Order: React.FC = (props) => {
 
@@ -126,75 +95,90 @@ const Order: React.FC = (props) => {
 
   //导入快递单号状态
   const [importVisible, setImportVisible] = useState(false); RefundModel
+
   const [remarkOrderVisible, setRemarkOrderVisible] = useState(false);
   const [refundVisible, setRefundVisible] = useState(false);
-  const [shipVisible, setShipVisible] = useState(false);
-  const [modifyExpressVisible, setModifyExpressVisible] = useState(false);
 
   //查看订单详情
-  const [showDetail, setShowDetail] = useState<boolean>(false);
   const [selectedRowsState, setSelectedRows] = useState<OrderListItem[]>([]);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<OrderListItem>();
+
+  const { setCurrentOrder } = useModel('order', (ret) => ({
+    setCurrentOrder: ret.setCurrentOrder
+  }));
+
+
+  const handleShip = async (data: OrderListItem) => {
+    const hide = message.loading('正在发货');
+    try {
+      let res = await goShip({ id: data.id, orderNo: data.orderNo });
+      if (res.status === 200 && res.code !== 200) {
+        hide();
+        message.error('发货失败，' + res.msg);
+        return;
+      }
+      hide();
+      message.success('发货成功')
+    } catch (error) {
+      hide();
+      message.error('发货失败，请重试')
+    }
+  }
+
   const columns: ProColumns<OrderListItem>[] = [
     {
       title: '订单号',
-      dataIndex: 'orderNumber',
+      dataIndex: 'orderNo',
       valueType: 'textarea',
       render: (_, record) => (
-        <a onClick={() => { history.push(`/order/${record.id}`) }}>{_}</a>
+        <a onClick={() => { setCurrentOrder(record); history.push(`/order/${record.orderNo}`) }}>{_}</a>
       )
 
     },
     {
       title: '下单时间',
-      dataIndex: 'orderTime',
-      valueType: 'dateTimeRange',
+      dataIndex: 'placeorDate',
+      valueType: 'date',
     },
     {
       title: '订单状态',
-      dataIndex: 'status',
+      dataIndex: 'orderStatus',
       valueType: 'select',
       // initialValue: [1],
       valueEnum: orderStatusEnum
     },
     {
-      title: '用户名',
-      dataIndex: 'userName',
-      valueType: 'textarea',
-      search: false,
-    },
-    {
       title: '会员手机号',
-      dataIndex: 'consigneePhone',
+      dataIndex: 'userTel',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '收货人手机号',
-      dataIndex: 'consigneePhone',
+      dataIndex: 'receiverPhone',
       valueType: 'textarea',
     },
     {
       title: '总金额（￥）',
-      dataIndex: 'totalAmount',
+      dataIndex: 'orderTotalPrice',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '应付金额（￥）',
-      dataIndex: 'orderNumber',
+      dataIndex: 'amountPayable',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '支付方式',
-      dataIndex: 'paymentMethod',
+      dataIndex: 'payType',
       valueType: 'textarea',
     },
     {
       title: '付款状态',
-      dataIndex: 'payStatus',
+      dataIndex: 'paymStatus',
       valueType: 'select',
       filters: true,
       onFilter: true,
@@ -203,89 +187,46 @@ const Order: React.FC = (props) => {
     },
     {
       title: '所属商家',
-      dataIndex: 'ownedBusiness',
+      dataIndex: 'shopName',
       valueType: 'textarea',
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [
-        // <a onClick={() => {
-        //   setCurrentRow(record);
-        //   setShowDetail(true);
-        // }}>查看订单</a>,
-        <a onClick={() => {
-          setRemarkOrderVisible(true);
-        }}>备注订单</a>,
-        <a onClick={() => {
-         setModifyExpressVisible(true);
-        }}>修改快递</a>,
-        <a onClick={() => {
-          setRefundVisible(true);
-        }}>立即退款</a>,
-        <a onClick={() => {
-          setShipVisible(true);
-        }}>去发货</a>
-      ]
+      render: (_, record) => {
+        let viewArr = [
+          <a onClick={() => {
+            setCurrentRow(record)
+            setRemarkOrderVisible(true);
+          }}>备注订单</a>,
+        ]
+
+        if (record.orderStatus === '待收货' || record.orderStatus === '待发货' || record.orderStatus === '已完成') {
+          viewArr.push(<a onClick={() => {
+            setCurrentRow(record)
+            setRefundVisible(true);
+          }}>立即退款</a>)
+        }
+
+        if (record.orderStatus === '待发货' && record.shippingAddress && record.shippingAddress !== '') {
+          viewArr.push(<a onClick={() => {
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '确认发货吗？',
+              okText: '确认',
+              cancelText: '取消',
+              onOk() {
+                handleShip(record);
+              },
+            });
+          }}>去发货</a>)
+        }
+        return viewArr
+      }
     }
   ]
-
-  // const productTableCoulumn = [{
-  //   title: '商品名称',
-  //   dataIndex: 'productName',
-  // }, {
-  //   title: '货号',
-  //   dataIndex: 'itemNo.',
-  // }, {
-  //   title: '配送单号',
-  //   dataIndex: 'deliveryNumber',
-  // }, {
-  //   title: '配送方式',
-  //   dataIndex: 'deliveryMethod',
-  // }, {
-  //   title: '配送时间',
-  //   dataIndex: 'deliveryTime',
-  // }, {
-  //   title: '价格',
-  //   dataIndex: 'price',
-  // }, {
-  //   title: '数量',
-  //   dataIndex: 'count',
-  // }, {
-  //   title: '小计',
-  //   dataIndex: 'subtotal',
-  // }, {
-  //   title: '操作',
-  //   render: () => <Button type="primary" size="small">操作</Button>
-  // }
-  // ]
-
-
-  // const productTableData = [
-  //   {
-  //     id: '1',
-  //     productName: '中国蓝星BLUESTAR芳香球50粒/盒 洁厕球厕所卫生间小便池除臭除异味清香香精球樟脑丸空气清新剂 五彩香球',
-  //     itemNo: '芳香球',
-  //     deliveryNumber: 'XSFA-ASWD-AAAA',
-  //     deliveryMethod: '顺丰快递',
-  //     deliveryTime: '2021-3-14',
-  //     price: 109.00,
-  //     count: 1,
-  //     subtotal: 109.00
-  //   },
-  //   {
-  //     id: '2',
-  //     productName: '中国蓝星BLUESTAR芳香球50粒/盒 洁厕球厕所卫生间小便池除臭除异味清香香精球樟脑丸空气清新剂 五彩香球',
-  //     itemNo: '芳香球',
-  //     deliveryNumber: 'XSFA-ASWD-AAAA',
-  //     deliveryMethod: '顺丰快递',
-  //     deliveryTime: '2021-3-14',
-  //     price: 109.00,
-  //     count: 1,
-  //     subtotal: 109.00
-  //   }
-  // ]
 
   const importDraggerProps = {
     name: 'file',
@@ -319,7 +260,7 @@ const Order: React.FC = (props) => {
     <>
       {
         pathname === local ? <PageContainer
-          title='我是撒打算打算'
+          title='订单管理'
         >
           <ProTable
             headerTitle="订单列表"
@@ -348,7 +289,7 @@ const Order: React.FC = (props) => {
                 <ImportOutlined /> 快递单号批量导入
             </Button>
             ]}
-            request={orderList}
+            request={formatRequestListParams(orderList)}
             columns={columns}
             rowSelection={{
               onChange: (_, selectedRows) => {
@@ -386,138 +327,6 @@ const Order: React.FC = (props) => {
             </FooterToolbar>
           )}
 
-          {/* <Drawer
-            width={1000}
-            visible={showDetail}
-            onClose={() => {
-              setCurrentRow(undefined);
-              setShowDetail(false);
-            }}
-            closable={false}
-            footer={
-              <div
-                style={{
-                  textAlign: 'right',
-                }}
-              >
-                <Button onClick={() => { }} type="primary">
-                  发货
-              </Button>
-              </div>
-            }
-          >
-
-            <ProCard style={{ marginTop: 8 }} gutter={8} title="基本信息">
-              <ProDescriptions
-                column={2}
-                dataSource={{
-                  receiver: 'xxxxxxxxx1',
-                  status: '已支付',
-                  orderTime: '2021-03-11',
-                  paymentTime: '2021-03-11',
-                  paymentMethod: '微信支付',
-                  ownedBusiness: '红背心自营商城'
-                }}
-                columns={[
-                  {
-                    title: '订单号',
-                    key: 'receiver',
-                    dataIndex: 'receiver',
-                  },
-                  {
-                    title: '订单状态',
-                    key: 'status',
-                    dataIndex: 'status',
-                  },
-                  {
-                    title: '下单时间',
-                    key: 'orderTime',
-                    dataIndex: 'orderTime',
-                    valueType: 'date',
-                  },
-                  {
-                    title: '付款时间',
-                    key: 'paymentTime',
-                    dataIndex: 'paymentTime',
-                    valueType: 'date',
-                  },
-                  {
-                    title: '支付方式',
-                    key: 'paymentMethod',
-                    dataIndex: 'paymentMethod',
-                  },
-                  {
-                    title: '所属商家',
-                    key: 'ownedBusiness',
-                    dataIndex: 'ownedBusiness',
-                  },
-                ]}
-              >
-              </ProDescriptions>
-            </ProCard>
-
-            <ProCard style={{ marginTop: 8 }} gutter={8} title="收货人信息">
-              <ProDescriptions
-                column={2}
-                actionRef={actionRef}
-                // bordered
-                formProps={{
-                  onValuesChange: (e, f) => console.log(f),
-                }}
-                dataSource={{
-                  receiver: '用户1',
-                  consigneePhone: '1324444444',
-                  address: '茶张路和团结南路十字西南角',
-                  postcode: '719000',
-                }}
-
-                editable={{}}
-                columns={[
-                  {
-                    title: '收货人',
-                    key: 'receiver',
-                    dataIndex: 'receiver',
-                  },
-                  {
-                    title: '联系方式',
-                    key: 'consigneePhone',
-                    dataIndex: 'consigneePhone',
-                  },
-                  {
-                    title: '收货地址',
-                    key: 'address',
-                    dataIndex: 'address',
-                  },
-                  {
-                    title: '邮编',
-                    key: 'postcode',
-                    dataIndex: 'postcode',
-                  },
-                ]}
-              >
-              </ProDescriptions>
-            </ProCard>
-
-            <ProCard style={{ marginTop: 8 }} gutter={8} title="商品信息">
-              <Table
-                columns={productTableCoulumn}
-                dataSource={productTableData}
-                bordered
-                pagination={false}
-              />
-            </ProCard>
-
-            <ProCard style={{ marginTop: 8 }} direction="column" gutter={8} title="费用信息">
-              <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
-                <span>商品总金额:￥ 109.00 元 - 折扣：￥ 0.00 元 + 发票税额：￥ 0.00 元 + 配送费用：￥ 0.00 元 + 保价费用：￥ 0.00 元 + 包装费用：￥ 0.00 元 + 贺卡费用：￥ 0.00 元</span>
-                <span>= 订单总金额:￥ 109.00 元</span>
-                <span>- 已付款金额:￥ 0.00 元 - 使用余额：￥ 0.00 元 - 使用消费码：￥ 0.00 元 - 使用积分：￥ 0.00 元 - 使用红包：￥ 0.00 元</span>
-                <span>= 应付款金额:￥ 109.00 元</span>
-              </div>
-
-            </ProCard>
-          </Drawer > */}
-
           <Modal
             title="快递单号批量导入"
             visible={importVisible}
@@ -544,17 +353,34 @@ const Order: React.FC = (props) => {
             </div>
           </Modal>
         </PageContainer > : <Detail
-          remarkOrder={(code) => { setRemarkOrderVisible(true)}}
-          ship={(code) => { setShipVisible(true)}}
-          refund={(code) => { setRefundVisible(true)}}
-          modifyExpress={(code) => { setModifyExpressVisible(true)}} />
+          remarkOrder={(currrent: any, callback: Function) => {
+            if (!callbackDetail) {
+              callbackDetail = callback;
+            }
+            setCurrentRow(currrent);
+            setRemarkOrderVisible(true)
+          }}
+          refund={(currrent: any, callback: Function) => {
+            if (!callbackDetail) {
+              callbackDetail = callback;
+            }
+            setRefundVisible(true)
+          }}
+        />
       }
-      <RemarkOrderModel code={'123123123123123'} visible={remarkOrderVisible} onFinish={() => setRemarkOrderVisible(false)} onCancel={() => setRemarkOrderVisible(false)} />
-      <RefundModel code={'123123123123123'} visible={refundVisible} onFinish={() => setRefundVisible(false)} onCancel={() => setRefundVisible(false)} />
-      <ShipModel code={'123123123123123'} visible={shipVisible} onFinish={() => setShipVisible(false)} onCancel={() => setShipVisible(false)} />
-      <ModifyExpressModel code={'123123123123123'} visible={modifyExpressVisible} onFinish={() => setModifyExpressVisible(false)} onCancel={() => setModifyExpressVisible(false)} />
+      <RemarkOrderModel
+        id={currentRow && currentRow.id}
+        code={currentRow && currentRow.orderNo}
+        visible={remarkOrderVisible}
+        onFinish={() => {callbackDetail&& callbackDetail();setRemarkOrderVisible(false)}}
+        onCancel={() => setRemarkOrderVisible(false)} />
+      <RefundModel
+        id={currentRow && currentRow.id}
+        code={currentRow && currentRow.orderNo}
+        visible={refundVisible}
+        onFinish={() => {callbackDetail&& callbackDetail();setRefundVisible(false)}}
+        onCancel={() => setRefundVisible(false)} />
     </>
-
   )
 }
 

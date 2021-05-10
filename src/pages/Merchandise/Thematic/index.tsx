@@ -235,7 +235,7 @@ const Thematic: React.FC = () => {
     <PageContainer>
       <ProTable<ProductListItem>
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
           <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>

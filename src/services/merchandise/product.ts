@@ -91,12 +91,6 @@ export async function getBrandList(
   }
 
 
-
-
-
-
-
-
 /** 品牌类型列表 */
 export async function getSpecialList(
   params: {
@@ -126,6 +120,33 @@ export async function getSpecialGroupList(
     method: 'GET',
     params: {
       ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/**商品回收站 */
+export async function deleteRecycle(
+  ids: string,
+  options?: { [key: string]: any },
+) {
+  return request('/xxxxxxxxxxxxxx', {
+    method: 'DELETE',
+    params: {
+      ids
+    },
+    ...(options || {}),
+  });
+}
+
+export async function resetRecycle(
+  ids: string,
+  options?: { [key: string]: any },
+) {
+  return request('/xxxxxxxxxxxxxx', {
+    method: 'GET',
+    params: {
+      ids
     },
     ...(options || {}),
   });
