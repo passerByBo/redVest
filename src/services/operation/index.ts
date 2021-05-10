@@ -39,7 +39,7 @@ export async function addArea(body: any) {
 }
 
 /**
- * 提现
+ * 提现-列表
  */
 export async function getWithdrawList(
     params: {
@@ -56,7 +56,19 @@ export async function getWithdrawList(
 }
 
 /**
- * 快递模板
+ * 提现-审核
+ */
+export async function updateWithdrawList(params: any) {
+    return request('/operations/extractApply', {
+        method: 'put',
+        data: {
+            ...params,
+        },
+    });
+}
+
+/**
+ * 快递模板-列表
  */
 
 export async function getExpressList(
@@ -70,5 +82,17 @@ export async function getExpressList(
         params: {
             ...params,
         }
+    });
+}
+
+/**
+ * 快递模板-是否启用
+ */
+export async function updateExpressList(params: any) {
+    return request('/operations/expressTemplate', {
+        method: 'put',
+        data: {
+            ...params,
+        },
     });
 }
