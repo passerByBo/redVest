@@ -15,8 +15,6 @@ import formatRequestListParams from '@/utils/formatRequestListParams';
 
 /**
  * 添加节点
- *
- * @param fields
  */
 const handleAdd = async (fields: TableListItem) => {
     const hide = message.loading('正在添加');
@@ -34,8 +32,6 @@ const handleAdd = async (fields: TableListItem) => {
 
 /**
  * 更新节点
- *
- * @param fields
  */
 const handleUpdate = async (fields: FormValueType) => {
     const hide = message.loading('正在更新');
@@ -57,8 +53,6 @@ const handleUpdate = async (fields: FormValueType) => {
 
 /**
  * 删除节点
- *
- * @param selectedRows
  */
 const handleRemove = async (selectedRows: TableListItem[]) => {
     const hide = message.loading('正在删除');

@@ -20,21 +20,25 @@ const columnsOperation: ProColumns<TableListItem>[] = [
         dataIndex: 'operId',
         valueType: 'textarea',
         search: false,
+        width: 120,
     },
     {
         title: '操作人',
         dataIndex: 'operName',
         valueType: 'textarea',
+        width: 120,
     },
     {
         title: '操作日期',
         dataIndex: 'operTime',
         valueType: 'textarea',
+        width: 500,
     },
     {
         title: 'IP地址',
         dataIndex: 'operUrl',
         valueType: 'textarea',
+        width: 500,
     },
     {
         title: '操作记录',

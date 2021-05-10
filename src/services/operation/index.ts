@@ -1,7 +1,7 @@
 import { request } from 'umi';
 
 /**
- * 省市区
+ * 省市区-列表查询
  */
 export async function getAreaList(
     params: {
@@ -13,6 +13,27 @@ export async function getAreaList(
         method: 'get',
         params: {
             ...params,
+        }
+    });
+}
+
+/**
+ * 省市区-删除
+ */
+export async function removeArea(params: { ids: string }) {
+    return request(`/operations/provinces/${params.ids}`, {
+        method: 'delete',
+    });
+}
+
+/**
+ * 省市区-新建
+ */
+export async function addArea(body: any) {
+    return request('/operations/provinces', {
+        method: 'POST',
+        data: {
+            ...body,
         }
     });
 }
