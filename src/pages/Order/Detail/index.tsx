@@ -304,8 +304,8 @@ const Detail: React.FC<OrderDetailProps> = (props) => {
                           title={(orderStatusEnum[orderDetail.orderStatus] as unknown as number) === 1 ? '订单支付中' : '支付订单'}
                           icon={(orderStatusEnum[orderDetail.orderStatus] as unknown as number) === 1 && <LoadingOutlined />} />
                         {/* <Step title="支付订单" description="未支付"/> */}
-                        <Step title="平台发货" />
-                        <Step title="确认收货" />
+                        <Step title="平台发货" description={orderDetail && orderDetail.deliveryTime}/>
+                        <Step title="确认收货" description={orderDetail && orderDetail.shippingDate}/>
                       </Steps>
                       <Divider />
 

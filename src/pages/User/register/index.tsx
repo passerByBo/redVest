@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
 import styles from './style.less'
-import { Link } from 'umi';
-import { Form, Input, Radio, Cascader, Upload, Row, Col, Button } from 'antd';
-import { getProvinceList } from '@/services/user/register';
+import { Link, history } from 'umi';
+import { Form, Input, Radio, Cascader, Upload, Row, Col, Button, message } from 'antd';
+import { getProvinceList, register } from '@/services/user/register';
 // import chinaDivisions from '@/utils/china-divisions'
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -17,15 +17,75 @@ const layout = {
   },
 };
 
+const initData = {
+  "compName": "汇安居(北京)信息科技有限公司",
+  "companytype": "供方",
+  "mainBusiness": "技术推广；经济贸易咨询；市场调查；承办展览展示；会议服务；家庭劳务服务；销售家用电器、电子产品、五金交电、建筑材料、机械设备、专用设备、汽车配件；维修家用电器；装卸服务；搬运服务；仓储服务；分批包装；配送服务；维修家具；软件开发；专业承包。",
+  "companyregnum": "91110112089609815N",
+  "inprovinces": "北京市",
+  "incities": "北京市",
+  "region": [],
+  "adressOffice": "北京市通州区物流基地兴贸二街16号581室",
+  "businesslicense": "红背心fg_logo.png",
+  "companyprofile": "红背心成立于2014年，是汇安居（北京）信息科技有限公司打造的一个为全国家居电商提供专业的仓储、配送、安装、维修以及售后服务一体化的服务平台。红背心以“专注服务，安全高效”为品牌理念，为商家提供一站式售后解决方案，帮助商家为消费者提供高标准的家具送装服务体验。同时结合互联网应用技术实现全供应链的全程节点管控和信息管理同步，为商家提供全链数据和信息支持，进一步降低商家物流、售后服务成本。也为全国师傅提供行业内标准化、规范化的事业平台。",
+  "shopname": "红背心自营商城",
+  "shopmobile": "17600133016",
+  "authorizedFile": "红背心fg_logo.png",
+  "authorizedUsername": "红背心自营店长",
+  "authorizedUserTel": "15210140885",
+  "authorizedUserMail": "jianghua@hongbeixin.com",
+  "officeTel": "15210140885",
+  "contaccessory": "红背心fg_logo.png",
+  "bankDeposit": "招商银行",
+  "accountName": "科技信息公司",
+  "bankAccount": "621010101010101010",
+}
+
+
+interface IOptions {
+  value: number;
+  label: string;
+  isLeaf?: boolean;
+}
+
+
+function formatCascaderData<T>(arr: T[], tag: boolean = false) {
+  if (!arr || !Array.isArray(arr)) return [];
+  return arr.map((item) => {
+    return { ...item, isLeaf: tag }
+  })
+}
+
 const Register: React.FC = () => {
 
 
+  const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [count, setcount]: [number, any] = useState(0);
+  const [chinaDivisionsOptions, setChinaDivisionsOptions] = useState<IOptions[]>([]);
+
+
+  useEffect(() => {
+    getProvinceList().then(res => {
+      if (res.status === 200 && res.code === 200) {
+        setChinaDivisionsOptions(formatCascaderData<IOptions>([...res.data]))
+      }
+    }, error => {
+      message.error('加载省市区数据出错！')
+    })
+  }, [])
 
   let interval: number | undefined;
 
-  const onGetCaptcha = () => {
+  const onGetCaptcha = async () => {
+
+    //获取验证码以前需要校验表单输入
+    try {
+      await form.validateFields();
+    } catch (error) {
+      message.error('请先输入表单信息')
+    }
+
     let counts = 59;
     setcount(counts);
     interval = window.setInterval(() => {
@@ -37,7 +97,43 @@ const Register: React.FC = () => {
     }, 1000);
   };
 
-  const submit = () => {
+  const submit = async (fields) => {
+    fields.region = fields.region.pop();
+    fields.contaccessory = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
+    fields.businesslicense = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
+    let hide = message.loading('正在注册中！')
+    try {
+      let res = await register(fields);
+      if (res.status === '200' && res.code !== 200) {
+        hide();
+        message.error('注册失败，' + res.msg);
+        return false;
+      }
+      message.success('注册成功');
+    } catch (error) {
+      hide();
+      message.error('注册失败请重试！');
+      return false;
+    }
+
+    return true;
+  }
+
+  const loadDivisionsData = async selectedOptions => {
+    const targetOption = selectedOptions[selectedOptions.length - 1];
+    targetOption.loading = true;
+    try {
+      const res = await getProvinceList({ pNo: targetOption.value });
+      if (res.status === 200 && res.code === 200) {
+        targetOption.children = formatCascaderData<IOptions>([...res.data], targetOption.value.length >= 4);
+        targetOption.loading = false;
+        setChinaDivisionsOptions([...chinaDivisionsOptions]);
+      } else {
+        message.error(res.msg)
+      }
+    } catch (error) {
+      message.error('加载省市区数据出错，刷新后重试')
+    }
 
   }
 
@@ -58,9 +154,14 @@ const Register: React.FC = () => {
         <div className={styles.main}>
           {/* <h3> 注册</h3> */}
           <Form
+            initialValues={initData}
             {...layout}
-            onFinish={(values) => {
-              console.log('values', values)
+            form={form}
+            onFinish={async (values) => {
+              let success = await submit(values);
+              if (success) {
+                history.push('/user/register-result')
+              }
             }}
           >
             <FormItem
@@ -122,7 +223,7 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            {/* <Form.Item name='divisions' label="所在省市区"
+            <Form.Item name='region' label="所在省市区"
               rules={[
                 {
                   required: true,
@@ -132,9 +233,11 @@ const Register: React.FC = () => {
             >
               <Cascader
                 placeholder="请选择所在省市区"
-                options={chinaDivisions}
+                options={chinaDivisionsOptions}
+                loadData={loadDivisionsData}
+                changeOnSelect
               />
-            </Form.Item> */}
+            </Form.Item>
 
             <FormItem
               label='详细地址'
@@ -151,7 +254,7 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            <FormItem
+            {/* <FormItem
               label="营业执照"
 
             >
@@ -173,7 +276,7 @@ const Register: React.FC = () => {
                   <p className="ant-upload-hint">支持单次或批量上传</p>
                 </Upload.Dragger>
               </FormItem>
-            </FormItem>
+            </FormItem> */}
             <Form.Item
               name="companyprofile"
               label="企业简介"
