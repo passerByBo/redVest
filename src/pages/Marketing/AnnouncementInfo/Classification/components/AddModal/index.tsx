@@ -47,7 +47,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                 {...formItemLayout}
                 hideRequiredMark
                 form={form}
-                name="basic"
             >
                 <FormItem
                     label="分类名称"

@@ -96,3 +96,14 @@ export async function updateExpressList(params: any) {
         },
     });
 }
+
+/**
+ * 快递模板-删除
+ */
+
+export async function removeExpressList(params: { ids: string }) {
+    return request(`/operations/expressTemplate/${params.ids}`, {
+        method: 'delete',
+    });
+}
+

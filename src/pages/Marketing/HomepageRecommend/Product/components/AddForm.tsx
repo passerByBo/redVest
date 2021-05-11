@@ -6,9 +6,9 @@ import ProForm, {
   ProFormDigit, ProFormDatePicker
 } from '@ant-design/pro-form';
 
-import { Form, Input } from 'antd';
+import { Form, Input, Card } from 'antd';
 
-import OperationLog from './ProductList';
+import ProductTable from './ProductList';
 
 export type FormValueType = {
   id?: string;
@@ -39,13 +39,15 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const useData = (useData: any) => {
     console.log(useData);
     addForm.setFieldsValue({
-      productName: useData.loginTime,
+      productName: useData.productName,
+      productNo: useData.productNo
     });
     setTableVisible(false);
   };
 
   return (
     <ModalForm
+      width={1400}
       form={addForm}
       title={'新增产品'}
       visible={addModalVisible}
@@ -81,7 +83,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
     >
       <ProForm.Group>
         <Form.Item name="productName" label="商品名称" rules={[{ required: true }]}>
-          <Input.Search onSearch={onSearch} style={{ width: 328 }} />
+          <Input.Search allowClear enterButton="参考录入" onSearch={onSearch} style={{ width: 328 }} />
         </Form.Item>
       </ProForm.Group>
 
@@ -93,7 +95,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       {/* 缺少图片选择器 */}
 
       <ProForm.Group>
-        <ProFormText width="md" name="productNo" label="商品货号" placeholder="请输入商品货号" initialValue={Date.now()} />
+        <ProFormText width="md" name="productNo" label="商品货号" placeholder="请输入商品货号" rules={[{ required: true }]} />
       </ProForm.Group>
 
       <ProForm.Group>
@@ -111,7 +113,10 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       <ProForm.Group>
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
       </ProForm.Group>
-      {tableVisible && <OperationLog useData={useData} />}
+      {
+        tableVisible &&
+        <Card><ProductTable useData={useData} /></Card>
+      }
     </ModalForm>
   );
 });

@@ -10,11 +10,6 @@ import DetailDrawer from './components/DetailDrawer';
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
 
-const isvalidEnum = {
-    pass: { text: '通过', status: 'Y' },
-    Fail: { text: '不通过', status: 'N' },
-};
-
 export interface IBrand {
     id: string;
     brandDescribe: string;
@@ -28,7 +23,6 @@ export interface IBrand {
     isRecommend: string;
     status: string;
 }
-
 
 const Brand: React.FC = () => {
     /** 分布更新窗口的弹窗 */
@@ -77,8 +71,8 @@ const Brand: React.FC = () => {
             dataIndex: 'isValid',
             search: false,
             valueEnum: {
-                true: { text: '是' },
-                false: { text: '否' },
+                Y: { text: '是' },
+                N: { text: '否' },
             },
 
         },
@@ -140,25 +134,25 @@ const Brand: React.FC = () => {
     }
 
     const handleUpdateSubmit = useCallback(async (fields) => {
-        const hide = message.loading('正在编辑');
-        try {
-            let res = await updateBrand({ ...fields });
-            if (res.status === 200 && res.code !== 200) {
-                hide();
-                message.error('编辑失败请重试！');
-            }
-            hide();
-            message.success('编辑成功');
-        } catch (error) {
-            hide();
-            message.error('编辑失败请重试！');
-        }
+        // const hide = message.loading('正在编辑');
+        // try {
+        //     let res = await updateBrand({ ...fields });
+        //     if (res.status === 200 && res.code !== 200) {
+        //         hide();
+        //         message.error('编辑失败请重试！');
+        //     }
+        //     hide();
+        //     message.success('编辑成功');
+        // } catch (error) {
+        //     hide();
+        //     message.error('编辑失败请重试！');
+        // }
 
-        handleUpdateModalVisible(false);
+        // handleUpdateModalVisible(false);
 
-        if (actionRef.current) {
-            actionRef.current.reload();
-        }
+        // if (actionRef.current) {
+        //     actionRef.current.reload();
+        // }
 
     }, [])
 
@@ -180,16 +174,12 @@ const Brand: React.FC = () => {
             hide();
             message.error('新增失败请重试！');
         }
-
         handleAddModalVisible(false);
-
         if (actionRef.current) {
             actionRef.current.reload();
         }
 
     }, [])
-
-
 
     return (
         <PageContainer>
@@ -210,7 +200,6 @@ const Brand: React.FC = () => {
                     },
                 }}
             >
-
             </ProTable>
 
             <AddForm onCancel={handleAddCancel}

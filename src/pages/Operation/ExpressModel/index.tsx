@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { ExportOutlined } from '@ant-design/icons';
-import { Button, Switch, message, Form } from 'antd';
+import { Button, Switch, message, Form, Popconfirm } from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -9,7 +9,7 @@ import ProForm, {
     ProFormText,
 } from '@ant-design/pro-form'
 
-import { getExpressList, updateExpressList } from '@/services/operation/index';
+import { getExpressList, updateExpressList, removeExpressList } from '@/services/operation/index';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 type TableListType = {
@@ -54,6 +54,38 @@ const ExpressModel: React.FC<TableListType> = () => {
         }
     };
 
+    // 删除
+    const handleDelete = async (selectedRows: TableListType[]) => {
+        const hide = message.loading('正在删除');
+        try {
+            const res = await removeExpressList(
+                {
+                    ids: selectedRows.map(row => row.id).join(','),
+                }
+            );
+            if (res.status === 200 && res.code === 200) {
+                hide();
+                message.success('删除成功！');
+                if (actionRef.current) {
+                    actionRef.current.reload();
+                }
+                return;
+            }
+
+            hide();
+            message.error('删除失败请重试！');
+        } catch (error) {
+            hide();
+            message.error('删除失败请重试！');
+        }
+    }
+
+    const removeSingleRow = (selectedRows: TableListType[]) => {
+        handleDelete(selectedRows)
+        setSelectedRows([]);
+        actionRef.current?.reloadAndRest?.();
+    }
+
     const columns: ProColumns<TableListType>[] = [
         {
             title: '单据编号',
@@ -86,14 +118,25 @@ const ExpressModel: React.FC<TableListType> = () => {
             title: '操作',
             dataIndex: 'option',
             valueType: 'option',
-            render: (_, record) => [<a onClick={() => {
-                setUpdateFormVisible(true);
-                setFormValues(record);
-                addForm.setFieldsValue({
-                    billNo: record.billNo,
-                    billName: record.billName,
-                });
-            }}>编辑</a>, <a onClick={() => { }}>删除</a>],
+            render: (_, record) => [
+                <a onClick={() => {
+                    setUpdateFormVisible(true);
+                    setFormValues(record);
+                    addForm.setFieldsValue({
+                        billNo: record.billNo,
+                        billName: record.billName,
+                    });
+                }}>编辑</a>,
+                <Popconfirm
+                    placement="topRight"
+                    title={'确定要删除' + '吗？'}
+                    onConfirm={() => { removeSingleRow([record]) }}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <a key="delete">删除</a>
+                </Popconfirm>
+            ],
         },
     ]
 
@@ -129,21 +172,17 @@ const ExpressModel: React.FC<TableListType> = () => {
                     <FooterToolbar
                         extra={
                             <div>
-                                已选择{' '}
-                                <a
-                                    style={{
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    {selectedRowsState.length}
-                                </a>{' '}
-                                项 &nbsp;&nbsp;
-                                <span>
-                                </span>
-                            </div>
+                                已选择 <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a> 项
+                        </div>
                         }
                     >
-                        <Button type='primary' danger>批量删除</Button>
+                        <Button
+                            danger
+                            type='primary'
+                            onClick={() => {
+                                removeSingleRow(selectedRowsState);
+                            }}
+                        >批量删除</Button>
                     </FooterToolbar>
                 )
             }

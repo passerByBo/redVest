@@ -1,7 +1,7 @@
 import React from 'react';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns } from '@ant-design/pro-table';
-import { getProductList } from '@/services/merchandise/product';
+import { getThematicList } from '@/services/merchandise/thematic';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 export type UpdateFormProps = {
@@ -9,47 +9,44 @@ export type UpdateFormProps = {
 };
 
 type TableListType = {
-    productName: string;
-    productNo: string;
+    specialName: string;
+    specialDescribe: string;
+    specialNameImg1: string;
+    isValid: string;
+    sort: string;
     id: string;
-    productBrand: string;
-    typeName: string;
-    os: string;
 }
 
 const ProductTable: React.FC<UpdateFormProps> = (props) => {
     const { useData } = props;
     const columnsOperation: ProColumns<TableListType>[] = [
         {
-            title: '商品名称',
-            dataIndex: 'productName',
+            title: '专题名称',
+            dataIndex: 'specialName',
             valueType: 'textarea',
         },
         {
-            title: '商品货号',
-            dataIndex: 'productNo',
+            title: '专题图片',
+            dataIndex: 'specialNameImg1',
             valueType: 'textarea',
         },
         {
-            title: '商品ID',
-            dataIndex: 'id',
+            title: '专题描述',
+            dataIndex: 'specialDescribe',
             valueType: 'textarea',
         },
         {
-            title: '商品品牌',
-            dataIndex: 'productBrand',
-            valueType: 'textarea',
-            search: false,
+            title: '是否有效',
+            dataIndex: 'isValid',
+            valueEnum: {
+                Y: { text: '是' },
+                N: { text: '否' },
+            },
+
         },
         {
-            title: '商品分类',
-            dataIndex: 'typeName',
-            valueType: 'textarea',
-            search: false,
-        },
-        {
-            title: '计量单位',
-            dataIndex: 'os',
+            title: '排序',
+            dataIndex: 'sort',
             valueType: 'textarea',
             search: false,
         },
@@ -71,7 +68,7 @@ const ProductTable: React.FC<UpdateFormProps> = (props) => {
             }}
             toolBarRender={false}
             search={{ labelWidth: 'auto' }}
-            request={formatRequestListParams(getProductList)}
+            request={formatRequestListParams(getThematicList)}
             columns={columnsOperation}
         />
     )
