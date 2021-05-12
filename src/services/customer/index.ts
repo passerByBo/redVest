@@ -51,7 +51,7 @@ export async function getMerchantCertificateList(
  * 新建（保存）
  */
 export async function saveApply(body: any) {
-    return request('/customer/shopInfo', {
+    return request('/customer/shopInfo/insert', {
         method: 'POST',
         data: {
             ...body,

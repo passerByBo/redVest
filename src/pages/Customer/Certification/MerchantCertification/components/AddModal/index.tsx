@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Input, Form, Select, DatePicker, Upload } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Modal, Input, Form, Select, DatePicker, Upload, Button, Radio } from 'antd';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -11,61 +10,64 @@ export interface AddModalProps {
     onFinish: (values: any) => void;
 }
 
-const waitTime = (time: number = 100) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(true);
-        }, time);
-    });
+const nowTime = new Date();
+const timePoint = nowTime.getFullYear() + "" + (nowTime.getMonth() + 1) + nowTime.getDay();
+
+const initData = {
+    billno: `RZ-` + timePoint,
+    "compName": "汇安居(北京)信息科技有限公司",
+    "companytype": "供方",
+    "mainBusiness": "技术推广；经济贸易咨询；市场调查；承办展览展示；会议服务；家庭劳务服务；销售家用电器、电子产品、五金交电、建筑材料、机械设备、专用设备、汽车配件；维修家用电器；装卸服务；搬运服务；仓储服务；分批包装；配送服务；维修家具；软件开发；专业承包。",
+    "companyregnum": "91110112089609815N",
+    "inprovinces": "北京市",
+    "incities": "北京市",
+    "region": [],
+    "nameAgent": "北京代理",
+    "adressOffice": "北京市通州区物流基地兴贸二街16号581室",
+    "businesslicense": "红背心fg_logo.png",
+    "companyprofile": "红背心成立于2014年，是汇安居（北京）信息科技有限公司打造的一个为全国家居电商提供专业的仓储、配送、安装、维修以及售后服务一体化的服务平台。红背心以“专注服务，安全高效”为品牌理念，为商家提供一站式售后解决方案，帮助商家为消费者提供高标准的家具送装服务体验。同时结合互联网应用技术实现全供应链的全程节点管控和信息管理同步，为商家提供全链数据和信息支持，进一步降低商家物流、售后服务成本。也为全国师傅提供行业内标准化、规范化的事业平台。",
+    "shopname": "红背心自营商城",
+    "shopmobile": "17600133016",
+    "authorizedFile": "红背心fg_logo.png",
+    "authorizedUsername": "红背心自营店长",
+    "authorizedUserTel": "15210140885",
+    "authorizedUserMail": "jianghua@hongbeixin.com",
+    "officeTel": "15210140885",
+    "contaccessory": "红背心fg_logo.png",
+    "bankDeposit": "招商银行",
+    "accountName": "科技信息公司",
+    "bankAccount": "621010101010101010",
+}
+
+
+const formItemLayout = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 14 },
 };
 
-const normFile = (e: any) => {
-    if (Array.isArray(e)) {
-        return e;
-    }
-    return e && e.fileList;
+const tailLayout = {
+    wrapperCol: { offset: 6, span: 6 },
 };
 
 const AddModal: React.FC<AddModalProps> = (props) => {
-
-    const nowTime = new Date();
-    const timePoint = nowTime.getFullYear() + "" + (nowTime.getMonth() + 1) + nowTime.getDay();
-    const [fileList, setFileList] = useState([{
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    }]);
     const [form] = Form.useForm();
+    const [transactForm] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
+    const [transactVisible, setTransactVisible] = useState<boolean>(false);
 
-    const handleFinish = async () => {
-        await waitTime(2000);
-        const values = await form.validateFields();
+    // 保存
+    const handleFinish = async (values: any) => {
         onFinish(values);
     }
 
-    const formItemLayout = {
-        labelCol: { span: 6, offset: 1 },
-        wrapperCol: { span: 14 },
-    };
-
-
-    const uploadProps = {
-        name: 'file',
-        action: '/prod-api/mall/common/upload',
+    // 办理
+    const handleTransact = () => {
+        setTransactVisible(true)
     }
 
-    const uploadButton = (
-        <div>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>上传</div>
-        </div>
-    );
-
-
-    const handleChange = ({ fileList }: any) => {
-        setFileList(fileList);
+    const doTransact = async () => {
+        const values = await transactForm.validateFields();
+        console.log(values)
     }
 
     return (
@@ -73,17 +75,16 @@ const AddModal: React.FC<AddModalProps> = (props) => {
             title="商家认证申请"
             visible={visible}
             centered
-            onOk={() => handleFinish()}
+            footer={null}
             onCancel={onCancel}
-            width={800}
+            width={900}
         >
             <Form
                 {...formItemLayout}
                 hideRequiredMark
                 form={form}
-                initialValues={{
-                    billno: `RZ-` + timePoint,
-                }}
+                initialValues={initData}
+                onFinish={handleFinish}
             >
                 <FormItem
                     label="单据编号"
@@ -180,18 +181,8 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                 <FormItem
                     label="营业执照"
                     name="businesslicense"
-                    valuePropName="fileList"
-                    getValueFromEvent={normFile}
-                    extra="建议图片大小不超过250kb"
                 >
-                    <Upload
-                        {...uploadProps}
-                        showUploadList={{ showPreviewIcon: false }}
-                        listType="picture-card"
-                        fileList={fileList}
-                        onChange={handleChange}>
-                        {fileList.length >= 8 ? null : uploadButton}
-                    </Upload>
+                    <Input />
                 </FormItem>
 
                 <FormItem
@@ -212,7 +203,10 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label="是否自营"
                     name="selfSupport"
                 >
-                    <Input placeholder="请输入商家名称" allowClear />
+                    <Select defaultValue="是">
+                        <Option value="是">是</Option>
+                        <Option value="否">否</Option>
+                    </Select>
                 </FormItem>
 
                 <FormItem
@@ -226,21 +220,25 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label="所属代理商"
                     name="nameAgent"
                 >
-                    <Input placeholder="请输入所属代理商" allowClear />
+                    <Select>
+                        <Option value="北京代理">北京代理</Option>
+                        <Option value="平台">平台</Option>
+                    </Select>
                 </FormItem>
 
                 <FormItem
                     label="公司授权书"
                     name="authorizedFile"
                 >
-                    <Upload
+                    {/* <Upload
                         {...uploadProps}
                         showUploadList={{ showPreviewIcon: false }}
                         listType="picture-card"
                         fileList={fileList}
                         onChange={handleChange}>
                         {fileList.length >= 8 ? null : uploadButton}
-                    </Upload>
+                    </Upload> */}
+                    <Input />
                 </FormItem>
 
                 <FormItem
@@ -275,14 +273,15 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label="合同附件"
                     name="contaccessory"
                 >
-                    <Upload
+                    {/* <Upload
                         {...uploadProps}
                         showUploadList={{ showPreviewIcon: false }}
                         listType="picture-card"
                         fileList={fileList}
                         onChange={handleChange}>
                         {fileList.length >= 8 ? null : uploadButton}
-                    </Upload>
+                    </Upload> */}
+                    <Input />
                 </FormItem>
 
                 <FormItem
@@ -310,9 +309,44 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label="结算类型"
                     name="settlementtype"
                 >
-                    <Input placeholder="请输入结算类型" allowClear />
+                    <Select>
+                        <Option value="按周结算">按周结算</Option>
+                        <Option value="按月结算">按月结算</Option>
+                    </Select>
                 </FormItem>
+
+                <Form.Item {...tailLayout}>
+                    <Button type="primary" htmlType="submit" style={{ marginRight: 10 }}>
+                        保存
+                    </Button>
+                    <Button htmlType="button" onClick={handleTransact}>
+                        办理
+                    </Button>
+                </Form.Item>
             </Form>
+
+            <Modal
+                title="办理"
+                visible={transactVisible}
+                onOk={doTransact}
+                onCancel={() => {
+                    setTransactVisible(false)
+                }}
+            >
+                <Form {...formItemLayout} form={transactForm} initialValues={{ status: '通过' }}>
+                    <Form.Item name='status' label="请选择" rules={[{ required: true }]}>
+                        <Radio.Group>
+                            <Radio value={'通过'}>通过</Radio>
+                            <Radio value={'不通过'}>不通过</Radio>
+                        </Radio.Group>
+
+                    </Form.Item>
+
+                    <Form.Item name="auditOpinion" label="审核意见" rules={[{ required: true }]}>
+                        <Input.TextArea />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </Modal>
     )
 }

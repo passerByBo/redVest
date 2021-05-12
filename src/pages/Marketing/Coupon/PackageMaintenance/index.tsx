@@ -12,7 +12,7 @@ import { getArticleSortList, addArticleSortList, removeRule, updateRule } from '
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 const PackageMaintenance: React.FC = () => {
-
+    const [statusKey, setStatusKey] = useState<string>('审核通过');
     const [addCouponModalVisible, setAddCouponModalVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
 
@@ -25,8 +25,10 @@ const PackageMaintenance: React.FC = () => {
     };
 
     const onTabChange = (key: string) => {
-        console.log(key);
+        setStatusKey(key)
+        actionRef.current?.reloadAndRest?.();
     };
+
 
     const toolBarRenderList = [
         (
@@ -124,11 +126,11 @@ const PackageMaintenance: React.FC = () => {
                 [
                     {
                         tab: '审核通过套餐',
-                        key: 'passed'
+                        key: '审核通过'
                     },
                     {
                         tab: '审核未通过套餐',
-                        key: 'denied'
+                        key: '审核未通过'
                     }
                 ]
             }
@@ -143,7 +145,7 @@ const PackageMaintenance: React.FC = () => {
                     defaultCollapsed: false
                 }}
                 toolbar={{ actions: toolBarRenderList }}
-                request={formatRequestListParams(getArticleSortList)}
+                request={formatRequestListParams(getArticleSortList, { status: statusKey })}
                 columns={columns}
                 rowSelection={{
                     onChange: (_, selectedRows) => {
