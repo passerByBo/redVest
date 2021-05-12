@@ -1,12 +1,14 @@
-import React from 'react';
-import { Form } from 'antd';
+import React, { useState } from 'react';
 import ProForm, {
-  ProFormText,
   ProFormTextArea,
   ModalForm,
   ProFormSwitch,
   ProFormDigit,
 } from '@ant-design/pro-form';
+
+import { Form, Input, Card } from 'antd';
+
+import ProductTable from './ProductList';
 
 export type FormValueType = {
   id?: string;
@@ -31,9 +33,23 @@ export type UpdateFormProps = {
 const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addForm] = Form.useForm();
   const { addModalVisible, onSubmit, onCancel } = props;
+  const [tableVisible, setTableVisible] = useState<boolean>(false);
+  const onSearch = () => { setTableVisible(!tableVisible) };
+
+  const useData = (useData: any) => {
+    console.log(useData);
+    addForm.setFieldsValue({
+      specialName: useData.specialName,
+      specialDescribe: useData.specialDescribe,
+      isValid: useData.isValid,
+      sort: useData.sort
+    });
+    setTableVisible(false);
+  };
 
   return (
     <ModalForm
+      width={1400}
       form={addForm}
       title={'新增专题'}
       visible={addModalVisible}
@@ -68,7 +84,9 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
     >
       <ProForm.Group>
-        <ProFormText width="md" name="specialName" label="专题名称" placeholder="请输入专题名称" />
+        <Form.Item name="specialName" label="专题名称" rules={[{ required: true }]}>
+          <Input.Search allowClear enterButton="参考录入" onSearch={onSearch} style={{ width: 328 }} />
+        </Form.Item>
       </ProForm.Group>
 
       {/* 缺少图片选择器 */}
@@ -85,6 +103,10 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       <ProForm.Group>
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
       </ProForm.Group>
+      {
+        tableVisible &&
+        <Card><ProductTable useData={useData} /></Card>
+      }
     </ModalForm >
 
   );

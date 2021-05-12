@@ -1,16 +1,28 @@
 import React, { useRef, useState } from 'react';
-import { Card, InputNumber, Form, Button } from 'antd';
+import {
+    Card, InputNumber, Form, Button, Typography, Row,
+    Col,
+} from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 
+const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+};
+
+const tailLayout = {
+    wrapperCol: { offset: 8, span: 16 },
+};
+
+const FormItem = Form.Item;
+
 const OrderSetting: React.FC = () => {
-    const layout = {
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 },
+    const [form] = Form.useForm();
+
+    const onFinish = (values: any) => {
+        console.log(values);
     };
 
-    const tailLayout = {
-        wrapperCol: { offset: 8, span: 16 },
-    };
     return (
         <PageContainer
             header={{
@@ -20,45 +32,71 @@ const OrderSetting: React.FC = () => {
             <Card>
                 <Form
                     {...layout}
-                    name="basic"
-                    initialValues={{ remember: true }}
-                    onFinish={() => { }}
-                    onFinishFailed={() => { }}
+                    form={form}
+                    onFinish={onFinish}
+                    initialValues={{
+                        businessCloseTime: 1,
+                        closeTime: 1,
+                        completeTime: 1
+                    }}
                 >
-                    <Form.Item
+
+                    <FormItem
                         label="正常订单超过"
-                        name="username"
-                        rules={[{ required: true, message: 'Please input your username!' }]}
                     >
-                        <InputNumber min={1} max={10} defaultValue={3} />
-                        <span>分 未付款，订单自动关闭</span>
-                    </Form.Item>
+                        <Row gutter={8}>
+                            <Col>
+                                <Form.Item
+                                    name="businessCloseTime"
+                                >
+                                    <InputNumber min={1} max={7} defaultValue={1} />
+                                </Form.Item>
+                            </Col>
+                            <Col>
+                                <span style={{ lineHeight: 2 }}> 分 未付款，订单自动关闭</span>
+                            </Col>
+                        </Row>
+                    </FormItem>
 
-                    <Form.Item
+                    <FormItem
                         label="发货超过"
-                        name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
                     >
-                        <InputNumber min={1} max={10} defaultValue={7} />
-                        <span>天 未收获，订单自动完成</span>
-                    </Form.Item>
+                        <Row gutter={8}>
+                            <Col>
+                                <Form.Item
+                                    name="closeTime"
+                                >
+                                    <InputNumber min={1} max={7} defaultValue={1} />
+                                </Form.Item>
+                            </Col>
+                            <Col>
+                                <span style={{ lineHeight: 2 }}> 天 未收获，订单自动完成</span>
+                            </Col>
+                        </Row>
+                    </FormItem>
 
-                    <Form.Item
+                    <FormItem
                         label="订单完成超过"
-                        name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
                     >
-                        <InputNumber min={1} max={7} defaultValue={7} />
-                        <span>天 自动结束交易，不能申请退款</span>
-                    </Form.Item>
-                    <Form.Item {...tailLayout}>
+                        <Row gutter={8}>
+                            <Col>
+                                <Form.Item
+                                    name="completeTime"
+                                >
+                                    <InputNumber min={1} max={7} defaultValue={1} />
+                                </Form.Item>
+                            </Col>
+                            <Col>
+                                <span style={{ lineHeight: 2 }}> 天 自动结束交易，不能申请退款</span>
+                            </Col>
+                        </Row>
+                    </FormItem>
+
+                    <FormItem {...tailLayout}>
                         <Button style={{ marginRight: '20px' }} type="primary" htmlType="submit">
                             提交
                         </Button>
-                        <Button htmlType="button" onClick={() => { }}>
-                            取消
-                        </Button>
-                    </Form.Item>
+                    </FormItem>
                 </Form>
             </Card>
         </PageContainer>

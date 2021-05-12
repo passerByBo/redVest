@@ -64,6 +64,7 @@ const ProductTable: React.FC<UpdateFormProps> = (props) => {
     ]
     return (
         <ProTable
+            headerTitle="高级表格"
             rowKey="id"
             bordered
             pagination={{

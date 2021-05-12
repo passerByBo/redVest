@@ -1,12 +1,14 @@
-import React from 'react';
-import { Form } from 'antd';
+import React, { useState } from 'react';
 import ProForm, {
   ProFormText,
-  ProFormTextArea,
   ModalForm,
   ProFormSwitch,
   ProFormDigit,
 } from '@ant-design/pro-form';
+
+import { Form, Input, Card } from 'antd';
+
+import ProductTable from './ProductList';
 
 export type FormValueType = {
   id?: string;
@@ -31,6 +33,18 @@ export type UpdateFormProps = {
 const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addForm] = Form.useForm();
   const { addModalVisible, onSubmit, onCancel } = props;
+  const [tableVisible, setTableVisible] = useState<boolean>(false);
+  const onSearch = () => { setTableVisible(!tableVisible) };
+
+  const useData = (useData: any) => {
+    console.log(useData);
+    addForm.setFieldsValue({
+      specialName: useData.productName,
+      type: useData.typeName,
+      proLogoImg1: useData.proLogoImg1,
+    });
+    setTableVisible(false);
+  };
 
   return (
     <ModalForm
@@ -68,23 +82,28 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
     >
       <ProForm.Group>
-        <ProFormText width="md" name="specialName" label="名称" placeholder="请输入名称" />
+        <Form.Item name="specialName" label="名称" rules={[{ required: true }]}>
+          <Input.Search allowClear enterButton="参考录入" onSearch={onSearch} style={{ width: 328 }} />
+        </Form.Item>
       </ProForm.Group>
 
       {/* 缺少图片选择器 */}
 
       <ProForm.Group>
-        <ProFormTextArea width="md" name="specialDescribe" label="类型" placeholder="请输入类型" />
+        <ProFormText width="md" name="type" label="类型" placeholder="请输入类型" />
       </ProForm.Group>
 
       <ProForm.Group>
         <ProFormSwitch name="isValid" label="是否有效" />
       </ProForm.Group>
 
-
       <ProForm.Group>
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
       </ProForm.Group>
+      {
+        tableVisible &&
+        <Card><ProductTable useData={useData} /></Card>
+      }
     </ModalForm >
 
   );
