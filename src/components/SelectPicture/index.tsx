@@ -52,7 +52,6 @@ const PictureCard: React.FC<IPictureCardProps> = (props) => {
 
   const { data, onChange, selected, onDelete, showPreview } = props;
 
-
   return (
     <div className={classnames(styles.pictureCard, selected ? styles.pictureCardActive : '')} onClick={(e) => {onChange(e, !selected);}}>
       <Checkbox checked={selected} className={styles.checkbox} onChange={(e) => { onChange(e, !selected) }}></Checkbox>
@@ -61,7 +60,7 @@ const PictureCard: React.FC<IPictureCardProps> = (props) => {
         <DeleteOutlined onClick={(e) => { onDelete && onDelete(e); }} className={styles.iconBg} />
       </Space>
       <div className={styles.bar}>{data.name || '---'}</div>
-      <img className={styles.img} src={data.url || "https://pic.qqtn.com/up/2019-9/15690311636958128.jpg"} alt="图片玩命加载中！" />
+      <img className={styles.img} src={data.imgUrl} alt="图片玩命加载中！" />
     </div>
   )
 

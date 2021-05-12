@@ -171,7 +171,7 @@ const TableTitle: React.FC<{ title: string, callback: Function }> = ({ title, ca
  * @param key
  */
 const hangleColumnChange = (value: string, key: string) => {
-  console.log(value, key)
+
 }
 
 const productYColumn = [
@@ -741,7 +741,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <img alt="商品主图" style={{ width: '100%' }} src={previewImage} />
           </Modal>
 
-          <SelectPictureModal visible={selectPictureVisible} onCancel={() => {setSelectPictureVisible(false)}}/>
+          <SelectPictureModal visible={selectPictureVisible} onOk={(pictures) => {console.log('pictures',pictures)}} limit={3} onCancel={() => {setSelectPictureVisible(false)}}/>
 
         </PageContainer>
         <FooterToolbar>
