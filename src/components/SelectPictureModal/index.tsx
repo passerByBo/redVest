@@ -483,22 +483,22 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
               </div>
               <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb
                 {
-                  limit !== undefined &&
-                  [
-                    '，',
-                    <span ref={wrapSpan} className={classnames(styles.limitSpan, selectPictures.size > limit ? styles.limitSpanWarning : '' + selectPictures.size)}>
-                      <span className={styles.s1}>最</span>
-                      <span className={styles.s2}>多</span>
-                      <span className={styles.s2}>可</span>
-                      <span className={styles.s3}>选</span>
-                      <span className={styles.s4}>择</span>
-                      <span className={styles.s5}>{limit}</span>
-                      <span className={styles.s6}>张</span>
-                      <span className={styles.s7}>图</span>
-                      <span className={styles.s8}>片。</span>
-                    </span>
-                  ]
-
+                  limit !== undefined ?
+                    [
+                      '，',
+                      <span ref={wrapSpan} className={classnames(styles.limitSpan, selectPictures.size > limit ? styles.limitSpanWarning : '' + selectPictures.size)}>
+                        <span className={styles.s1}>最</span>
+                        <span className={styles.s2}>多</span>
+                        <span className={styles.s2}>可</span>
+                        <span className={styles.s3}>选</span>
+                        <span className={styles.s4}>择</span>
+                        <span className={styles.s5}>{limit}</span>
+                        <span className={styles.s6}>张</span>
+                        <span className={styles.s7}>图</span>
+                        <span className={styles.s8}>片。</span>
+                      </span>
+                    ]
+                    : ','
                 }
                 <span>已经选择{selectPictures.size}张</span>
               </span>

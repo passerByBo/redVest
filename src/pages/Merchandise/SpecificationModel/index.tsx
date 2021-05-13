@@ -67,9 +67,17 @@ const SpecificationModel: React.FC = () => {
       render: (_, record) => {
         const checked = _ === 'Y' ? true : false;
         return (
-          <Switch defaultChecked={checked} onChange={(() => { })} />
+          <span>{checked ? '启用' : '禁用'}</span>
         )
       }
+    },
+    {
+      title: '操作',
+      dataIndex: 'option',
+      render: (_, record) => {
+        const checked = record.isValid === 'Y' ? true : false;
+        return <a>{checked ? '禁用' : '启用'}</a>
+       }
     }
   ]
 
@@ -167,7 +175,7 @@ const SpecificationModel: React.FC = () => {
           <Button type="primary" onClick={() => { }}>
             <ExportOutlined /> 导出
           </Button>,
-          <Button type="primary" onClick={() => {handleAddModalVisible(true) }}>
+          <Button type="primary" onClick={() => { handleAddModalVisible(true) }}>
             <PlusOutlined /> 新建
           </Button>,
         ]}
