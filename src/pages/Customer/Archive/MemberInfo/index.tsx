@@ -24,23 +24,23 @@ const MemberInfo: React.FC = () => {
     },
     {
       title: '注册日期',
-      dataIndex: 'createdAt',
+      dataIndex: 'applydate',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '企业名称',
-      dataIndex: 'name',
+      dataIndex: 'companyname',
       valueType: 'textarea',
     },
     {
       title: '企业类型',
-      dataIndex: 'name',
+      dataIndex: 'companytype',
       valueType: 'textarea',
     },
     {
       title: '会员姓名',
-      dataIndex: 'name',
+      dataIndex: 'username',
       valueType: 'textarea',
     },
     {
@@ -50,30 +50,30 @@ const MemberInfo: React.FC = () => {
     },
     {
       title: '手机号',
-      dataIndex: 'callNo',
+      dataIndex: 'moble',
       valueType: 'textarea',
     },
     {
       title: '邮箱',
-      dataIndex: 'status',
+      dataIndex: 'email',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '消费积分',
-      dataIndex: 'status',
+      dataIndex: 'consumeIntegral',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '余额',
-      dataIndex: 'status',
+      dataIndex: 'balance',
       valueType: 'textarea',
       search: false,
     },
     {
       title: '角色',
-      dataIndex: 'status',
+      dataIndex: 'rolename',
       valueType: 'textarea',
     },
   ];

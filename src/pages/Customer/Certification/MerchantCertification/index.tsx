@@ -78,19 +78,18 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 const MerchantCertification: React.FC = () => {
     const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
     const [flowStepVisible, setFlowStepVisible] = useState<boolean>(false);
-    const [statusKey, setStatusKey] = useState<string>('1');
+    const [statusKey, setStatusKey] = useState<string>('代办');
     const [btnIndex, setBtnIndex] = useState<number>(0);
     const actionRef = useRef<ActionType>();
+    const onTabChange = (key: string) => {
+        setStatusKey(key);
+        actionRef.current?.reloadAndRest?.();
+    };
 
     const confirmAdd = (newData: TableListParams) => {
         setAddModalVisible(false);
         handleAdd(newData);
         actionRef.current?.reloadAndRest?.();
-    };
-
-
-    const onTabChange = (key: string) => {
-        setStatusKey(key)
     };
 
     const onBtnClick = (item: number) => {
@@ -110,7 +109,7 @@ const MerchantCertification: React.FC = () => {
         },
         {
             title: '来自',
-            dataIndex: 'desc',
+            dataIndex: 'userName',
             valueType: 'textarea',
         },
         {
@@ -120,24 +119,24 @@ const MerchantCertification: React.FC = () => {
         },
         {
             title: '类型',
-            dataIndex: 'name',
+            dataIndex: 'billType',
             valueType: 'textarea'
         },
         {
             title: '接收时间',
-            dataIndex: 'updatedAt',
+            dataIndex: 'updatedate',
             valueType: 'textarea',
             search: false
         },
         {
             title: '期限',
-            dataIndex: 'updatedAt',
+            dataIndex: 'dueTime',
             valueType: 'textarea',
             search: false
         },
         {
             title: '审核结果',
-            dataIndex: 'name',
+            dataIndex: 'status',
             valueType: 'textarea',
             search: statusKey === '1' ? false : undefined,
             hideInTable: statusKey === '1'
@@ -164,21 +163,22 @@ const MerchantCertification: React.FC = () => {
                 tabList={[
                     {
                         tab: '代办',
-                        key: '1',
+                        key: '代办',
                     },
                     {
                         tab: '已办',
-                        key: '2',
+                        key: '已办',
                     },
                     {
                         tab: '发起',
-                        key: '3',
+                        key: '发起',
                     }
                 ]}
                 onTabChange={onTabChange}
             >
                 <ProTable
                     headerTitle="商家认证管理"
+                    actionRef={actionRef}
                     options={{ search: false, fullScreen: false, reload: true, setting: false, density: false }}
                     rowKey="key"
                     search={{
@@ -196,7 +196,7 @@ const MerchantCertification: React.FC = () => {
                             <PlusOutlined /> 新建
                         </Button>,
                     ]}
-                    request={formatRequestListParams(getMerchantCertificateList)}
+                    request={formatRequestListParams(getMerchantCertificateList, { type: statusKey })}
                     columns={columns}
                     rowSelection={{
                         onChange: (_, selectedRows) => {
