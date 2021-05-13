@@ -24,6 +24,7 @@ export interface IFormData {
 const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
 
   const { visible, onOk, value, onChange, limit, ...others } = props;
+  console.log(props, 'xxxxx')
   const [selectPictures, setSelectPictures] = useState<IProduct[]>([]);
 
   const triggerChange = (changedValue: string) => {
