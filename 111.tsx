@@ -9,6 +9,9 @@ import { DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 
 export interface IImagePickerProps {
   limit?: number;
+  visible: boolean;
+  onOk?: (images: IProduct[]) => void;
+  onCancel?: () => void;
   value?: any;
   onChange?: Function;
 }
@@ -24,6 +27,7 @@ export interface IFormData {
 const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
 
   const { value, onChange, limit, ...others } = props;
+  console.log(props, 'xxxxx')
   const [selectPictures, setSelectPictures] = useState<IProduct[]>([]);
   const [selectPictureVisible, setSelectPictureVisible] = useState(false);
 
@@ -94,7 +98,7 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
 
 
       {
-        (!limit || (limit && selectPictures.length < limit)) && (<div className={classnames(styles.pictureCardContainer, styles.selectBtn)}>
+        !limit || (limit && selectPictures.length < limit) && (<div className={classnames(styles.pictureCardContainer, styles.selectBtn)}>
           {
             uploadButton
           }
