@@ -58,10 +58,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
     const [transactForm] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
     const [transactVisible, setTransactVisible] = useState<boolean>(false);
-    const [selectPictureVisible1, setSelectPictureVisible1] = useState(false);
-    const [selectPictureVisible2, setSelectPictureVisible2] = useState(false);
-    const [selectPictureVisible3, setSelectPictureVisible3] = useState(false);
-    const [coverPictures, setCoverPictures] = useState<any[]>([])
 
     // 保存
     const handleFinish = async (values: any) => {
@@ -77,26 +73,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         const values = await transactForm.validateFields();
         console.log(values)
     }
-
-    const uploadButton1 = (
-        <div className={styles.selectBtn} onClick={() => { setSelectPictureVisible1(true); }}>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>选择图片</div>
-        </div>
-    );
-    const uploadButton2 = (
-        <div className={styles.selectBtn} onClick={() => { setSelectPictureVisible2(true); }}>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>选择图片</div>
-        </div>
-    );
-    const uploadButton3 = (
-        <div className={styles.selectBtn} onClick={() => { setSelectPictureVisible3(true); }}>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>选择图片</div>
-        </div>
-    );
-
 
     return (
         <Modal
@@ -210,14 +186,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label={'营业执照'}
                     name="businesslicense"
                 >
-                    <ImagePicker visible={selectPictureVisible1}
-                        onOk={(pictures) => {
-                            setSelectPictureVisible1(false)
-                        }}
-                        limit={10}
-                        onCancel={() => { setSelectPictureVisible1(false) }}>
-                        {uploadButton1}
-                    </ImagePicker>
+                    <ImagePicker limit={1}></ImagePicker>
                 </Form.Item>
 
                 <FormItem
@@ -265,14 +234,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label="公司授权书"
                     name="authorizedFile"
                 >
-                    <ImagePicker visible={selectPictureVisible2}
-                        onOk={(pictures) => {
-                            setSelectPictureVisible2(false)
-                        }}
-                        limit={10}
-                        onCancel={() => { setSelectPictureVisible2(false) }}>
-                        {uploadButton2}
-                    </ImagePicker>
+                    <ImagePicker limit={1}></ImagePicker>
                 </FormItem>
 
                 <FormItem
@@ -307,14 +269,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label="合同附件"
                     name="contaccessory"
                 >
-                    <ImagePicker visible={selectPictureVisible3}
-                        onOk={(pictures) => {
-                            setSelectPictureVisible3(false)
-                        }}
-                        limit={10}
-                        onCancel={() => { setSelectPictureVisible3(false) }}>
-                        {uploadButton3}
-                    </ImagePicker>
+                    <ImagePicker limit={1}></ImagePicker>
                 </FormItem>
 
                 <FormItem
