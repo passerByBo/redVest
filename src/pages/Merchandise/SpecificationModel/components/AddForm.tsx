@@ -137,7 +137,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       onFinish={async (data) => {
         const fields = { ...data }
         clearData();
-        fields.specInfo = Object.fromEntries(specifiesMap.entries())
+        fields.specInfo = JSON.stringify(Object.fromEntries(specifiesMap.entries()));
         onSubmit(fields);
         setSpecifiesMap(new Map())
       }}

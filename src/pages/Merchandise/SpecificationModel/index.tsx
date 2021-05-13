@@ -2,12 +2,12 @@ import { ExportOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useCallback, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, message, Switch } from 'antd';
+import { Button, message, Space, Switch } from 'antd';
 // import AddFormModal from './components/AddFormModal'
 import ProTable from '@ant-design/pro-table';
 
 import formatRequestListParams from '@/utils/formatRequestListParams';
-import { getSpecModelList, addSpecModel, deleteSpecMode, updateSpecMode } from '@/services/merchandise/model';
+import { getSpecModelList, addSpecModel, deleteSpecMode, updateSpecMode, disableModel } from '@/services/merchandise/model';
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
@@ -36,6 +36,48 @@ const SpecificationModel: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<ISpecationModel | null>(null);
   const [selectedRowsState, setSelectedRows] = useState<ISpecationModel[]>([]);
 
+  const parseBody = (data: ISpecationModel | ISpecationModel[], isValid: boolean) => {
+    let body = { ids: '', isValid: isValid ? 'Y' : 'N' };
+    if (Array.isArray(data)) {
+      let idsArr: any[] = [];
+      idsArr = data.map(item => item.id)
+      body.ids = idsArr.join(',')
+    } else {
+      (body as any).ids = data.id;
+    }
+    return body;
+  }
+
+
+  const handleValid = useCallback(async (data: ISpecationModel | ISpecationModel[], flag: boolean) => {
+    const valid = flag;
+    const tap = valid ? '启用' : '禁用'
+    const hide = message.loading(`正在${tap}`);
+    try {
+      const body = parseBody(data, valid)
+      const res = await disableModel(body);
+      if (res.status === 200 && res.code === 200) {
+        hide();
+        message.success(`${tap}成功！`);
+        if (actionRef.current) {
+          actionRef.current.reload();
+        }
+      } else {
+        hide();
+        message.error(`${tap}失败,${res.msg}！`);
+      }
+    } catch {
+      hide();
+      message.error(`${tap}失败请重试！`);
+    }
+  }, [])
+
+
+  const handleEdit = useCallback((data: ISpecationModel) => {
+    setCurrentRow(data);
+    handleUpdateModalVisible(true);
+  }, [])
+
 
   const columns: ProColumns = [
     {
@@ -62,22 +104,25 @@ const SpecificationModel: React.FC = () => {
     },
     {
       title: '是否启用',
-      dataIndex: 'user',
+      dataIndex: 'isValid',
       search: false,
       render: (_, record) => {
-        const checked = _ === 'Y' ? true : false;
         return (
-          <span>{checked ? '启用' : '禁用'}</span>
+          <span>{_}</span>
         )
       }
     },
     {
       title: '操作',
       dataIndex: 'option',
+      search:false,
       render: (_, record) => {
         const checked = record.isValid === 'Y' ? true : false;
-        return <a>{checked ? '禁用' : '启用'}</a>
-       }
+        return <Space>
+          <a onClick={() => handleEdit(record)}>编辑</a>
+          <a onClick={() => handleValid(record, !checked)}>{checked ? '禁用' : '启用'}</a>
+        </Space>
+      }
     }
   ]
 
@@ -114,6 +159,7 @@ const SpecificationModel: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('编辑失败请重试！');
+        return;
       }
       hide();
       message.success('编辑成功');
@@ -141,6 +187,7 @@ const SpecificationModel: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('新增失败请重试！');
+        return;
       }
       hide();
       message.success('新增成功');
@@ -172,6 +219,12 @@ const SpecificationModel: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
+          <Button onClick={() => { handleValid(selectedRowsState, true) }}>
+            <PlusOutlined /> 启用
+         </Button>,
+          <Button onClick={() => { handleValid(selectedRowsState, false) }}>
+            <PlusOutlined /> 禁用
+        </Button>,
           <Button type="primary" onClick={() => { }}>
             <ExportOutlined /> 导出
           </Button>,
@@ -181,7 +234,9 @@ const SpecificationModel: React.FC = () => {
         ]}
         columns={columns}
         rowSelection={{
-          onChange: (_, selectedRows) => { },
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows)
+          },
         }}
       >
 
@@ -196,7 +251,7 @@ const SpecificationModel: React.FC = () => {
         values={currentRow}
         updateModalVisible={updateModalVisible} />
 
-      {currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => setShowDetail(false)} />}
+      {/* {currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => setShowDetail(false)} />} */}
 
       {/* <AddFormModal visible={addFormModalVisible} onOk={() => {setAddFormModalVisible(false)}} onCancel={() => {setAddFormModalVisible(false)}}/> */}
 
