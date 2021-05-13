@@ -562,13 +562,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   label={'商品轮播图'}
                   name="proRotationImg1"
                 >
-                  <ImagePicker visible={selectPictureVisible}
-                    onOk={(pictures) => {
-                      setSelectPictureVisible(false)
-                    }}
-                    limit={3}
-                    onCancel={() => { setSelectPictureVisible(false) }}>
-                    {fileList.length >= 5 ? null : uploadButton}
+                  <ImagePicker >
                   </ImagePicker>
                   {/* <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，最多可上传5张。</span> */}
                 </Form.Item>
