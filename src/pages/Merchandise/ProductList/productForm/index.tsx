@@ -16,6 +16,7 @@ import { ISpecify } from '../../SpecificationModel/components/AddFormModal';
 import { SpecifyItem, Specify } from '../../components/Specify';
 import Preview from '../components/Preview';
 import SelectPictureModal from '@/components/SelectPictureModal';
+import ImagePicker from '@/components/ImagePicker';
 
 
 const { SHOW_PARENT } = TreeSelect;
@@ -447,7 +448,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
         layout="vertical"
         hideRequiredMark
         initialValues={{}}
-        onFinish={() => { }}
+        onFinish={(values) => {console.log('values', values) }}
         onFinishFailed={() => { }}
       >
         <PageContainer>
@@ -559,18 +560,17 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col span={24}>
                 <Form.Item
                   label={'商品轮播图'}
-                  name="123123123"
+                  name="proRotationImg1"
                 >
-                  <Upload
-                    openFileDialogOnClick={false}
-                    listType="picture-card"
-                    fileList={coverPictures}
-                    onPreview={handlePreview}
-                    onChange={handleChange}
-                  >
+                  <ImagePicker visible={selectPictureVisible}
+                    onOk={(pictures) => {
+                      setSelectPictureVisible(false)
+                    }}
+                    limit={3}
+                    onCancel={() => { setSelectPictureVisible(false) }}>
                     {fileList.length >= 5 ? null : uploadButton}
-                  </Upload>
-                  <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，最多可上传5张。</span>
+                  </ImagePicker>
+                  {/* <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，最多可上传5张。</span> */}
                 </Form.Item>
               </Col>
             </Row>
@@ -741,12 +741,14 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <img alt="商品主图" style={{ width: '100%' }} src={previewImage} />
           </Modal>
 
-          <SelectPictureModal visible={selectPictureVisible} onOk={(pictures) => {console.log('pictures',pictures)}} limit={3} onCancel={() => {setSelectPictureVisible(false)}}/>
+          {/* <SelectPictureModal visible={selectPictureVisible} onOk={(pictures) => {console.log('pictures',pictures)}} limit={3} onCancel={() => {setSelectPictureVisible(false)}}/> */}
+
+
 
         </PageContainer>
         <FooterToolbar>
           {/* {getErrorInfo(error)} */}
-          <Button onClick={() => { setPreviewProductVisible(true) }} loading={false}>
+          <Button onClick={() => { console.log(form.getFieldsValue()); return; setPreviewProductVisible(true) }} loading={false}>
             预览
         </Button>
           <Button type="primary" onClick={() => form?.submit()} loading={false}>

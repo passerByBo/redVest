@@ -1,0 +1,46 @@
+@import '~antd/es/style/themes/default.less';
+
+.imaListWrap {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  font-variant: tabular-nums;
+  line-height: 1.5715;
+  list-style: none;
+  font-feature-settings: 'tnum', 'tnum';
+  .selectBtn {
+    border: 1px dashed #d9d9d9;
+    cursor: pointer;
+    transition: all 0.5s;
+    &:hover {
+      border-color: @primary-color;
+    }
+  }
+  .pictureCardContainer {
+    display: inline-block;
+    width: 104px;
+    height: 104px;
+    margin: 0 8px 8px 0;
+    vertical-align: top;
+    background-color: #fafafa;
+    border-radius: 2px;
+
+    .pictureCardContainerItem {
+      position: relative;
+      height: 100%;
+      margin: 0;
+      padding: 8px;
+      background-color: transparent;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+
+      .itemInfo {
+        width: 86px;
+        height: 86px;
+        overflow: hidden;
+      }
+    }
+  }
+}

@@ -15,6 +15,19 @@ const PAGE_NUM = 1;
 
 const { confirm } = Modal;
 
+
+const parseArrToMap = (arr: any[]): Map<string, any> => {
+  if (!arr || arr.length === 0) return new Map();
+
+  let map = new Map();
+
+  arr.forEach((item) => {
+    map.set(item.id, item)
+  })
+
+  return map;
+}
+
 const testUploadFileList = [
   {
     uid: '-1',
@@ -61,6 +74,7 @@ export interface ISelectPictureModalProps {
   onCancel?(): void;
   onOk?(pics: string[]): void;
   visible?: boolean;
+  initData?: any[];
 }
 
 const formatTreeData = (arr) => {
@@ -138,7 +152,7 @@ const cardDatas = [
 
 
 const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
-  const { visible, limit, onCancel = () => { }, onOk = () => { } } = props;
+  const { visible, limit, initData, onCancel = () => { }, onOk = () => { } } = props;
 
 
 
@@ -171,6 +185,7 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
     }
   })
 
+
   const getImageListFn = (fn: Function): Function => {
     return (...args: any[]) => {
       return fn.bind(null, ...args)
@@ -188,6 +203,10 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
 
   useEffect(() => {
     if (visible) {
+      //不需要每次都初始化，多次实例化，一次实例化只服务于一个选择器
+      //initStatus();
+      //同步上层经过操作后的数据
+      initData && setSelectPirtures(parseArrToMap([...initData]))
       run();
       getImageList();
     }
@@ -221,7 +240,7 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
     }
   }
 
-  const handleShowPreview = (e, data:any) => {
+  const handleShowPreview = (e, data: any) => {
     e.stopPropagation();
     setPreviewImage(data);
     setPreviewVisible(true);
@@ -404,16 +423,21 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
     }
   }
 
-  const mapToPictureString = (map:Map<string, any>):string[] => {
-    let ids:string[] = [];
-    map.forEach((item) => ids.push(item.id));
-    return ids;
+  const mapToPictureString = (map: Map<string, any>): string[] => {
+    let images: any[] = [];
+    map.forEach((item) => images.push({ ...item }));
+    return images;
   }
 
+  const initStatus = () => {
+    setSelectPirtures(new Map());
+    setSelectGroup(testTreeData[0]);
+  }
 
+  console.log('limit', limit)
   return (
     // <Modal className={styles.wrap} width={1300 - (uploadBlockVisible ? 0 : 255)} title='图片素材库' visible={visible} onCancel={onCancel} onOk={() => { }}>
-    <Modal className={styles.wrap} width={1065} title='图片素材库' visible={visible} onCancel={onCancel} onOk={() => { onOk(mapToPictureString(selectPictures))}}>
+    <Modal className={styles.wrap} width={1065} title='图片素材库' visible={visible} onCancel={onCancel} onOk={() => { onOk(mapToPictureString(selectPictures)) }}>
       {/* <Drawer
         getContainer={false}
         style={{ position: 'absolute', zIndex: 10001 }}
@@ -500,7 +524,7 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
                       selected={selectPictures.has(item.id)}
                       data={item}
                       onChange={(e: any, selected: boolean) => { handleSelectedChange(e, selected, item) }}
-                      onDelete={() => { handleDelete( item) }}
+                      onDelete={() => { handleDelete(item) }}
                       showPreview={(e) => { handleShowPreview(e, item) }}
                     />
                   </List.Item>
