@@ -1,26 +1,43 @@
 import React, { useState, useRef } from 'react';
 import { PlusOutlined, DeleteOutlined, ExportOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import AddCouponModal from './components/AddCouponModal';
 
 import type { TableListItem } from './data.d';
-import { getArticleSortList, addArticleSortList, removeRule, updateRule } from '@/services/marketing/couponProduction';
+import { getArticleSortList, addArticleSortList } from '@/services/marketing/couponProduction';
 import formatRequestListParams from '@/utils/formatRequestListParams';
+
+/**
+ * 添加节点
+ *
+ * @param fields
+ */
+const handleAdd = async (fields: TableListItem) => {
+  const hide = message.loading('正在添加');
+  try {
+    await addArticleSortList({ ...fields });
+    hide();
+    message.success('添加成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('添加失败！');
+    return false;
+  }
+};
 
 const CouponProduction: React.FC = () => {
   const [statusKey, setStatusKey] = useState<string>('审核通过');
   const [addCouponModalVisible, setAddCouponModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
 
-  const onFinish = () => {
-    // handleAdd(newData);
-    // if (actionRef.current) {
-    //     actionRef.current.reload();
-    // }
+  const confirmAdd = (newData: TableListItem) => {
     setAddCouponModalVisible(false);
+    handleAdd(newData);
+    actionRef.current?.reloadAndRest?.();
   };
 
   const onTabChange = (key: string) => {
@@ -144,7 +161,7 @@ const CouponProduction: React.FC = () => {
       <ProTable<TableListItem>
         headerTitle="卡券制作"
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 100,
           defaultCollapsed: false,
@@ -159,7 +176,7 @@ const CouponProduction: React.FC = () => {
       <AddCouponModal
         visible={addCouponModalVisible}
         onCancel={() => setAddCouponModalVisible(false)}
-        onFinish={onFinish}
+        onFinish={confirmAdd}
       />
     </PageContainer>
   );
