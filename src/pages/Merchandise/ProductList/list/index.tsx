@@ -1,4 +1,4 @@
-import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined, EyeOutlined, ConsoleSqlOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -120,7 +120,7 @@ const List: React.FC = (props) => {
 
 
   //tab切换state
-  const [productTab, setProductTab] = useState('added')
+  const [productTab, setProductTab] = useState('上架')
 
   //商品表单
   const [productFormVisible, setProductFormVisible] = useState(false);
@@ -129,7 +129,7 @@ const List: React.FC = (props) => {
   const [editProduct, setEditProduct] = useState<ProductListItem>()
 
 
-  const addBtn = (<Button type="primary" key="primary"  onClick={() => { history.push(`/merchandise/product/add`) }}>
+  const addBtn = (<Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
     <PlusOutlined />新建
   </Button>)
 
@@ -242,17 +242,23 @@ const List: React.FC = (props) => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => (
-        <>
+      render: (_, record) => {
+        let { productStatus } = record;
+        return <>
           <a onClick={() => setLogTableModalVisible(true)}>日志</a>
           <Divider type="vertical" />
           <a onClick={() => { history.push(`/merchandise/product/edit?id=${record.id}`) }}>编辑</a>
           <Divider type="vertical" />
-          <a>下架</a>
-          <Divider type="vertical" />
-          <a >删除</a>
+          {productStatus === '上架' ? <a>下架</a> : <a>上架</a>}
+          {
+            productStatus === '下架' && <>
+              <Divider type="vertical" />
+              <a >删除</a>
+            </>
+          }
+
         </>
-      )
+      }
     }
   ]
 
@@ -260,11 +266,11 @@ const List: React.FC = (props) => {
     let toolBarList: any[] = [];
 
     //切换到已上架
-    if (key === 'added') {
+    if (key === '上架') {
       toolBarList = [
         downBtn
       ]
-    } else if (key === 'notListed') {
+    } else if (key === '下架') {
       //切换到已下架
       toolBarList = [
         deleteBtn,
@@ -281,6 +287,7 @@ const List: React.FC = (props) => {
     toolBarList.push(addBtn)
     setToolBarRenderList(toolBarList)
     setProductTab(key)
+    actionRef.current?.reloadAndRest?.();
   }
 
   return (
@@ -291,15 +298,15 @@ const List: React.FC = (props) => {
         [
           {
             tab: '已上架商品',
-            key: 'added'
+            key: '上架'
           },
           {
             tab: '已下架商品',
-            key: 'notListed'
+            key: '下架'
           },
           {
             tab: '待上架商品',
-            key: 'toBe'
+            key: '待上架'
           }
         ]
       }
@@ -309,7 +316,7 @@ const List: React.FC = (props) => {
         rowKey="key"
         search={{ labelWidth: 120 }}
         toolbar={{ actions: toolBarRenderList }}
-        request={formatRequestListParams(getProductList)}
+        request={formatRequestListParams(getProductList, { productStatus: productTab })}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
