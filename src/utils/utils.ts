@@ -18,3 +18,13 @@ export const isAntDesignProOrDev = (): boolean => {
   }
   return isAntDesignPro();
 };
+
+export const getIds = <T extends { [key: string]: any }>(arg: T | T[]): string => {
+  if (!Array.isArray(arg)) return arg.id;
+  let idArr: string[] = [];
+  arg.forEach((item) => {
+    idArr.push(item.id);
+  });
+
+  return idArr.join(',');
+};

@@ -6,6 +6,7 @@ import ProTable from '@ant-design/pro-table';
 import { deleteRecycle, getProductList, resetRecycle } from '@/services/merchandise/product';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { EyeOutlined } from '@ant-design/icons';
+import { getIds } from '@/utils/utils';
 type ProductListItem = {
   id: string,
   shopname: string,
@@ -24,13 +25,14 @@ type ProductListItem = {
 const Recycle: React.FC = () => {
   const actionRef = useRef<ActionType>();
 
-  const resetProduct = async (data: ProductListItem) => {
+  const resetProduct = async (data: ProductListItem | ProductListItem[]) => {
     const hide = message.loading('正在还原');
     try {
-      const res = await resetRecycle(data.id);
+      let ids = getIds<ProductListItem>(data);
+      const res = await resetRecycle({ ids, action: '还原' });
       if (res.status === 200 && res.code === 200) {
         hide();
-        message.success('删除成功！');
+        message.success('还原成功！');
         if (actionRef.current) {
           actionRef.current.reload();
         }
@@ -38,17 +40,18 @@ const Recycle: React.FC = () => {
       }
 
       hide();
-      message.error('删除失败请重试！');
+      message.error('还原失败请重试！');
     } catch (error) {
       hide();
-      message.error('删除失败，'+ error.msg);
+      message.error('还原失败，' + error.msg);
     }
   }
 
   const handleDelete = async (data: any) => {
     const hide = message.loading('正在删除');
     try {
-      const res = await deleteRecycle(data.id);
+      let ids = getIds<ProductListItem>(data);
+      const res = await deleteRecycle({ ids, action: '删除' });
       if (res.status === 200 && res.code === 200) {
         hide();
         message.success('删除成功！');
@@ -131,7 +134,7 @@ const Recycle: React.FC = () => {
           <Popconfirm
             placement="topRight"
             title={<p>确定要彻底删除商品编号{record.productNo}的商品吗吗？<br />彻底删除后不可还原</p>}
-            onConfirm={() => { }}
+            onConfirm={() => { handleDelete(record) }}
             okText="确认"
             cancelText="取消"
           >
@@ -155,7 +158,7 @@ const Recycle: React.FC = () => {
         actionRef={actionRef}
         rowKey="key"
         search={{ labelWidth: 120 }}
-        request={formatRequestListParams(getProductList)}
+        request={formatRequestListParams(getProductList, { productStatus: '已回收' })}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

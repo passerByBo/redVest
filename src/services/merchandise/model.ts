@@ -15,7 +15,7 @@ export async function addSpecModel(
   body: { [key: string]: unknown },
   options?: { [key: string]: any },
 ) {
-  return request('/product/specModel', {
+  return request('/product/specModel/add', {
     method: 'POST',
     data: { ...body },
     ...(options || {}),
@@ -29,7 +29,7 @@ export async function updateSpecMode(
   data: { [key: string]: unknown },
   options?: { [key: string]: any },
 ) {
-  return request('/product/brand', {
+  return request('/product/specModel', {
     method: 'PUT',
     data: {
       ...data,
@@ -42,9 +42,9 @@ export async function getSpecModeDetail(
   params: { [key: string]: unknown },
   options?: { [key: string]: unknown },
 ) {
-  console.log('params', params)
-  return request(`/product/brand/${params.id}`, {
+  return request(`/product/specModel/specDetail`, {
     method: 'GET',
+    params:{...params},
     ...(options || {}),
   });
 }
@@ -52,6 +52,15 @@ export async function getSpecModeDetail(
 export async function deleteSpecMode(id:string,options?: { [key: string]: any }){
   return request(`/product/brand/${id}`, {
     method: 'DELETE',
+    ...(options || {}),
+  });
+}
+
+
+export async function disableModel(body?:any,options?: { [key: string]: any }){
+  return request('/product/specModel/disable', {
+    method: 'POST',
+    data: { ...body },
     ...(options || {}),
   });
 }

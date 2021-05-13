@@ -1,11 +1,12 @@
-import React, {  useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../style.less';
-import { Button, Col, Form, Input, Row, Space } from 'antd';
-import  {
+import { Button, Col, Form, Input, message, Row, Space } from 'antd';
+import {
   ModalForm,
 } from '@ant-design/pro-form';
 import { Specify, SpecifyItem } from '../../components/Specify';
 import { CheckOutlined } from '@ant-design/icons';
+import { getSpecModeDetail } from '@/services/merchandise/model';
 
 export type FormValueType = {
   id?: string;
@@ -42,12 +43,15 @@ export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (fiedls: FormValueType) => {};
   updateModalVisible: boolean;
-  values:FormValueType;
+  values: FormValueType;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [updateForm] = Form.useForm();
   const { values, updateModalVisible, onSubmit, onCancel } = props;
+
+
+  const [detail, setDetail] = useState(values);
 
 
   const [specify, setSpecify] = useState<ISpecify>({ name: '', value: '' });
@@ -59,9 +63,46 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addSpecifyVisible, setAddSpecifyVisible] = useState(false);
 
 
-  if (values) {
-    updateForm.setFieldsValue(values)
+  const parseJsonStringToMap = (json: string) => {
+    if (!json || json === '') return new Map();
+    try {
+      let newJSON = json.replace(/\'/g, '"');
+      let obj = JSON.parse(newJSON);
+      let newMap = new Map(Object.entries(obj));
+      return newMap;
+    } catch (error) {
+      console.error(error)
+    }
   }
+
+  const getDetail = async () => {
+    try {
+      let res = await getSpecModeDetail({ modelId: values.id });
+      if (res.status === 200 && res.code !== 200) {
+        message.error(res.msg);
+        return;
+      }
+      setDetail(res.data);
+      updateForm.setFieldsValue(res.data)
+      setSpecifiesMap(parseJsonStringToMap(res.data.specInfo) as Map<string, string[]>);
+
+    } catch (error) {
+      message.error('加载规格信息失败请重试！');
+    }
+  }
+
+
+  useEffect(() => {
+    //初始化获取数据
+    if (updateModalVisible) {
+      getDetail()
+    }
+  }, [updateModalVisible])
+
+
+  // if (values) {
+  //   updateForm.setFieldsValue(values)
+  // }
 
   function specifyChange(e, key: string) {
     setSpecify({ ...specify, [key]: e.target.value })
@@ -125,10 +166,8 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const clearData = () => {
     setSpecify({ name: '', value: '' })
     setAddSpecifyVisible(false);
+    setSpecifyInputs([]);
   }
-
-
-
 
   return (
     <ModalForm
@@ -145,10 +184,12 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
       onFinish={async (data) => {
         const fields = { ...data }
+        fields.id = detail.id;
         clearData();
-        fields.specInfo = Object.fromEntries(specifiesMap.entries())
+        fields.specInfo = JSON.stringify(Object.fromEntries(specifiesMap.entries()));
         onSubmit(fields);
         setSpecifiesMap(new Map())
+        clearData();
       }}
     >
       <Form.Item
@@ -159,7 +200,7 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
       </Form.Item>
 
       <Form.Item
-       name='specModelDescribe'
+        name='specModelDescribe'
         label='模板描述'
       >
         <TextArea placeholder="请输入模板描述" rows={4} />
