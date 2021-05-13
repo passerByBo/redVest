@@ -23,11 +23,9 @@ export interface IFormData {
 
 const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
 
-<<<<<<< HEAD
-  const { visible, onOk, value, onChange, limit, ...others } = props;
-=======
+
   const { value, onChange, limit, ...others } = props;
->>>>>>> 8a9bc695ce3c7cf8abf99c7f6bbbb7f25e81d557
+
   const [selectPictures, setSelectPictures] = useState<IProduct[]>([]);
   const [selectPictureVisible, setSelectPictureVisible] = useState(false);
 
