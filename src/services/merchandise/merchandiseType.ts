@@ -1,7 +1,7 @@
 import { request } from 'umi';
 
 export async function getMerchandiseTypeList(
-  params: { [key: string]: unknown },
+  params?: { [key: string]: unknown },
   options?: { [key: string]: any },
 ) {
   return request('/product/type/list', {

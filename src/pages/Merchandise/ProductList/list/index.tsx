@@ -1,18 +1,19 @@
 import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined, EyeOutlined, ConsoleSqlOutlined } from '@ant-design/icons';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Divider } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import type { FormValueType } from '../components/UpdateForm';
-import { getProductList } from '@/services/merchandise/product';
+import { getProductList, onAndOffShelves } from '@/services/merchandise/product';
 import { SKUTip, SPUTip } from '../tips';
 
 import LogTableModal from '../components/LogTableModal';
 import SKUTableModal from '../components/SKUTableModal';
-import { history } from 'umi';
+import { history , useModel} from 'umi';
 import 'braft-editor/dist/index.css';
 import formatRequestListParams from '@/utils/formatRequestListParams';
+import { getIds } from '@/utils/utils';
 /**
  * 添加节点
  *
@@ -129,31 +130,67 @@ const List: React.FC = (props) => {
   const [editProduct, setEditProduct] = useState<ProductListItem>()
 
 
-  const addBtn = (<Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
-    <PlusOutlined />新建
-  </Button>)
+  const { setCurrentProduct } = useModel('product', (ret) => ({
+    setCurrentProduct: ret.setCurrentProduct
+  }));
 
-  const deleteBtn = (
-    <Button ghost type="primary" key="primary" onClick={() => { }}>
-      <DeleteOutlined />删除
-    </Button>
-  )
 
-  const addedBtn = (
-    <Button ghost type="primary" key="primary" onClick={() => { }}>
-      <VerticalAlignTopOutlined />上架
-    </Button>
-  )
+  const updateShelves = async (data: ProductListItem | ProductListItem[], shelves: string) => {
+    if (!data || data.length === 0) return;
+    let hide = message.loading('正在' + shelves + '中!');
+    let ids = getIds<ProductListItem>(data);
+    try {
+      let res = await onAndOffShelves({ action: shelves, ids });
+      if (res.status === 200 && res.code !== 200) {
+        hide();
+        message.error(shelves + '失败，' + res.msg);
+        return;
+      }
+
+      hide();
+      message.success(shelves + '成功！');
+      actionRef.current?.reloadAndRest?.();
+    } catch (error) {
+      hide();
+      message.error(shelves + '失败，请重试！')
+    }
+  }
+
+  const gen = () => {
+    console.log('|', selectedRowsState)
+  }
+
+
+  const addBtn = useMemo(() => {
+    let selectData = selectedRowsState;
+    return (<Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
+      <PlusOutlined />新建
+    </Button>)
+  }, [selectedRowsState])
+
+  const deleteBtn = useMemo(() => {
+    let selectData = selectedRowsState;
+    return (
+      <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectData, '删除') }}>
+        <DeleteOutlined />删除
+      </Button>
+    )
+  }, [selectedRowsState])
+
+  const addedBtn = useMemo(() => {
+    let selectData = selectedRowsState;
+    return (
+      <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectData, '上架') }}>
+        <VerticalAlignTopOutlined />上架
+      </Button>
+    )
+  }, [selectedRowsState])
 
   const downBtn = (
-    <Button ghost type="primary" key="primary" onClick={() => { }}>
+    <Button ghost type="primary" key="primary" onClick={gen}>
       <VerticalAlignBottomOutlined />下架
     </Button>
   )
-
-
-  //操作按钮state
-  const [toolBarRenderList, setToolBarRenderList] = useState([downBtn, addBtn]);
 
   const columns: ProColumns<ProductListItem>[] = [
     {
@@ -171,7 +208,7 @@ const List: React.FC = (props) => {
       width: 300,
       render: ((_, item) => {
         return (
-          <a onClick={() => { history.push(`/merchandise/product/list/${item.id}`) }}>{_}</a>
+          <a onClick={() => { setCurrentProduct(item);history.push(`/merchandise/product/list/${item.id}`) }}>{_}</a>
         )
       })
     },
@@ -249,11 +286,11 @@ const List: React.FC = (props) => {
           <Divider type="vertical" />
           <a onClick={() => { history.push(`/merchandise/product/edit?id=${record.id}`) }}>编辑</a>
           <Divider type="vertical" />
-          {productStatus === '上架' ? <a>下架</a> : <a>上架</a>}
+          {productStatus === '上架' ? <a onClick={() => updateShelves(record, '下架')}>下架</a> : <a onClick={() => updateShelves(record, '上架')}>上架</a>}
           {
             productStatus === '下架' && <>
               <Divider type="vertical" />
-              <a >删除</a>
+              <a onClick={() => updateShelves(record, '删除')}>删除</a>
             </>
           }
 
@@ -262,33 +299,15 @@ const List: React.FC = (props) => {
     }
   ]
 
+
+
   const onTabChange = (key: string) => {
-    let toolBarList: any[] = [];
-
-    //切换到已上架
-    if (key === '上架') {
-      toolBarList = [
-        downBtn
-      ]
-    } else if (key === '下架') {
-      //切换到已下架
-      toolBarList = [
-        deleteBtn,
-        addedBtn
-      ]
-    } else {
-      //待上架商品操作按钮
-      toolBarList = [
-        deleteBtn,
-        addedBtn
-      ]
-    }
-
-    toolBarList.push(addBtn)
-    setToolBarRenderList(toolBarList)
-    setProductTab(key)
+    setProductTab(key);
+    setSelectedRows([]);
     actionRef.current?.reloadAndRest?.();
   }
+
+
 
   return (
     <PageContainer
@@ -313,14 +332,27 @@ const List: React.FC = (props) => {
     >
       <ProTable<ProductListItem, API.PageParams>
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{ labelWidth: 120 }}
-        toolbar={{ actions: toolBarRenderList }}
+        toolBarRender={() => [
+         productTab === '下架' && (<Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectedRowsState, '回收') }}>
+            <DeleteOutlined />删除
+          </Button>),
+           (productTab === '下架' ||   productTab === '待上架') &&<Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectedRowsState, '上架') }}>
+            <VerticalAlignTopOutlined />上架
+          </Button>,
+         productTab === '上架' && <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectedRowsState, '下架') }}>
+            <VerticalAlignBottomOutlined />下架
+           </Button>,
+             <Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
+             <PlusOutlined />新建
+           </Button>
+        ]}
         request={formatRequestListParams(getProductList, { productStatus: productTab })}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
+            setSelectedRows([...selectedRows]);
           },
         }}
       >
@@ -339,21 +371,21 @@ const List: React.FC = (props) => {
                 </a>
                                     项 &nbsp;&nbsp;
                                     <span>
-                  这里可以统计已选项的一些参数
+                  {/* 这里可以统计已选项的一些参数 */}
                                     </span>
               </div>
             }
           >
-            <Button
+            {/* <Button
               onClick={async () => {
                 await handleRemove(selectedRowsState);
-                setSelectedRows([]);
+                // setSelectedRows([]);
                 actionRef.current?.reloadAndRest?.();
               }}
             >
               批量删除
                             </Button>
-            <Button type="primary">批量审批</Button>
+            <Button type="primary">批量审批</Button> */}
           </FooterToolbar>
         )
       }

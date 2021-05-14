@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { history } from 'umi';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Col, Form, Input, Modal, Popover, Radio, Row, Select, Space, Table, TreeSelect, Upload } from 'antd';
+import { Button, Card, Col, Form, Input, message, Modal, Popover, Radio, Row, Select, Space, Table, TreeSelect, Upload } from 'antd';
 import styles from '../style.less';
 // 引入编辑器组件
 import BraftEditor from 'braft-editor';
@@ -17,9 +17,11 @@ import { SpecifyItem, Specify } from '../../components/Specify';
 import Preview from '../components/Preview';
 import SelectPictureModal from '@/components/SelectPictureModal';
 import ImagePicker from '@/components/ImagePicker';
+import { getMerchandiseTypeList } from '@/services/merchandise/merchandiseType';
+import { getSepcModel } from '@/services/merchandise/product';
 
 
-const { SHOW_PARENT } = TreeSelect;
+const { SHOW_PARENT, SHOW_ALL } = TreeSelect;
 const { TextArea } = Input;
 const { Option } = Select;
 interface IProductFormProps {
@@ -34,42 +36,49 @@ interface IImageListItem {
   percent?: string
 }
 
-const treeData = [
-  {
-    title: 'Node1',
-    value: '0-0',
-    key: '0-0',
-    children: [
-      {
-        title: 'Child Node1',
-        value: '0-0-0',
-        key: '0-0-0',
-      },
-    ],
-  },
-  {
-    title: 'Node2',
-    value: '0-1',
-    key: '0-1',
-    children: [
-      {
-        title: 'Child Node3',
-        value: '0-1-0',
-        key: '0-1-0',
-      },
-      {
-        title: 'Child Node4',
-        value: '0-1-1',
-        key: '0-1-1',
-      },
-      {
-        title: 'Child Node5',
-        value: '0-1-2',
-        key: '0-1-2',
-      },
-    ],
-  },
-];
+interface ITreeNode {
+  title: string;
+  key: string;
+  value: string;
+  children: ITreeNode[]
+}
+
+// const treeData = [
+//   {
+//     title: 'Node1',
+//     value: '0-0',
+//     key: '0-0',
+//     children: [
+//       {
+//         title: 'Child Node1',
+//         value: '0-0-0',
+//         key: '0-0-0',
+//       },
+//     ],
+//   },
+//   {
+//     title: 'Node2',
+//     value: '0-1',
+//     key: '0-1',
+//     children: [
+//       {
+//         title: 'Child Node3',
+//         value: '0-1-0',
+//         key: '0-1-0',
+//       },
+//       {
+//         title: 'Child Node4',
+//         value: '0-1-1',
+//         key: '0-1-1',
+//       },
+//       {
+//         title: 'Child Node5',
+//         value: '0-1-2',
+//         key: '0-1-2',
+//       },
+//     ],
+//   },
+// ];
 
 const fileList = [
   {
@@ -306,42 +315,80 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   //商品属性列表元数据
   const [productsAttr, setProductsAttr] = useState<IProductAttr[]>([{ 1: '1', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }, { 1: '2', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }]);
 
+  const [treeData, setTreeData] = useState<ITreeNode[]>();
+  const [selectedSpecModelList, setSelectedSpecModelList] = useState([]);
+
   const [form] = Form.useForm();
 
   const { location: { query } } = history;
 
-  const tProps = {
-    treeData,
-    value: '',
-    onChange: () => { },
-    treeCheckable: true,
-    showCheckedStrategy: SHOW_PARENT,
-    placeholder: 'Please select',
-    style: {
-      width: '100%',
-    },
-  };
-
-  //选择图片
-  const selectCoverPictures = (e) => {
-    setSelectPictureVisible(true);
+  const parseTreeData = (arr: any[]): ITreeNode[] => {
+    return arr.map((item) => {
+      let children: ITreeNode[] = [];
+      if (item.children && item.children.length > 0) {
+        children = parseTreeData(item.children);
+      }
+      return {
+        title: item.typeName,
+        value: item.id,
+        children,
+        key: item.id
+      }
+    })
   }
 
-  const handlePreview = async file => {
-    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1))
-    setPreviewImage(file.url || file.preview)
-    setPreviewVisible(true)
-  };
-
-  const handleChange = ({ fileList }) => setCoverPictures(fileList);
 
 
-  const uploadButton = (
-    <div className={styles.selectBtn} onClick={selectCoverPictures}>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>选择图片</div>
-    </div>
-  );
+  const getTypeList = async () => {
+    try {
+      const res = await getMerchandiseTypeList();
+      if (res.status === 200 && res.code === 200) {
+        setTreeData(parseTreeData(res.rows))
+        return;
+      }
+      throw new Error();
+    } catch (error) {
+      message.error('商品分类加载失败!')
+    }
+  }
+
+  const getSpecModelList = async () => {
+    try {
+      const res = await getSepcModel();
+      if (res.status === 200 && res.code === 200) {
+        setSelectedSpecModelList(res.data);
+
+        console.log(Object.keys(res.data[0]))
+        return;
+      }
+
+      // throw new Error();
+    } catch (error) {
+      message.error('商品规格属性加载失败!')
+    }
+  }
+
+  const tProps = useMemo(() => {
+    return {
+      treeDefaultExpandAll: true,
+      treeData,
+      value: '',
+      onChange: () => { },
+      // treeCheckable: true,
+      showCheckedStrategy: SHOW_ALL,
+      placeholder: '请选择商品分类',
+      style: {
+        width: '100%',
+      },
+    }
+  }, [treeData]);
+
+
+  useEffect(() => {
+    getTypeList();
+    getSpecModelList()
+  }, [])
+
 
   const handleSave = (row) => {
     const newData = [productsAttr];
@@ -448,7 +495,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
         layout="vertical"
         hideRequiredMark
         initialValues={{}}
-        onFinish={(values) => {console.log('values', values) }}
+        onFinish={(values) => { console.log('values', values) }}
         onFinishFailed={() => { }}
       >
         <PageContainer>
@@ -468,7 +515,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col {...largItemLayout}>
                 <Form.Item
                   label={'商品名称'}
-                  name="name"
+                  name="productName"
                   rules={[{ required: true, message: '请输入商品名称' }]}
                 >
                   <Input placeholder="请输入商品名称" />
@@ -477,7 +524,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col {...largItemLayout}>
                 <Form.Item
                   label={'商品副标题'}
-                  name="subName"
+                  name="productTitle"
                   rules={[{ required: true, message: '请输入商品副标题名称' }]}
                 >
                   <Input placeholder="请输入商品副标题名称" />
@@ -489,7 +536,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col {...smallItemLayout}>
                 <Form.Item
                   label={'商品品牌'}
-                  name="ping31235pai"
+                  name="productBrand"
                   rules={[{ required: true, message: '请输入商品品牌' }]}
                 >
                   <Input placeholder="请输入商品品牌" />
@@ -497,16 +544,16 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               </Col>
               <Col {...smallItemLayout}>
                 <Form.Item
-                  label={'商品编码'}
-                  name="pin1321gpai"
+                  label={'货号'}
+                  name="productNo"
                 >
-                  <Input placeholder="请输入商品编码" />
+                  <Input placeholder="请输入商品货号" />
                 </Form.Item>
               </Col>
               <Col {...smallItemLayout}>
                 <Form.Item
                   label={'单位'}
-                  name="ping11pai"
+                  name="productUnit"
                 >
                   <Input placeholder="请输入单位" />
                 </Form.Item>
@@ -514,7 +561,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col {...smallItemLayout}>
                 <Form.Item
                   label={'商品排序'}
-                  name="pingpai22"
+                  name="sort"
                 >
                   <Input placeholder="请输入商品排序" />
                 </Form.Item>
@@ -525,7 +572,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 <Form.Item
                   style={{ marginBottom: 0 }}
                   label={'商品简介'}
-                  name="pingpai33"
+                  name="productDescribe"
                 >
                   <TextArea placeholder="请输入商品简介" allowClear />
                 </Form.Item>
@@ -540,18 +587,10 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col span={24}>
                 <Form.Item
                   label={'商品封面主图'}
-                  name="pingpai322223"
+                  name="proLogoImg1"
                 >
-                  <Upload
-                    openFileDialogOnClick={false}
-                    listType="picture-card"
-                    fileList={coverPictures}
-                    onPreview={handlePreview}
-                    onChange={handleChange}
-                  >
-                    {fileList.length >= 5 ? null : uploadButton}
-                  </Upload>
-                  <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，只可上传一张。</span>
+                  <ImagePicker limit={5} />
+                  {/* <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，只可上传一张。</span> */}
                 </Form.Item>
               </Col>
             </Row>
@@ -582,9 +621,12 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                       style={{ width: 200 }}
                     // filterOption={(input, option) => {}}
                     >
-                      <Option value="1">规格模板1</Option>
-                      <Option value="2">规格模板2</Option>
-                      <Option value="3">规格模板3</Option>
+                      {/* {
+                        selectedSpecModelList && Object.keys(selectedSpecModelList).map((key) => {
+                          return <Option value={selectedSpecModelList[key]}>key</Option>
+                           }
+                        )
+                      } */}
                     </Select>
                     <Button >确认</Button>
                   </Input.Group>
@@ -656,7 +698,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
             <Row>
               <Col span={24}>
-                <Form.Item name="productDetail" label="质检报告" rules={[{ required: true, message: '请输入质检报告' }]} >
+                <Form.Item name="qualityReport1" label="质检报告" rules={[{ required: true, message: '请输入质检报告' }]} >
                   <BraftEditor
                     className='my-editor'
                     placeholder=""
@@ -667,7 +709,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
             <Row gutter={16}>
               <Col  {...smallItemLayout}>
-                <Form.Item name="123123" label="商品状态">
+                <Form.Item name="productStatus" label="商品状态">
                   <Radio.Group onChange={() => { }} value={1}>
                     <Radio value={1}>上架</Radio>
                     <Radio value={2}>下架</Radio>
@@ -675,7 +717,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>
-                <Form.Item name="sdfwse" label="商品状态">
+                <Form.Item name="isRecommend" label="首页推荐">
                   <Radio.Group onChange={() => { }} value={1}>
                     <Radio value={1}>开启</Radio>
                     <Radio value={2}>关闭</Radio>
@@ -683,7 +725,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>
-                <Form.Item name="hjghj" label="商品状态">
+                <Form.Item name="isBoutique" label="精品推荐">
                   <Radio.Group onChange={() => { }} value={1}>
                     <Radio value={1}>开启</Radio>
                     <Radio value={2}>关闭</Radio>
@@ -691,7 +733,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>
-                <Form.Item name="fdsf" label="商品状态">
+                <Form.Item name="freightSetting" label="运费设置">
                   <Radio.Group onChange={() => { }} value={1}>
                     <Radio value={1}>免费包邮</Radio>
                     <Radio value={2}>邮费到付</Radio>
@@ -700,14 +742,12 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               </Col>
             </Row>
 
-            <Space>
-              <span>佣金设置</span>
+            <Form.Item name="commissionSetting" label="佣金设置">
               <Radio.Group onChange={handleCommissionChange} value={commission}>
                 <Radio value={1}>默认设置</Radio>
                 <Radio value={2}>自定义设置</Radio>
               </Radio.Group>
-            </Space>
-
+            </Form.Item>
             {
               commission === 2 &&
               (

@@ -16,6 +16,38 @@ export async function getProductList(
   });
 }
 
+export async function getSepcModel (){
+  return request('/product/specModel/product', {
+    method: 'GET',
+  })
+}
+
+export async function onAndOffShelves(
+  body: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/info/updateProStatus', {
+    method: 'PUT',
+    data: {
+      ...body,
+    },
+    ...(options || {}),
+  });
+}
+
+export async function getProductDetail(
+  params: { productId?: string },
+  options?: { [key: string]: string },
+) {
+  return request('/product/info/productDetail', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {})
+  });
+}
+
 /** 商品类型列表 */
 export async function getProductTypeList(
   params: {
@@ -121,7 +153,10 @@ export async function getSpecialGroupList(
 }
 
 /**商品回收站 */
-export async function deleteRecycle(body: { [key: string]: any }, options?: { [key: string]: any }) {
+export async function deleteRecycle(
+  body: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
   return request('/product/info/updateProStatus', {
     method: 'PUT',
     data: {
