@@ -95,15 +95,15 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
         wrapperCol: { span: 14 },
     };
 
-    const useData = (useData: any) => {
-        handleAdd(useData)
+    const useData = async (useData: any) => {
+        let result = await handleAdd(useData)
+        result && actionRef.current?.reloadAndRest?.();
         setProductVisible(false);
-        actionRef.current?.reloadAndRest?.();
     };
 
-    const deleteData = (useData: CounponRangeListTable[]) => {
-        handleRemove(useData)
-        actionRef.current?.reloadAndRest?.();
+    const deleteData = async (useData: CounponRangeListTable[]) => {
+        let result = await handleRemove(useData)
+        result && actionRef.current?.reloadAndRest?.();
     };
 
     const columnsSelectTable = [
@@ -152,6 +152,20 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
             title="卡券制作"
             visible={visible}
             centered
+            footer={[
+                <Button key="back" onClick={onCancel}>
+                    取消
+                </Button>,
+                <Button key="submit" type="primary" onClick={() => handleFinish()}>
+                    保存
+                </Button>,
+                <Button
+                    type="primary"
+                    onClick={() => { console.log('办理') }}
+                >
+                    办理
+                </Button>,
+            ]}
             onOk={() => handleFinish()}
             onCancel={onCancel}
             width={800}
