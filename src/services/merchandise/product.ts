@@ -48,6 +48,19 @@ export async function getProductDetail(
   });
 }
 
+
+export async function submitForm(
+  body: { [key: string]: any },
+  options?: { [key: string]: any }){
+    return request('/product/info', {
+      method: 'POST',
+      data: {
+        ...body,
+      },
+      ...(options || {}),
+    });
+}
+
 /** 商品类型列表 */
 export async function getProductTypeList(
   params: {

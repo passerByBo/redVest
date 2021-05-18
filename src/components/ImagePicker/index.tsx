@@ -11,6 +11,8 @@ export interface IImagePickerProps {
   limit?: number;
   value?: any;
   onChange?: Function;
+  type?: 'card' | 'button',
+  selectedBack?: (pictures: string[]) => void;
 }
 
 export interface IProduct {
@@ -24,7 +26,7 @@ export interface IFormData {
 const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
 
 
-  const { value, onChange, limit, ...others } = props;
+  const { type = 'card', selectedBack = () => { }, value, onChange, children, limit, ...others } = props;
 
   const [selectPictures, setSelectPictures] = useState<IProduct[]>([]);
   const [selectPictureVisible, setSelectPictureVisible] = useState(false);
@@ -46,10 +48,16 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
     return pictures.map((picture) => picture.imgUrl).join(',');
   }
 
+  const getPicturesArr = (pictures: IProduct[]): string[] => {
+    if (!Array.isArray(pictures) || pictures.length === 0) return [];
+    return pictures.map((picture) => picture.imgUrl);
+  }
+
   const handleOk = (pictures: IProduct[]) => {
     //不需要每次都累加选择的图片，每次返回的都是全部选项
-    setSelectPictures([...pictures]);
+    type === 'card' && setSelectPictures([...pictures]);
     triggerChange(getPicturesUrls(pictures));
+    selectedBack(getPicturesArr(pictures))
     setSelectPictureVisible(false)
   }
 
@@ -75,35 +83,39 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
   }
 
   return (
-    <div className={styles.imaListWrap}>
-
+    <>
       {
-        selectPictures.map((picture) => (
-          <div className={styles.pictureCardContainer}>
-            <div className={styles.pictureCardContainerItem}>
-              <Image className={styles.itemInfo} src={picture.imgUrl}
-                preview={{
-                  mask: <Space>
-                    <EyeOutlined style={IconStyle} />
-                    <DeleteOutlined style={IconStyle} onClick={(e) => handleDeleteSelected(e, picture)} />
-                  </Space>
-                }} />
+        type === 'button' && <span onClick={() => { setSelectPictureVisible(true) }}>{children}</span>
+      }
+      {type === 'card' && <div className={styles.imaListWrap}>
+        {
+          selectPictures.map((picture) => (
+            <div className={styles.pictureCardContainer}>
+              <div className={styles.pictureCardContainerItem}>
+                <Image className={styles.itemInfo} src={picture.imgUrl}
+                  preview={{
+                    mask: <Space>
+                      <EyeOutlined style={IconStyle} />
+                      <DeleteOutlined style={IconStyle} onClick={(e) => handleDeleteSelected(e, picture)} />
+                    </Space>
+                  }} />
+              </div>
             </div>
-          </div>
-        )
-        )
-      }
+          )
+          )
+        }
 
 
-      {
-        (!limit || (limit && selectPictures.length < limit)) && (<div className={classnames(styles.pictureCardContainer, styles.selectBtn)}>
-          {
-            uploadButton
-          }
-        </div>)
-      }
+        {
+          (!limit || (limit && selectPictures.length < limit)) && (<div className={classnames(styles.pictureCardContainer, styles.selectBtn)}>
+            {
+              uploadButton
+            }
+          </div>)
+        }
+      </div>}
       <SelectPictureModal initData={selectPictures} limit={limit} visible={selectPictureVisible} onOk={handleOk} onCancel={() => { setSelectPictureVisible(false) }} {...others} />
-    </div>
+    </>
   )
 });
 

@@ -151,7 +151,7 @@ const cardDatas = [
 ]
 
 
-const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
+const SelectPictureModal: React.FC<ISelectPictureModalProps> = React.memo((props) => {
   const { visible, limit, initData, onCancel = () => { }, onOk = () => { } } = props;
 
 
@@ -434,7 +434,6 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
     setSelectGroup(testTreeData[0]);
   }
 
-  console.log('limit', limit)
   return (
     // <Modal className={styles.wrap} width={1300 - (uploadBlockVisible ? 0 : 255)} title='图片素材库' visible={visible} onCancel={onCancel} onOk={() => { }}>
     <Modal className={styles.wrap} width={1065} title='图片素材库' visible={visible} onCancel={onCancel} onOk={() => { onOk(mapToPictureString(selectPictures)) }}>
@@ -569,6 +568,6 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = (props) => {
       </Modal>
     </Modal>
   )
-}
+})
 
 export default SelectPictureModal;

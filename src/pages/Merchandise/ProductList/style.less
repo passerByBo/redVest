@@ -1,3 +1,4 @@
+@import '~antd/es/style/themes/default.less';
 .card {
   margin-bottom: 24px;
 
@@ -77,6 +78,12 @@
   }
 }
 
+:global {
+  .ant-pro-table .ant-card-body {
+    padding: 0;
+  }
+}
+
 .main {
   :global(.anticon-delete) {
     display: none;
@@ -125,8 +132,14 @@
     }
   }
 
-  .spanLabel{
-    width: 90px;
+  .spanLabel {
     display: inline-block;
+    width: 90px;
   }
+}
+
+.tableItemImage {
+  width: 40px;
+  height: 40px;
+  border-radius: @border-radius-base;
 }

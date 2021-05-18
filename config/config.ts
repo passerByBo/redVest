@@ -8,10 +8,10 @@ import routes from './routes';
 const { REACT_APP_ENV, SERVE_ENV = 'idc' } = process.env;
 
 const serveUrlMap = {
-  dev: 'http://10.10.10.54:8088',
+  dev: 'http://10.10.10.54:8168',
   pre: '',
   test: '',
-  idc: 'http://10.10.10.54:8088',
+  idc: 'http://10.10.10.54:8168',
 };
 
 export default defineConfig({

@@ -1,13 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { history } from 'umi';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Col, Form, Input, message, Modal, Popover, Radio, Row, Select, Space, Table, TreeSelect, Upload } from 'antd';
+import { Button, Card, Col, Form, Input, message, Popconfirm, Popover, Radio, Row, Select, Space, Table, TreeSelect, Image } from 'antd';
 import styles from '../style.less';
-// 引入编辑器组件
-import BraftEditor from 'braft-editor';
-// 引入编辑器样式
-import 'braft-editor/dist/index.css';
-import { CheckOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { CheckOutlined, ClearOutlined, DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { ColumnsType } from 'antd/lib/table';
 
@@ -15,25 +11,46 @@ import { AttrEditableRow, AttrEditableCell } from "./components/AttrEditable"
 import { ISpecify } from '../../SpecificationModel/components/AddFormModal';
 import { SpecifyItem, Specify } from '../../components/Specify';
 import Preview from '../components/Preview';
-import SelectPictureModal from '@/components/SelectPictureModal';
 import ImagePicker from '@/components/ImagePicker';
 import { getMerchandiseTypeList } from '@/services/merchandise/merchandiseType';
-import { getSepcModel } from '@/services/merchandise/product';
+import { getSepcModel, submitForm } from '@/services/merchandise/product';
+import { fullCombination } from '@/utils/utils';
+import { EditableProTable } from '@ant-design/pro-table';
 
 
-const { SHOW_PARENT, SHOW_ALL } = TreeSelect;
+
+import Editor from '@/components/Editor'
+import SelectPictureModal from '@/components/SelectPictureModal';
+
+
+const initData = {
+  "productName": "诺基亚N98",
+  "productSkuInfo": [],
+  "productSpec": {},
+  "productNo": '123',
+  "productBrand": "诺基亚",
+  "productUnit": "台",
+  "productStatus": "上架",
+  " productDescribe": "商品简介asdasdasdasdasdasdasdasd",
+  " productDetail": "123123123123123",
+  "sort": "100",
+  "typeName": "手机",
+  "productTitle": "副标题",
+  "proLogoImg1": "123123123",
+  "proRotationImg1": "123123123123",
+  "qualityReport1": "123123123123",
+  "isRecommend": "Y",
+  "isBoutique": "Y",
+  "commissionSetting": "自定义设置",
+  "freightSetting": "免费包邮"
+
+}
+
+const { SHOW_ALL } = TreeSelect;
 const { TextArea } = Input;
 const { Option } = Select;
 interface IProductFormProps {
 
-}
-
-interface IImageListItem {
-  uid: string;
-  name: string;
-  status: string;
-  url: string;
-  percent?: string
 }
 
 interface ITreeNode {
@@ -42,70 +59,6 @@ interface ITreeNode {
   value: string;
   children: ITreeNode[]
 }
-
-// const treeData = [
-//   {
-//     title: 'Node1',
-//     value: '0-0',
-//     key: '0-0',
-//     children: [
-//       {
-//         title: 'Child Node1',
-//         value: '0-0-0',
-//         key: '0-0-0',
-//       },
-//     ],
-//   },
-//   {
-//     title: 'Node2',
-//     value: '0-1',
-//     key: '0-1',
-//     children: [
-//       {
-//         title: 'Child Node3',
-//         value: '0-1-0',
-//         key: '0-1-0',
-//       },
-//       {
-//         title: 'Child Node4',
-//         value: '0-1-1',
-//         key: '0-1-1',
-//       },
-//       {
-//         title: 'Child Node5',
-//         value: '0-1-2',
-//         key: '0-1-2',
-//       },
-//     ],
-//   },
-// ];
-
-const fileList = [
-  {
-    uid: '-1',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-2',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-3',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-4',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-]
 
 const largItemLayout = {
   xl: 12,
@@ -123,18 +76,13 @@ const smallItemLayout = {
   xs: 12,
 }
 
-// const components = {
-//   body: {
-//     row: EditableRow,
-//     cell: EditableCell,
-//   },
-// };
+
 
 //后续根据接口文档补充
 export interface IProductAttr {
   [key: string]: string;
 }
-const TableTitle: React.FC<{ title: string, callback: Function }> = ({ title, callback }) => {
+const TableTitle: React.FC<{ title: string, callback: Function }> = React.memo(({ title, callback }) => {
   const [visible, setVisible] = useState(false);
   const inputRef = useRef<Input>(null);
   const handleVisibleChange = (visible: boolean) => {
@@ -142,6 +90,7 @@ const TableTitle: React.FC<{ title: string, callback: Function }> = ({ title, ca
   }
 
   const handleOk = () => {
+    console.log('handleOk')
     const value = inputRef?.current?.input?.value || ''
     inputRef?.current?.handleReset()
     callback(value);
@@ -168,120 +117,14 @@ const TableTitle: React.FC<{ title: string, callback: Function }> = ({ title, ca
         visible={visible}
         onVisibleChange={handleVisibleChange}
       >
-        <EditOutlined onClick={callback()} className={styles.titleIcon} />
+        <EditOutlined onClick={() => setVisible(true)} className={styles.titleIcon} />
       </Popover>
 
     </>
   )
-}
+})
 
-/**
- * 修改列
- * @param value
- * @param key
- */
-const hangleColumnChange = (value: string, key: string) => {
 
-}
-
-const productYColumn = [
-  {
-    title: 'SKU属性',
-    dataIndex: '1',
-  },
-  {
-    title: '商品图片',
-    dataIndex: '2',
-  },
-  {
-    title: '货号',
-    dataIndex: '3',
-  },
-  {
-    title: '销售价',
-    dataIndex: '4',
-  },
-  {
-    title: '成本价',
-    dataIndex: '5',
-  },
-  {
-    title: '划线价',
-    dataIndex: '6',
-  },
-  {
-    title: '库存价',
-    dataIndex: '7',
-  },
-  {
-    title: '重量',
-    dataIndex: '8',
-  },
-  {
-    title: '体积',
-    dataIndex: '9',
-  },
-  {
-    title: '体积',
-    dataIndex: '9',
-  },
-  {
-    title: <TableTitle title='一级返佣' callback={(value) => { hangleColumnChange(value, '10') }} />,
-    dataIndex: '10',
-    editable: true,
-  },
-  {
-    title: <TableTitle title='二级返佣' callback={(value) => { hangleColumnChange(value, '10') }} />,
-    dataIndex: '11',
-    editable: true,
-  },
-]
-
-const productAttrColumn = [
-  {
-    title: 'SKU属性',
-    dataIndex: '1',
-  },
-  {
-    title: '商品图片',
-    dataIndex: '2',
-  },
-  {
-    title: <TableTitle title='货号' callback={(value) => { hangleColumnChange(value, '3') }} />,
-    dataIndex: '3',
-    editable: true,
-  },
-  {
-    title: <TableTitle title='销售价' callback={(value) => { hangleColumnChange(value, '4') }} />,
-    dataIndex: '4',
-    editable: true,
-  },
-  {
-    title: <TableTitle title='成本价' callback={(value) => { hangleColumnChange(value, '5') }} />,
-    dataIndex: '5',
-    editable: true,
-  },
-  {
-    title: <TableTitle title='划线价' callback={(value) => { hangleColumnChange(value, '6') }} />,
-    dataIndex: '6',
-    editable: true,
-  },
-  {
-    title: <TableTitle title='库存价' callback={(value) => { hangleColumnChange(value, '7') }} />,
-    dataIndex: '7',
-    editable: true,
-  },
-  {
-    title: <TableTitle title='重量' callback={(value) => { hangleColumnChange(value, '8') }} />,
-    dataIndex: '8',
-    editable: true,
-  },
-  {
-    title: <TableTitle title='体积' callback={(value) => { hangleColumnChange(value, '9') }} />,
-    dataIndex: '9',
-    editable: true,
-  },
-]
 
 const components = {
   body: {
@@ -299,40 +142,42 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   const [specifyInputs, setSpecifyInputs] = useState<string[]>([]);
   const [addSpecifyVisible, setAddSpecifyVisible] = useState(false);
 
-  const [coverPictures, setCoverPictures] = useState<any[]>([...fileList])
-  const [previewVisible, setPreviewVisible] = useState<boolean>(false);
-  const [previewImage, setPreviewImage] = useState<string>();
-  const [previewTitle, setPreviewTitle] = useState<string>();
-
-  const [commission, setCommission] = useState(1);
-
-  //图片选择器
-  const [selectPictureVisible, setSelectPictureVisible] = useState(false);
-
+  const [commission, setCommission] = useState();
 
   const [previewProductVisible, setPreviewProductVisible] = useState(false);
 
   //商品属性列表元数据
-  const [productsAttr, setProductsAttr] = useState<IProductAttr[]>([{ 1: '1', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }, { 1: '2', 2: '2', 3: '3', 5: '4', 4: '5', 6: '6', 7: '7', 8: '8', 9: '9' }]);
+  const [productsAttr, setProductsAttr] = useState<IProductAttr[]>([]);
 
   const [treeData, setTreeData] = useState<ITreeNode[]>();
   const [selectedSpecModelList, setSelectedSpecModelList] = useState([]);
 
+  //表格中选择图片
+  const [selectPictureVisible, setSelectPictureVisible] = useState(false);
+
   const [form] = Form.useForm();
+
 
   const { location: { query } } = history;
 
-  const parseTreeData = (arr: any[]): ITreeNode[] => {
+  //设置所有行 都是正在编辑的状态
+  const [editableKeys, setEditableRowKeys] = useState<React.Key[]>();
+
+  //选择的规格模板
+  const [selectSpecModel, setSelectSpecModel] = useState('');
+
+  const parseTreeData = (arr: any[], level?: number = 1): ITreeNode[] => {
     return arr.map((item) => {
       let children: ITreeNode[] = [];
       if (item.children && item.children.length > 0) {
-        children = parseTreeData(item.children);
+        children = parseTreeData(item.children, 2);
       }
       return {
         title: item.typeName,
         value: item.id,
         children,
-        key: item.id
+        key: item.id,
+        selectable: level > 1,
       }
     })
   }
@@ -357,8 +202,6 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       const res = await getSepcModel();
       if (res.status === 200 && res.code === 200) {
         setSelectedSpecModelList(res.data);
-
-        console.log(Object.keys(res.data[0]))
         return;
       }
 
@@ -390,41 +233,6 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   }, [])
 
 
-  const handleSave = (row) => {
-    const newData = [productsAttr];
-    const index = newData.findIndex(item => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setProductsAttr([...newData]);
-  };
-
-  const getColumns = (columns) => {
-    return columns.map(col => {
-      if (!col.editable) {
-        return col;
-      }
-      return {
-        ...col,
-        onCell: (record) => ({
-          record,
-          editable: col.editable,
-          dataIndex: col.dataIndex,
-          title: col.title,
-          handleSave: handleSave,
-        }),
-      };
-    })
-  }
-
-
-  const attrColumn = getColumns(productAttrColumn);
-
-  const yColumn = getColumns(productYColumn);
-
-
   const specifyChange = (e, key: string) => {
     setSpecify({ ...specify, [key]: e.target.value })
   }
@@ -433,6 +241,15 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     const { name, value } = data;
     setSpecifies([...specifies, name]);
     setSpecifiesMap(specifiesMap.set(name, [value]));
+    setSpecify({ name: '', value: '' });
+    setAddSpecifyVisible(false);
+
+    //同步规格值到表单中
+    setProductSpec(specifiesMap);
+  }
+
+  const cancelSpecify = () => {
+    setSpecify({ name: '', value: '' });
     setAddSpecifyVisible(false);
   }
 
@@ -447,6 +264,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     specifiesMap.set(name, valueArr)
     let newMap = new Map(specifiesMap);
     setSpecifiesMap(newMap);
+
+    //同步规格值到表单中
+    setProductSpec(newMap);
   }
 
   /**
@@ -461,6 +281,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     let arr = [...specifyInputs];
     arr.splice(index, 1);
     setSpecifyInputs(arr);
+
+    //同步规格值到表单中
+    setProductSpec(specifiesMap);
   }
 
   const addSpecifyValue = (name: string, index: number) => {
@@ -475,6 +298,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     let arr = [...specifyInputs];
     arr[index] = '';
     setSpecifyInputs(arr);
+
+    //同步规格值到表单中
+    setProductSpec(specifiesMap);
   }
 
   const specifyValueChange = (e, index: number) => {
@@ -488,14 +314,339 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     setCommission(e.target.value);
   }
 
+  //选择规格模板
+  const selectSpecifyChange = (name: string) => {
+    setSelectSpecModel(name);
+  }
+
+
+  const checkSpecModel = () => {
+    if (selectSpecModel === '') {
+      message.warning('请选择要使用的规格模板')
+      return;
+    }
+    for (let item of selectedSpecModelList) {
+      if ((item as any).name === selectSpecModel) {
+        let { value } = item;
+        let map = new Map<string, any>(Object.entries(value));
+        setSpecifiesMap(map);
+        setProductSpec(map);
+        break;
+      }
+    }
+  }
+
+  const setProductSpec = (map: Map<string, any>) => {
+    let productSpec = Object.fromEntries(map.entries());
+
+    if (JSON.stringify(productSpec) === '{}') {
+      form?.setFieldsValue({ productSpec: null });
+      return;
+    }
+    for (let key of Object.keys(productSpec)) {
+      productSpec[key] = productSpec[key].join(',')
+    }
+    form?.setFieldsValue({ productSpec });
+
+  }
+
+  const initSpecifiesData = (arr: string[]): any[] => {
+    const keys = [...specifiesMap.keys()]
+    return arr.map((name, index) => {
+      const skuNameArr = name.split(',');
+      let properties = Object.create(null);
+      keys.forEach((key, index) => {
+        properties[key] = skuNameArr[index];
+      })
+      return {
+        skuName: name,
+        properties,
+        skuImg: '',
+        articleNo: 0,
+        salePrice: 0,
+        supplyPrice: 0,
+        marketPrice: 0,
+        inventory: 0,
+        inventoryWarn: 0,
+        weight: 0,
+        volume: 0,
+        firReturnCommiss: 0,
+        secReturnCommiss: 0,
+      }
+    })
+  }
+
+  //根据规格模板生成商品表格
+  const genProductList = (map: Map<string, any>) => {
+    let arr = [...map].reduce((prev: any, next: any) => {
+      prev.push(next[1])
+      return prev;
+    }, [])
+
+    let result = initSpecifiesData(fullCombination(arr));
+    setProductsAttr([...result]);
+  }
+
+  /**
+ * 修改列
+ * @param value
+ * @param key
+ */
+  const hangleColumnChange = (value: string, key: string) => {
+    let newDataSource = productsAttr.map(item => ({
+      ...item,
+      [key]: value
+    }));
+
+    setProductsAttr(newDataSource);
+  }
+  const productYColumn = [
+    {
+      title: 'SKU属性',
+      dataIndex: 'skuName',
+      editable: false
+    },
+    {
+      title: '商品图片',
+      dataIndex: 'skuImg',
+      editable: false,
+      render: (_, row) => {
+        return <Space>
+          {row.skuImg !== "" && <Image preview={{ mask: <EyeOutlined /> }} src={_} className={styles.tableItemImage} />}
+          {/* {row.skuImg !== "" && < Button onClick={() => { deleteSkuImg(row) }} size="small" shape="circle" icon={<DeleteOutlined />} />} */}
+          {/* {row.skuImg === "" && <Button size="small" shape="circle" icon={<PlusOutlined />} onClick={() => skuRowSelectPicture(_, row)} />} */}
+          {/* <Button size="small" shape="circle" icon={<PlusOutlined />} onClick={() => skuRowSelectPicture(_, row)} /> */}
+        </Space>
+      }
+    },
+    {
+      title: <TableTitle title='货号' callback={(value: string) => { hangleColumnChange(value, 'articleNo') }} />,
+      dataIndex: 'articleNo',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='销售价' callback={(value: string) => { hangleColumnChange(value, 'salePrice') }} />,
+      dataIndex: 'salePrice',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='成本价' callback={(value: string) => { hangleColumnChange(value, 'supplyPrice') }} />,
+      dataIndex: 'supplyPrice',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='划线价' callback={(value: string) => { hangleColumnChange(value, 'marketPrice') }} />,
+      dataIndex: 'marketPrice',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='库存' callback={(value: string) => { hangleColumnChange(value, 'inventory') }} />,
+      dataIndex: 'inventory',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='重量' callback={(value: string) => { hangleColumnChange(value, 'weight') }} />,
+      dataIndex: 'weight',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='体积' callback={(value: string) => { hangleColumnChange(value, 'volume') }} />,
+      dataIndex: 'volume',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='一级返佣(%)' callback={(value) => { hangleColumnChange(value, 'firReturnCommiss') }} />,
+      dataIndex: 'firReturnCommiss',
+      dataType: 'inputNumber',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='二级返佣(%)' callback={(value) => { hangleColumnChange(value, 'secReturnCommiss') }} />,
+      dataIndex: 'secReturnCommiss',
+      dataType: 'inputNumber',
+      editable: true,
+    },
+    {
+      title: '操作',
+      valueType: 'option',
+      width: 200,
+      render: (text, record, _, action) => [
+        <a
+          key="editable"
+          onClick={() => {
+            action?.startEditable?.(record.skuName);
+          }}
+        >
+          编辑
+        </a>,
+        <Popconfirm
+          title={`确定要删除${record.skuName}吗？`}
+          onConfirm={() => {
+            setProductsAttr(productsAttr.filter((item) => item.skuName !== record.skuName));
+          }}
+        >
+          <a
+            key="delete"
+          >
+            删除
+        </a>
+        </Popconfirm>
+        ,
+      ],
+    }
+  ]
+
+  const [skuRowIndex, setSkuRowIndex] = useState(-1);
+
+  //编辑行图片信息
+  const selectPictureCallback = (imgs: any) => {
+    setSelectPictureVisible(false);
+    let urlArr = imgs.map((item: any) => item.imgUrl);
+    productsAttr[skuRowIndex].skuImg = urlArr[0];
+    setProductsAttr([...productsAttr]);
+  }
+
+  //保存当前正在编辑的行
+  const skuRowSelectPicture = (imgUrl: string, row: any) => {
+
+    for (let i = 0, length = productsAttr.length; i < length; i++) {
+      let item = productsAttr[i];
+      if (item.skuName === row.skuName) {
+        setSkuRowIndex(i);
+        break;
+      }
+    }
+
+    setSelectPictureVisible(true);
+  }
+
+  //将当前的sku图片设置为空
+  const deleteSkuImg = (row: any) => {
+    for (let i = 0, length = productsAttr.length; i < length; i++) {
+      let item = productsAttr[i];
+      if (item.skuName === row.skuName) {
+        productsAttr[skuRowIndex].skuImg = '';
+        setProductsAttr([...productsAttr]);
+        break;
+      }
+    }
+  }
+
+
+  const productAttrColumn = [
+    {
+      title: 'SKU属性',
+      dataIndex: 'skuName',
+    },
+    {
+      title: '商品图片',
+      dataIndex: 'skuImg',
+      editable: false,
+      render: (_, row) => {
+        return <Space>
+          {row.skuImg !== "" && <Image preview={{ mask: <EyeOutlined /> }} src={_} className={styles.tableItemImage} />}
+          {row.skuImg !== "" && < Button onClick={() => { deleteSkuImg(row) }} size="small" shape="circle" icon={<DeleteOutlined />} />}
+          {/* {row.skuImg === "" && <Button size="small" shape="circle" icon={<PlusOutlined />} onClick={() => skuRowSelectPicture(_, row)} />} */}
+          <Button size="small" shape="circle" icon={<PlusOutlined />} onClick={() => skuRowSelectPicture(_, row)} />
+        </Space>
+      }
+    },
+    {
+      title: <TableTitle title='货号' callback={(value: string) => { hangleColumnChange(value, 'articleNo') }} />,
+      dataIndex: 'articleNo',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='销售价' callback={(value: string) => { hangleColumnChange(value, 'salePrice') }} />,
+      dataIndex: 'salePrice',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='成本价' callback={(value: string) => { hangleColumnChange(value, 'supplyPrice') }} />,
+      dataIndex: 'supplyPrice',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='划线价' callback={(value: string) => { hangleColumnChange(value, 'marketPrice') }} />,
+      dataIndex: 'marketPrice',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='库存' callback={(value: string) => { hangleColumnChange(value, 'inventory') }} />,
+      dataIndex: 'inventory',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='重量' callback={(value: string) => { hangleColumnChange(value, 'weight') }} />,
+      dataIndex: 'weight',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='体积' callback={(value: string) => { hangleColumnChange(value, 'volume') }} />,
+      dataIndex: 'volume',
+      editable: true,
+    },
+    {
+      title: '操作',
+      valueType: 'option',
+      width: 200,
+      render: (text, record, _, action) => [
+        <a
+          key="editable"
+          onClick={() => {
+            action?.startEditable?.(record.skuName);
+          }}
+        >
+          编辑
+        </a>,
+        <Popconfirm
+          title={`确定要删除${record.skuName}吗？`}
+          onConfirm={() => {
+            setProductsAttr(productsAttr.filter((item) => item.skuName !== record.skuName));
+          }}
+        >
+          <a
+            key="delete"
+          >
+            删除
+        </a>
+        </Popconfirm>
+        ,
+      ],
+    },
+  ]
+
+
+  const submitData = async (values: any) => {
+    const hide = message.loading('商品正在创建中')
+    try{
+      let result = await submitForm(values);
+      if(result.status === 200 && result.code !== 200){
+        hide();
+        message.error('商品创建失败，' + result.msg);
+        return;
+      }
+
+      hide();
+      message.success('商品创建成功！');
+      //history()
+    } catch(error){
+      hide();
+      message.error('商品创建失败，请重试！')
+    }
+
+  }
+
   return (
     <>
       <Form
         form={form}
         layout="vertical"
         hideRequiredMark
-        initialValues={{}}
-        onFinish={(values) => { console.log('values', values) }}
+        initialValues={initData}
+        onFinish={(values) => {
+          console.log('values', values)
+        }}
         onFinishFailed={() => { }}
       >
         <PageContainer>
@@ -504,10 +655,12 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col span={24}>
                 <Form.Item
                   label={'商品分类'}
-                  name="name"
+                  name="typeId"
                   rules={[{ required: true, message: '请选择商品分类' }]}
                 >
-                  <TreeSelect {...tProps} placeholder="一级类目 < 二级类目" />
+                  <TreeSelect {...tProps} placeholder="一级类目 < 二级类目" >
+                    TreeNode
+                  </TreeSelect>
                 </Form.Item>
               </Col>
             </Row>
@@ -588,9 +741,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 <Form.Item
                   label={'商品封面主图'}
                   name="proLogoImg1"
+                  rules={[{ required: true, message: '请选择商品封面主图' }]}
                 >
                   <ImagePicker limit={5} />
-                  {/* <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，只可上传一张。</span> */}
                 </Form.Item>
               </Col>
             </Row>
@@ -600,39 +753,47 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 <Form.Item
                   label={'商品轮播图'}
                   name="proRotationImg1"
+                  rules={[{ required: true, message: '请选择商品轮播图' }]}
                 >
-                  <ImagePicker limit={1}>
+                  <ImagePicker limit={5}>
                   </ImagePicker>
-                  {/* <span className={styles.attaction}>建议尺寸：800*800，单张图片不超过256kb，最多可上传5张。</span> */}
                 </Form.Item>
               </Col>
             </Row>
 
             <Card type="inner" title="商品规格" className={styles.card}>
               <Row>
-                <Col span={24} className={styles.specifyRow}>
-                  <span className={classnames(styles.label, styles.right10)}>选择规格模板:</span>
-                  <Input.Group className={styles.right10} compact style={{ width: 265 }}>
-                    <Select
-                      showSearch
-                      placeholder="选择规格模板"
-                      optionFilterProp="children"
-                      onChange={() => { }}
-                      style={{ width: 200 }}
-                    // filterOption={(input, option) => {}}
-                    >
-                      {/* {
-                        selectedSpecModelList && Object.keys(selectedSpecModelList).map((key) => {
-                          return <Option value={selectedSpecModelList[key]}>key</Option>
-                           }
-                        )
-                      } */}
-                    </Select>
-                    <Button >确认</Button>
-                  </Input.Group>
-                  <Button type="primary" ghost className={styles.right10} onClick={() => { setAddSpecifyVisible(true) }}>添加新规格</Button>
-                  <Button type="primary">立即生成</Button>
-                </Col>
+                <Form.Item
+                  name="productSpec"
+                  rules={[{ required: true, message: '规格属性不能为空' }]}
+                >
+                  <Col span={24} className={styles.specifyRow}>
+                    <span className={classnames(styles.label, styles.right10)}>选择规格模板:</span>
+                    <Input.Group className={styles.right10} compact style={{ width: 265 }}>
+                      <Select
+                        value={selectSpecModel}
+                        showSearch
+                        placeholder="选择规格模板"
+                        optionFilterProp="children"
+                        onChange={(e) => { selectSpecifyChange(e) }}
+                        style={{ width: 200 }}
+                      // filterOption={(input, option) => {}}
+                      >
+                        {
+                          selectedSpecModelList && selectedSpecModelList.map((item: any) => {
+                            return <Option key={item.name} value={item.name}>{item.name}</Option>
+                          }
+                          )
+                        }
+                      </Select>
+                      <Button onClick={() => checkSpecModel()}>确认</Button>
+
+                    </Input.Group>
+                    <Button type="primary" ghost className={styles.right10} onClick={() => { setAddSpecifyVisible(true) }}>添加新规格</Button>
+                    <Button type="primary" onClick={() => genProductList(specifiesMap)}>立即生成</Button>
+                  </Col>
+
+                </Form.Item>
               </Row>
 
               {
@@ -648,7 +809,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                     </Col>
                     <Col className={styles.addModalCol} span={6}>
                       <Space>
-                        <Button size="small">取消</Button>
+                        <Button size="small" onClick={() => { cancelSpecify() }}>取消</Button>
                         <Button size="small" type='primary' onClick={() => { addSpecify(specify) }}>确认</Button>
                       </Space>
                     </Col>
@@ -659,10 +820,10 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
               {
                 [...specifiesMap.keys()].map((name, i) => (
-                  <Specify name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
+                  <Specify key={name} name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
                     {
                       (specifiesMap.get(name) || []).map((value: string, index: number) => (
-                        <SpecifyItem value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
+                        <SpecifyItem key={index} value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
                       ))
                     }
 
@@ -673,25 +834,31 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   </Specify>
                 ))
               }
-
-              <Table
-                style={{ marginTop: 24 }}
-                pagination={false}
-                components={components}
-                rowClassName={styles['editable-row']}
-                bordered
-                dataSource={productsAttr}
-                columns={attrColumn as ColumnsType}
-              />
             </Card>
 
+            <EditableProTable
+              bordered
+              rowKey="skuName"
+              headerTitle="SKU属性表"
+              maxLength={5}
+              recordCreatorProps={false}
+              toolBarRender={() => [
+              ]}
+              columns={productAttrColumn}
+              value={productsAttr}
+              onChange={setProductsAttr}
+              editable={{
+                type: 'multiple',
+                editableKeys,
+                onChange: setEditableRowKeys,
+              }}
+            />
+            <Form.Item name="productSkuInfo">
+            </Form.Item>
             <Row>
               <Col span={24}>
                 <Form.Item name="productDetail" label="商品详情" rules={[{ required: true, message: '请输入商品详情' }]} >
-                  <BraftEditor
-                    className='my-editor'
-                    placeholder=""
-                  />
+                  <Editor placeholder="请输入商品详情！" />
                 </Form.Item>
               </Col>
             </Row>
@@ -699,10 +866,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Row>
               <Col span={24}>
                 <Form.Item name="qualityReport1" label="质检报告" rules={[{ required: true, message: '请输入质检报告' }]} >
-                  <BraftEditor
-                    className='my-editor'
-                    placeholder=""
-                  />
+                  <Editor placeholder="请输入质检报告！" />
                 </Form.Item>
               </Col>
             </Row>
@@ -711,32 +875,32 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
               <Col  {...smallItemLayout}>
                 <Form.Item name="productStatus" label="商品状态">
                   <Radio.Group onChange={() => { }} value={1}>
-                    <Radio value={1}>上架</Radio>
-                    <Radio value={2}>下架</Radio>
+                    <Radio value={'上架'}>上架</Radio>
+                    <Radio value={'下架'}>下架</Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>
                 <Form.Item name="isRecommend" label="首页推荐">
                   <Radio.Group onChange={() => { }} value={1}>
-                    <Radio value={1}>开启</Radio>
-                    <Radio value={2}>关闭</Radio>
+                    <Radio value={'Y'}>开启</Radio>
+                    <Radio value={'N'}>关闭</Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>
                 <Form.Item name="isBoutique" label="精品推荐">
                   <Radio.Group onChange={() => { }} value={1}>
-                    <Radio value={1}>开启</Radio>
-                    <Radio value={2}>关闭</Radio>
+                    <Radio value={'Y'}>开启</Radio>
+                    <Radio value={'N'}>关闭</Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>
                 <Form.Item name="freightSetting" label="运费设置">
                   <Radio.Group onChange={() => { }} value={1}>
-                    <Radio value={1}>免费包邮</Radio>
-                    <Radio value={2}>邮费到付</Radio>
+                    <Radio value={'免费包邮'}>免费包邮</Radio>
+                    <Radio value={'邮费到付'}>邮费到付</Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>
@@ -744,54 +908,53 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
             <Form.Item name="commissionSetting" label="佣金设置">
               <Radio.Group onChange={handleCommissionChange} value={commission}>
-                <Radio value={1}>默认设置</Radio>
-                <Radio value={2}>自定义设置</Radio>
+                <Radio value={'默认设置'}>默认设置</Radio>
+                <Radio value={'自定义设置'}>自定义设置</Radio>
               </Radio.Group>
             </Form.Item>
             {
-              commission === 2 &&
+              commission === '自定义设置' &&
               (
-                <Table
-                  style={{ marginTop: 24 }}
-                  pagination={false}
-                  components={components}
-                  rowClassName={styles['editable-row']}
+                <EditableProTable
                   bordered
-                  dataSource={productsAttr}
-                  columns={yColumn as ColumnsType}
+                  rowKey="skuName"
+                  headerTitle="自定义佣金表"
+                  maxLength={5}
+                  recordCreatorProps={false}
+                  toolBarRender={() => [
+                  ]}
+                  columns={productYColumn}
+                  value={productsAttr}
+                  onChange={setProductsAttr}
+                  editable={{
+                    type: 'multiple',
+                    editableKeys,
+                    onChange: setEditableRowKeys,
+                  }}
                 />
               )
             }
 
           </Card>
-
-          {/* 预览图片 */}
-          <Modal
-            visible={previewVisible}
-            title={previewTitle}
-            footer={null}
-            onCancel={() => { setPreviewVisible(false) }}
-          >
-            <img alt="商品主图" style={{ width: '100%' }} src={previewImage} />
-          </Modal>
-
-          {/* <SelectPictureModal visible={selectPictureVisible} onOk={(pictures) => {console.log('pictures',pictures)}} limit={3} onCancel={() => {setSelectPictureVisible(false)}}/> */}
-
-
-
         </PageContainer>
         <FooterToolbar>
           {/* {getErrorInfo(error)} */}
-          <Button onClick={() => { console.log(form.getFieldsValue()); return; setPreviewProductVisible(true) }} loading={false}>
+          <Button onClick={() => { setPreviewProductVisible(true) }} loading={false}>
             预览
         </Button>
-          <Button type="primary" onClick={() => form?.submit()} loading={false}>
+          <Button type="primary" onClick={() => {
+            setProductsAttr([...productsAttr])
+            form.setFieldsValue({ productSkuInfo: productsAttr })
+            submitData(form.getFieldsValue());
+          }} loading={false}>
             提交
         </Button>
         </FooterToolbar>
       </Form >
 
-      <Preview product={{}} visible={previewProductVisible} onCancel={() => { setPreviewProductVisible(false) }} />
+
+      <SelectPictureModal initData={[]} limit={1} visible={selectPictureVisible} onOk={selectPictureCallback} onCancel={() => { setSelectPictureVisible(false) }} />
+      <Preview product={form?.getFieldsValue()} visible={previewProductVisible} onCancel={() => { setPreviewProductVisible(false) }} />
     </>
 
   )

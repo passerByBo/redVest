@@ -10,7 +10,7 @@ export const isAntDesignPro = (): boolean => {
   return window.location.hostname === 'preview.pro.ant.design';
 };
 
-// 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
+//用于关闭真实开发环境不需要使用的特性
 export const isAntDesignProOrDev = (): boolean => {
   const { NODE_ENV } = process.env;
   if (NODE_ENV === 'development') {
@@ -25,6 +25,20 @@ export const getIds = <T extends { [key: string]: any }>(arg: T | T[]): string =
   arg.forEach((item) => {
     idArr.push(item.id);
   });
-
   return idArr.join(',');
+};
+
+export const fullCombination = (arr): any[] => {
+ // 第一次的结果就是二维数组的第0项
+ let res = arr[0].slice();
+ for (let i = 1; i < arr.length; i++) {
+   const pre = res.slice();
+   res = [];
+   pre.forEach(item => {
+     arr[i].forEach(curr => {
+       res.push(item +','+ curr)
+     })
+   });
+ }
+ return res;
 };

@@ -59,6 +59,8 @@ const Preview: React.FC<IPreviewProps> = (props) => {
   const [device, setDevices] = useState(DEVICES[0]);
   const [deviceColors, setDeviceColors] = useState<IColor[]>([]);
   const [deviceColorClass, setDeviceColorClass] = useState('');
+  const { productName, productDescribe, productTitle, proRotationImg1, proLogoImg1, qualityReport1, productDetail } = product;
+
 
   const handleDeviceSelect = (key: string) => {
     for (let i = 0, length = DEVICES.length; i < length; i++) {
@@ -85,6 +87,9 @@ const Preview: React.FC<IPreviewProps> = (props) => {
       }
     </Menu>
   )
+
+
+
 
   return (
     <Modal title={'商品预览'} footer={null} {...others} width={800}>
@@ -115,8 +120,8 @@ const Preview: React.FC<IPreviewProps> = (props) => {
 
                 <Carousel autoplay>
                   {
-                    [1, 2, 3, 4].map((item) => (
-                      <img className={styles.carouselImg} src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2033921778,648007645&fm=26&gp=0.jpg"
+                    proRotationImg1 && proRotationImg1.split(',').map((url: string) => (
+                      <img className={styles.carouselImg} src={url}
                         alt="" />
                     ))
                   }
@@ -128,19 +133,19 @@ const Preview: React.FC<IPreviewProps> = (props) => {
                     <span className={styles["retail-price"]}>99.99</span>
                   </div>
                   <div className={styles["product-title"]}>
-                    中国蓝星BLUESTAR小便池除臭尿斗香片 10片装 卫生间厕所除臭芳香块过滤网 除味净化去味清洁剂芳香剂清新剂
-                            </div>
+                    {productName}
+                  </div>
                 </div>
 
 
                 <Tabs defaultActiveKey="1" onChange={() => { }} tabBarStyle={{ backgroundColor: 'white' }} centered >
                   <TabPane tab="商品参数" key="1" >
-                    <div dangerouslySetInnerHTML={{ __html: html }}>
+                    <div dangerouslySetInnerHTML={{ __html: productDetail }}>
 
                     </div>
                   </TabPane>
                   <TabPane tab="质检报告" key="2">
-                    <div dangerouslySetInnerHTML={{ __html: html2 }}>
+                    <div dangerouslySetInnerHTML={{ __html: qualityReport1 }}>
 
                     </div>
                   </TabPane>
