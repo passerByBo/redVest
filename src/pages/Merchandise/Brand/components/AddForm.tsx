@@ -7,6 +7,7 @@ import ProForm, {
   ProFormSwitch,
   ProFormDigit,
 } from '@ant-design/pro-form';
+import ImagePicker from '@/components/ImagePicker';
 
 export type FormValueType = {
   id?: string;
@@ -68,15 +69,30 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
     >
       <ProForm.Group>
-        <ProFormText width="md" name="productBrand" label="商品品牌" placeholder="请输入商品品牌" />
+        <ProFormText  rules={[{required: true, message:"请输入品牌名称"}]} width="md" name="productBrand" label="商品品牌" placeholder="请输入品牌名称" />
         {/* 接口中没有 */}
         <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
       </ProForm.Group>
 
       {/* 缺少图片选择器 */}
+      <Form.Item
+        name="logo"
+        label="品牌Logo"
+        extra="建议图片大小不超过250kb"
+      >
+        <ImagePicker limit={1} />
+      </Form.Item>
+
+      <Form.Item
+        name="brandImg"
+        label="品牌区大图"
+        extra="建议图片大小不超过250kb"
+      >
+        <ImagePicker limit={1} />
+      </Form.Item>
 
       <ProForm.Group>
-        <ProFormTextArea width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
+        <ProFormTextArea rules={[{required: true, message:"请输入品牌描述"}]} width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
       </ProForm.Group>
 

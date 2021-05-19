@@ -1,39 +1,32 @@
-import { EyeOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, Drawer, Form, message, Popconfirm, Upload,Image } from 'antd';
+import { Button, Drawer, Form, message, Popconfirm, Upload, Image } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import ProForm, {
   ModalForm,
   ProFormText,
   ProFormTextArea,
-  DrawerForm,
   ProFormDatePicker,
-  ProFormUploadDragger,
   ProFormSwitch,
   ProFormDigit
 } from '@ant-design/pro-form';
 import { getThematicGroupList, addThematicGroup, editThematicGroup, getThematicGroupDetail, deleteThematicGroup } from '@/services/merchandise/thematicGroup';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import ProDescriptions from '@ant-design/pro-descriptions';
+import ImagePicker from '@/components/ImagePicker';
 type ThematicGroupListItem = {
   id: string,
   isValid: string,
   endDate: string,
-  sort: number,
+  sort?: number,
   isShow: string,
   specialGroup: string,
   specialGroupDescribe: string,
   [key: string]: string,
 }
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
+
 
 const detailColumns = [
   {
@@ -246,14 +239,6 @@ const ThematicGroup: React.FC = () => {
       ],
     },
   ]
-
-  const normFile = (e: any) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
-
   /**
  * 添加节点
  *
@@ -262,25 +247,10 @@ const ThematicGroup: React.FC = () => {
 
   const handleAdd = async (fields) => {
     const hide = message.loading('正在添加');
-
     if (fields.hasOwnProperty('isValid')) {
       fields.isValid ? fields.isValid = 'Y' : fields.isValid = 'N'
     }
 
-    //处理上传图片form数据
-    if (fields.hasOwnProperty('specialGroupImgBig')) {
-      const specialGroupImgBig = fields.specialGroupImgBig;
-      let picArr: string[] = [];
-      specialGroupImgBig.forEach((proxy) => {
-        if (proxy.status === 'done') {
-          let res = proxy.response;
-          if (res.status === 200) {
-            picArr.push(res.fileName)
-          }
-        }
-      })
-      fields.specialGroupImgBig = picArr.join(',')
-    }
     try {
       let res = await addThematicGroup({ ...fields });
       if (res.status === 200 && res.code !== 200) {
@@ -317,27 +287,6 @@ const ThematicGroup: React.FC = () => {
       return false;
     }
   };
-
-
-  const uploadProps = {
-    name: 'file',
-    action: '/prod-api/mall/common/upload',
-    headers: {
-      Authorization: sessionStorage.getItem('token'),
-    },
-  }
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>上传</div>
-    </div>
-  );
-
-
-  const handleChange = ({ fileList }) => {
-    setFileList(fileList);
-  }
 
   return (
     <PageContainer>
@@ -413,6 +362,7 @@ const ThematicGroup: React.FC = () => {
           if (success) {
             setEditProduct(null);
             handleModalVisible(false);
+            updateForm.resetFields();
             if (actionRef.current) {
               actionRef.current.reload();
             }
@@ -420,28 +370,29 @@ const ThematicGroup: React.FC = () => {
         }}
       >
         <ProForm.Group>
-          <ProFormText width="md" name="specialGroup" label="专题组" placeholder="请输入名称" />
-          <ProFormDigit label="排序" name="sort" width="md" />
+          <ProFormText rules={[{
+            required: true,
+            message: '请输入专题组名称!',
+          }]} width="md" name="specialGroup" label="专题组" placeholder="请输入名称" />
+          <ProFormDigit rules={[{
+            required: true,
+            message: '请输入排序值',
+          }]} label="排序" name="sort" width="md" />
         </ProForm.Group>
 
-        <ProFormSwitch name="isValid" label="是否有效" />
+        <ProFormSwitch rules={[{
+            required: true,
+            message: '请选择是否有效',
+          }]} name="isValid" label="是否有效" />
 
         {/* <ProFormUploadDragger {...uploadProps } max={4} label="专题组图片" name="specialGroupImgBig" /> */}
 
         <Form.Item
           name="specialGroupImgBig"
           label="专题组图片"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
           extra="建议图片大小不超过250kb"
         >
-          <Upload {...uploadProps}
-            showUploadList={{ showPreviewIcon: false }}
-            listType="picture-card"
-            fileList={fileList}
-            onChange={handleChange}>
-            {fileList.length >= 8 ? null : uploadButton}
-          </Upload>
+          <ImagePicker limit={1} />
         </Form.Item>
 
 
@@ -456,7 +407,7 @@ const ThematicGroup: React.FC = () => {
       </ModalForm>
 
       <Drawer
-      title={ '专题组详情'}
+        title={'专题组详情'}
         width={700}
         visible={showDetail}
         onClose={() => {

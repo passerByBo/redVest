@@ -60,7 +60,7 @@ export default class Editer extends React.Component {
     return (
       <BraftEditor
         className='my-editor'
-        placeholder="请输入商品详情"
+        placeholder={this.props.placeholder || ''}
         extendControls={extendControls}
         value={this.state.editorState}
         onChange={this.handleChange}

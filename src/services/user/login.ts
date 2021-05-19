@@ -30,6 +30,13 @@ export async function getAuthCode(params: any, options?: { [key: string]: any })
   });
 }
 
+export async function getRegisterAuthCode(params: any, options?: { [key: string]: any }) {
+  return request(`/customer/shopInfo/register/getAuthCode/${params.phone}`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 export async function authCode(body: any, options?: { [key: string]: any }) {
   return request('/login/authCode', {
     method: 'POST',

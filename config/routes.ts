@@ -342,24 +342,24 @@ export default [
       },
     ],
   },
-  {
-    //帮助中心
-    path: '/help',
-    icon: 'questionCircle',
-    name: '帮助中心',
-    routes: [
-      {
-        path: '/help/document',
-        name: '平台帮助文档',
-        component: './Welcome',
-      },
-      {
-        path: '/help/contact',
-        name: '联系我们',
-        component: './TableList',
-      },
-    ],
-  },
+  // {
+  //   //帮助中心
+  //   path: '/help',
+  //   icon: 'questionCircle',
+  //   name: '帮助中心',
+  //   routes: [
+  //     {
+  //       path: '/help/document',
+  //       name: '平台帮助文档',
+  //       component: './Welcome',
+  //     },
+  //     {
+  //       path: '/help/contact',
+  //       name: '联系我们',
+  //       component: './TableList',
+  //     },
+  //   ],
+  // },
   {
     path: '/',
     redirect: '/home',

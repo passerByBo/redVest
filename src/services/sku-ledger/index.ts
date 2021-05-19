@@ -13,3 +13,17 @@ export async function getSKUList(
     ...(options || {}),
   });
 }
+
+export async function getSkuOrder(
+  params: {
+    pageNum?: number;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+){
+  return request('/product/info/skuorder', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}

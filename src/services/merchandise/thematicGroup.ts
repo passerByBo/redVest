@@ -1,7 +1,7 @@
 import { request } from 'umi';
 
 export async function getThematicGroupList(
-  params: {
+  params?: {
     pageSize?: number;
     pageNum?: number;
   },

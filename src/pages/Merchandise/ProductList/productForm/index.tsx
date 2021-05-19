@@ -1,19 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { history } from 'umi';
+import { history, useRequest } from 'umi';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Col, Form, Input, message, Popconfirm, Popover, Radio, Row, Select, Space, Table, TreeSelect, Image } from 'antd';
+import { Button, Card, Col, Form, Input, message, Popconfirm, Popover, Radio, Row, Select, Space, TreeSelect, Image } from 'antd';
 import styles from '../style.less';
-import { CheckOutlined, ClearOutlined, DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import { CheckOutlined, DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
-import { ColumnsType } from 'antd/lib/table';
-
-import { AttrEditableRow, AttrEditableCell } from "./components/AttrEditable"
 import { ISpecify } from '../../SpecificationModel/components/AddFormModal';
 import { SpecifyItem, Specify } from '../../components/Specify';
 import Preview from '../components/Preview';
 import ImagePicker from '@/components/ImagePicker';
 import { getMerchandiseTypeList } from '@/services/merchandise/merchandiseType';
-import { getSepcModel, submitForm } from '@/services/merchandise/product';
+import { getProductDetail, getSepcModel, submitForm } from '@/services/merchandise/product';
 import { fullCombination } from '@/utils/utils';
 import { EditableProTable } from '@ant-design/pro-table';
 
@@ -24,26 +21,11 @@ import SelectPictureModal from '@/components/SelectPictureModal';
 
 
 const initData = {
-  "productName": "诺基亚N98",
-  "productSkuInfo": [],
-  "productSpec": {},
-  "productNo": '123',
-  "productBrand": "诺基亚",
-  "productUnit": "台",
-  "productStatus": "上架",
-  " productDescribe": "商品简介asdasdasdasdasdasdasdasd",
-  " productDetail": "123123123123123",
-  "sort": "100",
-  "typeName": "手机",
-  "productTitle": "副标题",
-  "proLogoImg1": "123123123",
-  "proRotationImg1": "123123123123",
-  "qualityReport1": "123123123123",
   "isRecommend": "Y",
   "isBoutique": "Y",
-  "commissionSetting": "自定义设置",
-  "freightSetting": "免费包邮"
-
+  "commissionSetting": "默认设置",
+  "freightSetting": "免费包邮",
+  "productStatus": "上架"
 }
 
 const { SHOW_ALL } = TreeSelect;
@@ -90,7 +72,6 @@ const TableTitle: React.FC<{ title: string, callback: Function }> = React.memo((
   }
 
   const handleOk = () => {
-    console.log('handleOk')
     const value = inputRef?.current?.input?.value || ''
     inputRef?.current?.handleReset()
     callback(value);
@@ -126,12 +107,12 @@ const TableTitle: React.FC<{ title: string, callback: Function }> = React.memo((
 
 
 
-const components = {
-  body: {
-    row: AttrEditableRow,
-    cell: AttrEditableCell,
-  }
-}
+// const components = {
+//   body: {
+//     row: AttrEditableRow,
+//     cell: AttrEditableCell,
+//   }
+// }
 
 const ProductForm: React.FC<IProductFormProps> = (props) => {
 
@@ -154,6 +135,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
   //表格中选择图片
   const [selectPictureVisible, setSelectPictureVisible] = useState(false);
+
+  //商品详细信息编辑时使用
+  const [productDetail, setProductDetail] = useState<any>(null);
 
   const [form] = Form.useForm();
 
@@ -226,14 +210,42 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     }
   }, [treeData]);
 
+  const initPageContent = (data: any) => {
+    //需要初始化设置选中的图片
+
+    //初始化设置规格模板
+
+    //初始化设置商品详情和质检报告
+
+    //需要初始化设置SKU属性表格和自定义佣金表格
+  }
+
+
+  const { loading, run: getDetail } = useRequest(getProductDetail.bind(null, { productId: (query as any).id }), {
+    manual: true,
+    onSuccess: (result: any, params: any) => {
+      if (result) {
+        //将数据设置到表单内
+        form.setFieldsValue({ ...result })
+        initPageContent({ ...result });
+        setProductDetail({ ...result });
+        return;
+      }
+      message.error('初始化商品详情失败，请重试！')
+    }
+  })
+
 
   useEffect(() => {
+    if (query && query.id) {
+      getDetail(query.id);
+    }
     getTypeList();
     getSpecModelList()
   }, [])
 
 
-  const specifyChange = (e, key: string) => {
+  const specifyChange = (e: any, key: string) => {
     setSpecify({ ...specify, [key]: e.target.value })
   }
 
@@ -303,14 +315,14 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     setProductSpec(specifiesMap);
   }
 
-  const specifyValueChange = (e, index: number) => {
+  const specifyValueChange = (e: any, index: number) => {
     let arr = [...specifyInputs];
     arr[index] = e.target.value;
     setSpecifyInputs(arr);
   }
 
 
-  const handleCommissionChange = (e) => {
+  const handleCommissionChange = (e: any) => {
     setCommission(e.target.value);
   }
 
@@ -392,13 +404,13 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
  * @param value
  * @param key
  */
-  const hangleColumnChange = (value: string, key: string) => {
+  const hangleColumnChange = (value: string | number, key: string) => {
     let newDataSource = productsAttr.map(item => ({
       ...item,
       [key]: value
     }));
 
-    setProductsAttr(newDataSource);
+    setProductsAttr(newDataSource as any);
   }
   const productYColumn = [
     {
@@ -410,7 +422,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       title: '商品图片',
       dataIndex: 'skuImg',
       editable: false,
-      render: (_, row) => {
+      render: (_: any, row: any) => {
         return <Space>
           {row.skuImg !== "" && <Image preview={{ mask: <EyeOutlined /> }} src={_} className={styles.tableItemImage} />}
           {/* {row.skuImg !== "" && < Button onClick={() => { deleteSkuImg(row) }} size="small" shape="circle" icon={<DeleteOutlined />} />} */}
@@ -455,13 +467,13 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       editable: false,
     },
     {
-      title: <TableTitle title='一级返佣(%)' callback={(value) => { hangleColumnChange(value, 'firReturnCommiss') }} />,
+      title: <TableTitle title='一级返佣(%)' callback={(value: number) => { hangleColumnChange(value, 'firReturnCommiss') }} />,
       dataIndex: 'firReturnCommiss',
       dataType: 'inputNumber',
       editable: true,
     },
     {
-      title: <TableTitle title='二级返佣(%)' callback={(value) => { hangleColumnChange(value, 'secReturnCommiss') }} />,
+      title: <TableTitle title='二级返佣(%)' callback={(value: number) => { hangleColumnChange(value, 'secReturnCommiss') }} />,
       dataIndex: 'secReturnCommiss',
       dataType: 'inputNumber',
       editable: true,
@@ -470,7 +482,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       title: '操作',
       valueType: 'option',
       width: 200,
-      render: (text, record, _, action) => [
+      render: (text: any, record: any, _: any, action: any) => [
         <a
           key="editable"
           onClick={() => {
@@ -542,7 +554,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       title: '商品图片',
       dataIndex: 'skuImg',
       editable: false,
-      render: (_, row) => {
+      render: (_: any, row: any) => {
         return <Space>
           {row.skuImg !== "" && <Image preview={{ mask: <EyeOutlined /> }} src={_} className={styles.tableItemImage} />}
           {row.skuImg !== "" && < Button onClick={() => { deleteSkuImg(row) }} size="small" shape="circle" icon={<DeleteOutlined />} />}
@@ -590,7 +602,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       title: '操作',
       valueType: 'option',
       width: 200,
-      render: (text, record, _, action) => [
+      render: (text: any, record: any, _: any, action: any) => [
         <a
           key="editable"
           onClick={() => {
@@ -619,9 +631,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
   const submitData = async (values: any) => {
     const hide = message.loading('商品正在创建中')
-    try{
+    try {
       let result = await submitForm(values);
-      if(result.status === 200 && result.code !== 200){
+      if (result.status === 200 && result.code !== 200) {
         hide();
         message.error('商品创建失败，' + result.msg);
         return;
@@ -630,7 +642,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       hide();
       message.success('商品创建成功！');
       //history()
-    } catch(error){
+    } catch (error) {
       hide();
       message.error('商品创建失败，请重试！')
     }
@@ -643,13 +655,13 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
         form={form}
         layout="vertical"
         hideRequiredMark
-        initialValues={initData}
+        initialValues={productDetail || initData}
         onFinish={(values) => {
           console.log('values', values)
         }}
         onFinishFailed={() => { }}
       >
-        <PageContainer>
+        <PageContainer loading={loading}>
           <Card title="基本信息" className={styles.card} bordered={false}>
             <Row>
               <Col span={24}>
@@ -742,6 +754,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   label={'商品封面主图'}
                   name="proLogoImg1"
                   rules={[{ required: true, message: '请选择商品封面主图' }]}
+                  extra="建议图片大小不超过250kb"
                 >
                   <ImagePicker limit={5} />
                 </Form.Item>
@@ -754,9 +767,9 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   label={'商品轮播图'}
                   name="proRotationImg1"
                   rules={[{ required: true, message: '请选择商品轮播图' }]}
+                  extra="建议图片大小不超过250kb"
                 >
-                  <ImagePicker limit={5}>
-                  </ImagePicker>
+                  <ImagePicker limit={5}></ImagePicker>
                 </Form.Item>
               </Col>
             </Row>
@@ -923,7 +936,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   recordCreatorProps={false}
                   toolBarRender={() => [
                   ]}
-                  columns={productYColumn}
+                  columns={productYColumn as any}
                   value={productsAttr}
                   onChange={setProductsAttr}
                   editable={{

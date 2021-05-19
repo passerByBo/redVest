@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { InboxOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
 import styles from './style.less'
 import { Link, history } from 'umi';
-import { Form, Input, Radio, Cascader, Upload, Row, Col, Button, message } from 'antd';
+import { Form, Input, Radio, Cascader, Row, Col, Button, message, Upload } from 'antd';
 import { getProvinceList, register } from '@/services/user/register';
-import { getAuthCode } from '@/services/user/login';
-// import chinaDivisions from '@/utils/china-divisions'
+import { getAuthCode, getRegisterAuthCode } from '@/services/user/login';
+import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const layout = {
@@ -27,16 +26,16 @@ const initData = {
   "incities": "北京市",
   "region": [],
   "adressOffice": "北京市通州区物流基地兴贸二街16号581室",
-  "businesslicense": "红背心fg_logo.png",
+  // "businesslicense": "红背心fg_logo.png",
   "companyprofile": "红背心成立于2014年，是汇安居（北京）信息科技有限公司打造的一个为全国家居电商提供专业的仓储、配送、安装、维修以及售后服务一体化的服务平台。红背心以“专注服务，安全高效”为品牌理念，为商家提供一站式售后解决方案，帮助商家为消费者提供高标准的家具送装服务体验。同时结合互联网应用技术实现全供应链的全程节点管控和信息管理同步，为商家提供全链数据和信息支持，进一步降低商家物流、售后服务成本。也为全国师傅提供行业内标准化、规范化的事业平台。",
   "shopname": "红背心自营商城",
   "shopmobile": "17600133016",
-  "authorizedFile": "红背心fg_logo.png",
+  // "authorizedFile": "红背心fg_logo.png",
   "authorizedUsername": "红背心自营店长",
   "authorizedUserTel": "15210140885",
   "authorizedUserMail": "jianghua@hongbeixin.com",
   "officeTel": "15210140885",
-  "contaccessory": "红背心fg_logo.png",
+  // "contaccessory": "红背心fg_logo.png",
   "bankDeposit": "招商银行",
   "accountName": "科技信息公司",
   "bankAccount": "621010101010101010",
@@ -90,7 +89,7 @@ const Register: React.FC = () => {
     }
     const hide = message.loading('请求玩命发送中！')
     try {
-      const res = await getAuthCode({
+      const res = await getRegisterAuthCode({
         phone: form.getFieldValue('shopmobile')
       });
       if (res.status === 200 && res.code === 200) {
@@ -117,11 +116,18 @@ const Register: React.FC = () => {
 
   };
 
-  const submit = async (fields) => {
+  const submit = async (fields: any) => {
     fields.region = fields.region.pop();
-    fields.contaccessory = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
-    fields.businesslicense = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
-    fields.authorizedFile = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
+
+
+    // fields.contaccessory = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
+    // fields.businesslicense = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
+    // fields.authorizedFile = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
+
+    fields.contaccessory = fields.contaccessory.map((item:any) => item.response.fileName).join(',')
+    fields.businesslicense = fields.businesslicense.map((item:any) => item.response.fileName).join(',')
+    fields.authorizedFile = fields.authorizedFile.map((item:any) => item.response.fileName).join(',')
+
     let hide = message.loading('正在注册中！')
     try {
       let res = await register(fields);
@@ -140,7 +146,7 @@ const Register: React.FC = () => {
 
   }
 
-  const loadDivisionsData = async selectedOptions => {
+  const loadDivisionsData = async (selectedOptions: any) => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
     targetOption.loading = true;
     try {
@@ -156,6 +162,25 @@ const Register: React.FC = () => {
       message.error('加载省市区数据出错，刷新后重试')
     }
 
+  }
+
+
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
+
+  const uploadChange = (info:any) => {
+    const { status } = info.file;
+    if (status !== 'uploading') {
+    }
+    if (status === 'done') {
+      message.success(`${info.file.name} 上传成功`);
+    } else if (status === 'error') {
+      message.error(`${info.file.name} 上传失败`);
+    }
   }
 
   return (
@@ -179,6 +204,7 @@ const Register: React.FC = () => {
             {...layout}
             form={form}
             onFinish={async (values) => {
+              console.log('values',values)
               let success = await submit(values);
               if (success) {
                 history.push('/user/register-result?name=' + form.getFieldValue('compName'))
@@ -226,7 +252,7 @@ const Register: React.FC = () => {
                 }
               ]}
             >
-              <TextArea rows={8} />
+              <TextArea  placeholder='请输入主营业务' rows={8} />
             </Form.Item>
 
             <FormItem
@@ -275,29 +301,28 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            {/* <FormItem
-              label="营业执照"
-
-            >
-              <FormItem
-                name="dragger"
+            <Form.Item label="营业执照">
+              <Form.Item name="businesslicense"
                 valuePropName="fileList"
+                getValueFromEvent={normFile}
                 noStyle
                 rules={[
                   {
                     required: true,
-                    message: '请上传营业执照'
+                    message: '营业执照不能为空！',
                   }
                 ]}>
-                <Upload.Dragger name="businesslicense" action="/upload.do">
+                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info:any) => uploadChange(info)}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                   </p>
                   <p className="ant-upload-text">单击或拖动文件到此区域进行上传</p>
                   <p className="ant-upload-hint">支持单次或批量上传</p>
                 </Upload.Dragger>
-              </FormItem>
-            </FormItem> */}
+              </Form.Item>
+            </Form.Item>
+
+
             <Form.Item
               name="companyprofile"
               label="企业简介"
@@ -308,7 +333,7 @@ const Register: React.FC = () => {
                 }
               ]}
             >
-              <TextArea rows={8} />
+              <TextArea  placeholder='请输入企业简介' rows={8} />
             </Form.Item>
 
             <FormItem
@@ -340,6 +365,30 @@ const Register: React.FC = () => {
                 placeholder='请输入商家手机号'
               />
             </FormItem>
+
+            <Form.Item label="公司授权书">
+              <Form.Item name="authorizedFile"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                noStyle
+                rules={[
+                  {
+                    required: true,
+                    message: '公司授权书不能为空！',
+                  }
+                ]}>
+                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info:any) => uploadChange(info)}>
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined />
+                  </p>
+                  <p className="ant-upload-text">单击或拖动文件到此区域进行上传</p>
+                  <p className="ant-upload-hint">支持单次或批量上传</p>
+                </Upload.Dragger>
+              </Form.Item>
+            </Form.Item>
+
+
+
 
             <FormItem
               label='授权联系人姓名'
@@ -401,24 +450,26 @@ const Register: React.FC = () => {
               />
             </FormItem>
 
-            {/* <FormItem label="合同附件">
-              <FormItem name="dragger" valuePropName="fileList" noStyle
+            <Form.Item label="合同附件">
+              <Form.Item name="contaccessory"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                noStyle
                 rules={[
                   {
                     required: true,
                     message: '合同附件不能为空！',
                   }
-                ]}
-              >
-                <Upload.Dragger name="files" action="/upload.do">
+                ]}>
+                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info:any) => uploadChange(info)}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                   </p>
                   <p className="ant-upload-text">单击或拖动文件到此区域进行上传</p>
                   <p className="ant-upload-hint">支持单次或批量上传</p>
                 </Upload.Dragger>
-              </FormItem>
-            </FormItem> */}
+              </Form.Item>
+            </Form.Item>
 
             <FormItem
               label='开户行'

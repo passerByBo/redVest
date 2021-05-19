@@ -1,12 +1,12 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, Input } from 'antd';
-import React, { useRef } from 'react';
-import { getProductList } from '@/services/merchandise/product';
+import { Button, Form, Input, InputNumber, Modal, Space } from 'antd';
+import React, { useRef, useState } from 'react';
 import { SaveOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { getSKUList } from '@/services/sku-ledger';
+import ProForm, { ModalForm } from '@ant-design/pro-form';
 const List: React.FC = (props) => {
   const actionRef = useRef<ActionType>();
 
@@ -18,7 +18,7 @@ const List: React.FC = (props) => {
     },
     {
       title: '商品分类名称',
-      dataIndex: 'xxxxxxxx',
+      dataIndex: 'typeName',
     },
     {
       title: '商品名称',
@@ -56,13 +56,13 @@ const List: React.FC = (props) => {
       title: 'SKU库存数量',
       dataIndex: 'inventory',
       search: false,
-      render: (_, record) => (
-        <a onClick={() => { history.push(`/sku/list/stock-logger?id=${record.id}`) }}>{_}</a>
-      )
+      // render: (_, record) => (
+      //   <a onClick={() => { history.push(`/sku/list/stock-logger?id=${record.id}`) }}>{_}</a>
+      // )
     },
     {
       title: '出库数量',
-      dataIndex: 'xxxxxxxxxxxxxxxxxxxx',
+      dataIndex: 'salesVolume',
       search: false,
       render: (_, record) => (
         <a onClick={() => { history.push(`/sku/list/checklist?id=${record.id}`) }}>{_}</a>
@@ -73,17 +73,27 @@ const List: React.FC = (props) => {
       dataIndex: 'inventoryWarn',
       valueType: 'textarea',
       search: false,
-      render: (_, record) => (
-        <Input type='number' defaultValue={_} size="small" />
-      )
     },
-    {
-      title: '库存金额',
-      dataIndex: 'xxxxxxxxxxxxxxx',
-      valueType: 'textarea',
-      search: false,
-    }
+    // {
+    //   title: '操作',
+    //   dataIndex: 'option',
+    //   valueType: 'option',
+    //   search: false,
+    //   render(_: string, record: any) {
+    //     return (
+    //       <a onClick={() => handleEditRow(record)}>编辑</a>
+    //     )
+    //   }
+
+    // }
   ]
+
+  // const [editVisible, setEditVisible] = useState(false);
+  // const [editForm] = Form.useForm();
+
+  // function handleEditRow(data: any) {
+
+  // }
 
 
   const { location: { pathname } } = history;
@@ -94,6 +104,19 @@ const List: React.FC = (props) => {
     <>
       {
         pathname === '/sku/list' ? <PageContainer title='SKU台账列表'>
+          {/* <ModalForm
+            form={editForm}
+            title={'编辑预警值'}
+            visible={editVisible}
+            onFinish={async (data) => {
+              <ProForm.Group>
+              <InputNumber width="md" name="specialNameTitle" label="库存预警值" placeholder="请输入专题副标题" />
+            </ProForm.Group>
+
+
+            }}
+          >
+          </ModalForm > */}
           <ProTable
             actionRef={actionRef}
             rowKey="key"

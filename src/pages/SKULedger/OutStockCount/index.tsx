@@ -1,26 +1,27 @@
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType } from '@ant-design/pro-table';
 import { Button, Space } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { history } from 'umi';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
 import { ExportOutlined } from '@ant-design/icons';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+import { getSkuOrder } from '@/services/sku-ledger';
 const OutStockCount: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const columns = [
     {
       title: '订单号',
-      dataIndex: 'name',
+      dataIndex: 'orderNo',
     },
     {
       title: '下单时间',
-      dataIndex: 'desc',
+      dataIndex: 'placeorDate',
       valueType: 'updatedAt',
       search: false
     },
     {
       title: '订单状态',
-      dataIndex: 'status',
+      dataIndex: 'orderStatus',
       filters: true,
       onFilter: true,
       valueType: 'select',
@@ -42,39 +43,40 @@ const OutStockCount: React.FC = () => {
     },
     {
       title: '成本价',
-      dataIndex: 'callNo',
+      dataIndex: 'supplyPrice',
       search: false
     },
     {
       title: '销售价',
-      dataIndex: 'callNo',
+      dataIndex: 'productPrice',
       search: false
     },
     {
       title: '数量',
-      dataIndex: 'callNo',
+      dataIndex: 'productCount',
       search: false
     },
     {
       title: '成本总价',
-      dataIndex: 'callNo',
+      dataIndex: 'supplyPriceTotal',
       search: false
     },
     {
       title: '销售总价',
-      dataIndex: 'callNo',
+      dataIndex: 'subtotal',
       search: false
     },
   ]
 
   const { location: { query } } = history;
-
+  const [selectedRowsState, setSelectedRows] = useState<any[]>([]);
 
   return (
-    <PageContainer title={`货号${query.id}出库清单`}>
+    <PageContainer title={`货号${(query as any).id}出库清单`}>
       <ProTable<API.RuleListItem, API.PageParams>
         actionRef={actionRef}
         rowKey="key"
+        request={formatRequestListParams(getSkuOrder.bind(null, { productId: (query as any).id }))}
         search={{
           labelWidth: 120,
         }}
@@ -89,27 +91,26 @@ const OutStockCount: React.FC = () => {
             <ExportOutlined /> 导出
           </Button>,
         ]}
-        request={rule}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
-
+            setSelectedRows(selectedRows);
           },
         }}
       />
-        <FooterToolbar
-           extra={
-            <div>
-             <b style={{marginRight: 20}}>合计</b>
-             <Space >
-               <span>数量：300</span>
-               <span>成本总价：￥300123123123</span>
-               <span>销售总价：￥300</span>
-             </Space>
-            </div>
-          }
-        >
-        </FooterToolbar>
+      <FooterToolbar
+        extra={
+          <div>
+            <b style={{ marginRight: 20 }}>合计</b>
+            <Space >
+              <span>数量：300</span>
+              <span>成本总价：￥300123123123</span>
+              <span>销售总价：￥300</span>
+            </Space>
+          </div>
+        }
+      >
+      </FooterToolbar>
     </PageContainer>
   )
 }

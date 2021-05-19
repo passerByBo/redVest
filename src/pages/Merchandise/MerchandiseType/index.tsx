@@ -1,8 +1,8 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ExclamationCircleOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useCallback } from 'react';
-import { PageContainer} from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Popconfirm} from 'antd';
+import { Button, message, Modal, Popconfirm, Space } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { addMerchandiseType, deleteMerchandiseType, getMerchandiseTypeList, updateMerchandiseType } from '@/services/merchandise/merchandiseType'
 import UpdateForm from './components/UpdateForm';
@@ -12,7 +12,7 @@ import formatRequestListParams from '@/utils/formatRequestListParams';
 
 export interface IMerchandiseType {
   id: string;
-  typeLevel: number;
+  typeLevel: number | string;
   typeName: string;
   typeNo: string;
   parentLevel: string;
@@ -24,16 +24,16 @@ export interface IMerchandiseType {
 }
 
 const MerchandiseType: React.FC = () => {
-    /** 分布更新窗口的弹窗 */
-    const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-    //新增窗口
-    const [addModalVisible, handleAddModalVisible] = useState<boolean>(false);
+  /** 分布更新窗口的弹窗 */
+  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
+  //新增窗口
+  const [addModalVisible, handleAddModalVisible] = useState<boolean>(false);
 
-    const [showDetail, setShowDetail] = useState<boolean>(false);
-    const actionRef = useRef<ActionType>();
-    //编辑和新增选择的数据都保存在这里
-    const [currentRow, setCurrentRow] = useState<IMerchandiseType | null>(null);
-    const [selectedRowsState, setSelectedRows] = useState<IMerchandiseType[]>([]);
+  const [showDetail, setShowDetail] = useState<boolean>(false);
+  const actionRef = useRef<ActionType>();
+  //编辑和新增选择的数据都保存在这里
+  const [currentRow, setCurrentRow] = useState<IMerchandiseType | null>(null);
+  const [selectedRowsState, setSelectedRows] = useState<IMerchandiseType[]>([]);
 
   const columns: ProColumns<IMerchandiseType>[] = [
     {
@@ -86,31 +86,37 @@ const MerchandiseType: React.FC = () => {
       valueType: 'option',
       search: false,
       width: 200,
-      render: (text, record, _, action) => [
-        <a
-          key="editable"
-          onClick={() => {
-            setCurrentRow(record);
-            handleUpdateModalVisible(true)
-          }}
-        >
-          编辑
-        </a>,
-        <Popconfirm
-          placement="topRight"
-          title={'确定要删除' + '吗？'}
-          onConfirm={() => { handleDelete(record) }}
-          okText="确认"
-          cancelText="取消"
-        >
-          <a
-            key="delete"
-          >
-            删除
-                </a>
-        </Popconfirm>
+      render: (text, record, _, action) => {
 
-      ],
+        return <Space>
+          <a
+            key="editable"
+            onClick={() => {
+              setCurrentRow(record);
+              handleUpdateModalVisible(true)
+            }}
+          >
+            编辑
+        </a>
+          <Popconfirm
+            placement="topRight"
+            title={'确定要删除' + '吗？'}
+            onConfirm={() => { handleDelete(record.id) }}
+            okText="确认"
+            cancelText="取消"
+          >
+            <a
+              key="delete"
+            >
+              删除
+                </a>
+          </Popconfirm>
+          {
+            record.typeLevel == '1' && <a key="add" onClick={() => { }}>新增下一级</a>
+          }
+        </Space>
+
+      }
     }
   ]
 
@@ -118,10 +124,10 @@ const MerchandiseType: React.FC = () => {
     handleUpdateModalVisible(false)
   }, [])
 
-  const handleDelete = async (data: any) => {
+  const handleDelete = async (ids: string) => {
     const hide = message.loading('正在删除');
     try {
-      const res = await deleteMerchandiseType(data.id);
+      const res = await deleteMerchandiseType(ids);
       if (res.status === 200 && res.code === 200) {
         hide();
         message.success('删除成功！');
@@ -137,6 +143,29 @@ const MerchandiseType: React.FC = () => {
       hide();
       message.error('删除失败请重试！');
     }
+  }
+
+  async function handleDeleteRows() {
+    if(selectedRowsState.length < 1) {
+      message.warning('请选择要删除的分类！')
+      return;
+    }
+    let level1Types = selectedRowsState.filter((item) => item.typeLevel === '1');
+    let content = '';
+    if(level1Types.length>0){
+      content = '将删除'+level1Types.map((item) =>item.typeName).join(',')+'下的所有二级分类。'
+    }
+    Modal.confirm({
+      title: '确定要删除选中的分类吗',
+      icon: <ExclamationCircleOutlined />,
+      content: content,
+      okText: '确认',
+      cancelText: '取消',
+      onOk:() => {
+        let ids = selectedRowsState.map((item) => item.id).join(',')
+        handleDelete(ids);
+      }
+    });
   }
 
   const handleUpdateSubmit = useCallback(async (fields) => {
@@ -196,8 +225,20 @@ const MerchandiseType: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
+          <Button key="unfold" onClick={() => { }}>
+            <MenuUnfoldOutlined />
+            全部展开
+          </Button>,
+          <Button key="fold" onClick={() => { }}>
+            <MenuFoldOutlined />
+            全部关闭
+          </Button>,
+          <Button danger key="delete" onClick={() => { handleDeleteRows()}}>
+            <DeleteOutlined />
+            删除
+          </Button>,
           <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>
-            <PlusOutlined />新建
+            <PlusOutlined />新增一级分类
                     </Button>
         ]}
         request={formatRequestListParams(getMerchandiseTypeList)}
