@@ -72,7 +72,6 @@ export async function addCounponRangeList(body: any) {
     });
 }
 
-
 /**
  * 新建
  */
@@ -103,5 +102,17 @@ export async function updateRule(params: any) {
         data: {
             ...params,
         },
+    });
+}
+
+/**
+ * 办理
+ */
+export async function handletransact(body: any) {
+    return request('/marketing/consumerCoupon/handle', {
+        method: 'post',
+        data: {
+            ...body,
+        }
     });
 }

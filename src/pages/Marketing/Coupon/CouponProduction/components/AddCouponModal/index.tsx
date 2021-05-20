@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { Modal, Input, Form, Select, Table, Card, Button, DatePicker, message } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
+import { Modal, Input, Form, Select, Radio, Card, Button, DatePicker, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import type { ActionType } from '@ant-design/pro-table';
+import { PlusOutlined } from '@ant-design/icons';
+import { nanoid } from 'nanoid'
 
-import { getCounponRangeList, addCounponRangeList, getCounponRangeListAdded, removeCounponRangeList } from '@/services/marketing/couponProduction';
+import { getCounponRangeList, addCounponRangeList, getCounponRangeListAdded, removeCounponRangeList, handletransact } from '@/services/marketing/couponProduction';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 const { Option } = Select;
@@ -27,8 +28,8 @@ type CounponRangeListTable = {
 }
 
 const initData = {
-    "billno": "20200412123456",
-    "bindid": "uyt0678d-4436-4ec6-8d34-ee944c44485k",
+    "billno": '20110' + Math.round(Math.random() + 1),
+    "bindid": nanoid(),
     "applyman": "admin",
     "applymanid": "1",
     "useType": "公开",
@@ -49,6 +50,25 @@ const handleAdd = async (fields: any) => {
     const hide = message.loading('正在添加');
     try {
         await addCounponRangeList({ ...fields });
+        hide();
+        message.success('添加成功');
+        return true;
+    } catch (error) {
+        hide();
+        message.error('添加失败！');
+        return false;
+    }
+};
+
+/**
+ * 添加节点
+ *
+ * @param fields
+ */
+const handleTransact = async (fields: any) => {
+    const hide = message.loading('正在添加');
+    try {
+        await handletransact({ ...fields });
         hide();
         message.success('添加成功');
         return true;
@@ -81,13 +101,16 @@ const handleRemove = async (fields: CounponRangeListTable[]) => {
 
 const AddCouponModal: React.FC<AddModalProps> = (props) => {
     const [form] = Form.useForm();
+    const [transactForm] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
     const [productVisible, setProductVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
+    const [transactVisible, setTransactVisible] = useState<boolean>(false);
 
     const handleFinish = async () => {
         const values = await form.validateFields();
-        onFinish(values);
+        console.log(values);
+        // onFinish(values);
     }
 
     const formItemLayout = {
@@ -96,7 +119,9 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
     };
 
     const useData = async (useData: any) => {
-        let result = await handleAdd(useData)
+        const fields = { ...useData }
+        fields.bindid = initData.bindid;
+        let result = await handleAdd(fields)
         result && actionRef.current?.reloadAndRest?.();
         setProductVisible(false);
     };
@@ -105,6 +130,15 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
         let result = await handleRemove(useData)
         result && actionRef.current?.reloadAndRest?.();
     };
+
+    const doTransact = async () => {
+        const values1 = await transactForm.validateFields();
+        const values2 = await form.validateFields();
+        let result = await handleTransact({ ...values1, ...values2 })
+        setTransactVisible(false)
+        onCancel();
+        result && actionRef.current?.reloadAndRest?.();
+    }
 
     const columnsSelectTable = [
         {
@@ -147,6 +181,16 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
             ],
         },
     ];
+
+    useEffect(() => {
+        if (visible) {
+            form.setFieldsValue({
+                bindid: nanoid(),
+                billno: '20110' + Math.round(Math.random() + 1),
+            });
+        }
+    }, [visible])
+
     return (
         <Modal
             title="卡券制作"
@@ -156,12 +200,12 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                 <Button key="back" onClick={onCancel}>
                     取消
                 </Button>,
-                <Button key="submit" type="primary" onClick={() => handleFinish()}>
-                    保存
-                </Button>,
+                // <Button key="submit" type="primary" onClick={() => handleFinish()}>
+                //     保存
+                // </Button>,
                 <Button
                     type="primary"
-                    onClick={() => { console.log('办理') }}
+                    onClick={() => { setTransactVisible(true) }}
                 >
                     办理
                 </Button>,
@@ -187,6 +231,14 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                         ]}
                     >
                         <Input placeholder="请输入单据编号" allowClear />
+                    </FormItem>
+
+                    <FormItem
+                        label="关联id"
+                        name="bindid"
+                        hidden
+                    >
+                        <Input />
                     </FormItem>
 
                     <FormItem
@@ -289,7 +341,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                         </Button>
                     ]}
                     search={false}
-                    request={formatRequestListParams(getCounponRangeListAdded)}
+                    request={formatRequestListParams(getCounponRangeListAdded, { bindid: initData.bindid })}
                     columns={columns}
                 />
             </Card>
@@ -310,6 +362,27 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                     request={formatRequestListParams(getCounponRangeList)}
                     columns={columnsSelectTable}
                 />
+            </Modal>
+            <Modal
+                title="办理"
+                visible={transactVisible}
+                onOk={doTransact}
+                onCancel={() => {
+                    setTransactVisible(false)
+                }}
+            >
+                <Form {...formItemLayout} form={transactForm} initialValues={{ status: '审核通过' }}>
+                    <Form.Item name='status' label="请选择" rules={[{ required: true }]}>
+                        <Radio.Group>
+                            <Radio value={'审核通过'}>审核通过</Radio>
+                            <Radio value={'审核未通过'}>审核未通过</Radio>
+                        </Radio.Group>
+                    </Form.Item>
+
+                    <Form.Item name="auditOpinion" label="审核意见" rules={[{ required: true }]}>
+                        <Input.TextArea />
+                    </Form.Item>
+                </Form>
             </Modal>
         </Modal>
     )
