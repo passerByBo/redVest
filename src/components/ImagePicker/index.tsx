@@ -42,6 +42,7 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
   }, [initData])
 
   const triggerChange = (changedValue: string) => {
+    console.log('changedValue',changedValue)
     onChange?.(changedValue)
   }
 
@@ -82,7 +83,7 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
       if (selectPictures[index].id === picture.id) {
         selectPictures.splice(index, 1);
         setSelectPictures([...selectPictures]);
-        triggerChange(getPicturesUrls([...selectPictures]));
+        triggerChange(getPicturesUrls(selectPictures));
         return;
       }
       index++;

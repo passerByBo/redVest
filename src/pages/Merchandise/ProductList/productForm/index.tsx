@@ -214,7 +214,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
     data.isRecommend = data.isRecommend === 'Y' ? true : false;
     data.isBoutique = data.isBoutique === 'Y' ? true : false;
-    console.log('xxxx',data)
+    console.log('xxxx', data)
 
     form.setFieldsValue(data)
     const { productDetail, qualityReport1, productSkuInfo, productSpecObj, commissionSetting } = data;
@@ -668,7 +668,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
 
   const submitData = async (values: any) => {
-
+    await form.validateFields();
     let tag = '创建';
     if (query && query.id) {
       tag = '编辑';
@@ -694,7 +694,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
       hide();
       message.success(`商品${tag}成功！`);
-      //history()
+      history.push('/merchandise/product/list');
     } catch (error) {
       hide();
       message.error(`商品${tag}失败，请重试！`)
@@ -924,7 +924,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Row>
               <Col span={24}>
                 <Form.Item name="productDetail" label="商品详情" rules={[{ required: true, message: '请输入商品详情' }]} >
-                  <Editor initData={(productDetail && productDetail.productDetail) ||null} placeholder="请输入商品详情！" />
+                  <Editor initData={(productDetail && productDetail.productDetail) || null} placeholder="请输入商品详情！" />
                 </Form.Item>
               </Col>
             </Row>
@@ -932,7 +932,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Row>
               <Col span={24}>
                 <Form.Item name="qualityReport1" label="质检报告" rules={[{ required: true, message: '请输入质检报告' }]} >
-                  <Editor initData={(productDetail && productDetail.qualityReport1) ||null} placeholder="请输入质检报告！" />
+                  <Editor initData={(productDetail && productDetail.qualityReport1) || null} placeholder="请输入质检报告！" />
                 </Form.Item>
               </Col>
             </Row>

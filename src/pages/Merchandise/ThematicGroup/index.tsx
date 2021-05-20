@@ -18,13 +18,14 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import ImagePicker from '@/components/ImagePicker';
 type ThematicGroupListItem = {
   id: string,
-  isValid: string,
+  isValid: string | boolean,
   endDate: string,
-  sort?: number,
+  sort?: number | string,
   isShow: string,
   specialGroup: string,
   specialGroupDescribe: string,
-  [key: string]: string,
+  specialGroupImgBig?: any;
+  // [key: string]: string,
 }
 
 
@@ -89,6 +90,7 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
     return false;
   }
 };
+
 const ThematicGroup: React.FC = () => {
 
   const [updateForm] = Form.useForm();
@@ -119,13 +121,13 @@ const ThematicGroup: React.FC = () => {
 
   const initUpdateForm = (data: ThematicGroupListItem): object => {
     if (!data) return {};
-    let newData = { ...data };
+    let newData: ThematicGroupListItem = { ...data };
     if (newData.isValid === 'Y') {
       newData.isValid = true;
     } else {
       newData.isValid = false;
     }
-    delete newData.specialGroupImgBig
+    newData.specialGroupImgBig = Array.isArray(newData.specialGroupImgBig) ? newData.specialGroupImgBig.map((item) => item.id).join(',') : ''
     return newData;
   }
 
@@ -353,6 +355,11 @@ const ThematicGroup: React.FC = () => {
           handleModalVisible(visible)
         }}
         onFinish={async (value) => {
+          value.isValid = 'N';
+          if (value.hasOwnProperty('isValid') && value.isValid) {
+            value.isValid = 'Y';
+          }
+
           let success;
           if (editProduct) {
             success = await handleEdit(value);
@@ -381,9 +388,9 @@ const ThematicGroup: React.FC = () => {
         </ProForm.Group>
 
         <ProFormSwitch rules={[{
-            required: true,
-            message: '请选择是否有效',
-          }]} name="isValid" label="是否有效" />
+          required: true,
+          message: '请选择是否有效',
+        }]} name="isValid" label="是否有效" />
 
         {/* <ProFormUploadDragger {...uploadProps } max={4} label="专题组图片" name="specialGroupImgBig" /> */}
 
@@ -392,7 +399,7 @@ const ThematicGroup: React.FC = () => {
           label="专题组图片"
           extra="建议图片大小不超过250kb"
         >
-          <ImagePicker limit={1} />
+          <ImagePicker initData={(editProduct && editProduct.specialGroupImgBig) || []} limit={1} />
         </Form.Item>
 
 
