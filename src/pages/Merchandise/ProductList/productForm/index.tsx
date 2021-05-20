@@ -10,7 +10,7 @@ import { SpecifyItem, Specify } from '../../components/Specify';
 import Preview from '../components/Preview';
 import ImagePicker from '@/components/ImagePicker';
 import { getMerchandiseTypeList } from '@/services/merchandise/merchandiseType';
-import { getProductDetail, getSepcModel, submitForm } from '@/services/merchandise/product';
+import { editForm, getProductDetail, getSepcModel, submitForm } from '@/services/merchandise/product';
 import { fullCombination } from '@/utils/utils';
 import { EditableProTable } from '@ant-design/pro-table';
 
@@ -211,14 +211,45 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   }, [treeData]);
 
   const initPageContent = (data: any) => {
-    //需要初始化设置选中的图片
+
+    data.isRecommend = data.isRecommend === 'Y' ? true : false;
+    data.isBoutique = data.isBoutique === 'Y' ? true : false;
+    console.log('xxxx',data)
+
+    form.setFieldsValue(data)
+    const { productDetail, qualityReport1, productSkuInfo, productSpecObj, commissionSetting } = data;
+    //需要初始化设置选中的图片,通过表单初始化,表单初始化数据不一致不可使用需自定义initData来实现
 
     //初始化设置规格模板
+    if (productSpecObj && productSpecObj.constructor === Object) {
+      let map: Map<string, string[]> = new Map(Object.entries(productSpecObj));
+      //设置数据到操作数据中
+      setSpecifiesMap(map);
+    }
 
     //初始化设置商品详情和质检报告
-
+    form.setFieldsValue({ productDetail, qualityReport1 });
     //需要初始化设置SKU属性表格和自定义佣金表格
+    setProductsAttr([...productSkuInfo]);
+    //初始化自定义设置佣金
+    setCommission(commissionSetting);
   }
+
+  const initProRotationImg = useMemo(() => {
+    if (productDetail) {
+      const { proRotationImg1 } = productDetail;
+      return proRotationImg1;
+    }
+    return [];
+  }, [productDetail])
+
+  const initProLogoImg = useMemo(() => {
+    if (productDetail) {
+      const { proLogoImg1 } = productDetail;
+      return proLogoImg1;
+    }
+    return [];
+  }, [productDetail])
 
 
   const { loading, run: getDetail } = useRequest(getProductDetail.bind(null, { productId: (query as any).id }), {
@@ -226,7 +257,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     onSuccess: (result: any, params: any) => {
       if (result) {
         //将数据设置到表单内
-        form.setFieldsValue({ ...result })
+
         initPageContent({ ...result });
         setProductDetail({ ...result });
         return;
@@ -351,28 +382,31 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   const setProductSpec = (map: Map<string, any>) => {
     let productSpec = Object.fromEntries(map.entries());
 
+
     if (JSON.stringify(productSpec) === '{}') {
       form?.setFieldsValue({ productSpec: null });
       return;
     }
-    for (let key of Object.keys(productSpec)) {
-      productSpec[key] = productSpec[key].join(',')
-    }
-    form?.setFieldsValue({ productSpec });
+    // for (let key of Object.keys(productSpec)) {
+    //   productSpec[key] = productSpec[key].join(',')
+    // }
+    form?.setFieldsValue({ productSpecObj: productSpec });
 
   }
 
   const initSpecifiesData = (arr: string[]): any[] => {
     const keys = [...specifiesMap.keys()]
     return arr.map((name, index) => {
+      console.log(name)
       const skuNameArr = name.split(',');
-      let properties = Object.create(null);
+      let propertiesObj = Object.create(null);
       keys.forEach((key, index) => {
-        properties[key] = skuNameArr[index];
+        propertiesObj[key] = skuNameArr[index];
       })
+
       return {
         skuName: name,
-        properties,
+        propertiesObj,
         skuImg: '',
         articleNo: 0,
         salePrice: 0,
@@ -390,6 +424,10 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
   //根据规格模板生成商品表格
   const genProductList = (map: Map<string, any>) => {
+    if (map.size === 0) {
+      message.warning('请先选择或者创建规格!');
+      return;
+    }
     let arr = [...map].reduce((prev: any, next: any) => {
       prev.push(next[1])
       return prev;
@@ -630,21 +668,36 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
 
   const submitData = async (values: any) => {
-    const hide = message.loading('商品正在创建中')
+
+    let tag = '创建';
+    if (query && query.id) {
+      tag = '编辑';
+    }
+
+    const hide = message.loading(`商品正在${tag}中`)
     try {
-      let result = await submitForm(values);
+      let result = null;
+      //代表当前是编辑
+      if (query && query.id) {
+        values = { id: productDetail.id, ...values };
+        result = await editForm(values);
+      } else {
+        result = await submitForm(values);
+      }
+
+
       if (result.status === 200 && result.code !== 200) {
         hide();
-        message.error('商品创建失败，' + result.msg);
+        message.error(`商品${tag}失败，${result.msg}`);
         return;
       }
 
       hide();
-      message.success('商品创建成功！');
+      message.success(`商品${tag}成功！`);
       //history()
     } catch (error) {
       hide();
-      message.error('商品创建失败，请重试！')
+      message.error(`商品${tag}失败，请重试！`)
     }
 
   }
@@ -728,7 +781,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   label={'商品排序'}
                   name="sort"
                 >
-                  <Input placeholder="请输入商品排序" />
+                  <Input type='number' placeholder="请输入商品排序" />
                 </Form.Item>
               </Col>
             </Row>
@@ -756,7 +809,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   rules={[{ required: true, message: '请选择商品封面主图' }]}
                   extra="建议图片大小不超过250kb"
                 >
-                  <ImagePicker limit={5} />
+                  <ImagePicker initData={initProRotationImg} limit={5} />
                 </Form.Item>
               </Col>
             </Row>
@@ -769,7 +822,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   rules={[{ required: true, message: '请选择商品轮播图' }]}
                   extra="建议图片大小不超过250kb"
                 >
-                  <ImagePicker limit={5}></ImagePicker>
+                  <ImagePicker initData={initProLogoImg} limit={5}></ImagePicker>
                 </Form.Item>
               </Col>
             </Row>
@@ -777,7 +830,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Card type="inner" title="商品规格" className={styles.card}>
               <Row>
                 <Form.Item
-                  name="productSpec"
+                  name="productSpecObj"
                   rules={[{ required: true, message: '规格属性不能为空' }]}
                 >
                   <Col span={24} className={styles.specifyRow}>
@@ -793,8 +846,8 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                       // filterOption={(input, option) => {}}
                       >
                         {
-                          selectedSpecModelList && selectedSpecModelList.map((item: any) => {
-                            return <Option key={item.name} value={item.name}>{item.name}</Option>
+                          selectedSpecModelList && selectedSpecModelList.map((item: any, index: number) => {
+                            return <Option key={item.name + index} value={item.name}>{item.name}</Option>
                           }
                           )
                         }
@@ -835,7 +888,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                 [...specifiesMap.keys()].map((name, i) => (
                   <Specify key={name} name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
                     {
-                      (specifiesMap.get(name) || []).map((value: string, index: number) => (
+                      (Array.isArray(specifiesMap.get(name)) && specifiesMap.get(name) || []).map((value: string, index: number) => (
                         <SpecifyItem key={index} value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
                       ))
                     }
@@ -871,7 +924,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Row>
               <Col span={24}>
                 <Form.Item name="productDetail" label="商品详情" rules={[{ required: true, message: '请输入商品详情' }]} >
-                  <Editor placeholder="请输入商品详情！" />
+                  <Editor initData={(productDetail && productDetail.productDetail) ||null} placeholder="请输入商品详情！" />
                 </Form.Item>
               </Col>
             </Row>
@@ -879,7 +932,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Row>
               <Col span={24}>
                 <Form.Item name="qualityReport1" label="质检报告" rules={[{ required: true, message: '请输入质检报告' }]} >
-                  <Editor placeholder="请输入质检报告！" />
+                  <Editor initData={(productDetail && productDetail.qualityReport1) ||null} placeholder="请输入质检报告！" />
                 </Form.Item>
               </Col>
             </Row>

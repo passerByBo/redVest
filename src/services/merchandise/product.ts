@@ -61,6 +61,18 @@ export async function submitForm(
     });
 }
 
+export async function editForm(
+  body: { [key: string]: any },
+  options?: { [key: string]: any }){
+    return request('/product/info/edit', {
+      method: 'PUT',
+      data: {
+        ...body,
+      },
+      ...(options || {}),
+    });
+}
+
 /** 商品类型列表 */
 export async function getProductTypeList(
   params: {

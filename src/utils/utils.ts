@@ -29,16 +29,32 @@ export const getIds = <T extends { [key: string]: any }>(arg: T | T[]): string =
 };
 
 export const fullCombination = (arr): any[] => {
- // 第一次的结果就是二维数组的第0项
- let res = arr[0].slice();
- for (let i = 1; i < arr.length; i++) {
-   const pre = res.slice();
-   res = [];
-   pre.forEach(item => {
-     arr[i].forEach(curr => {
-       res.push(item +','+ curr)
-     })
-   });
- }
- return res;
+  // 第一次的结果就是二维数组的第0项
+  let res = arr[0].slice();
+  if (!Array.isArray(res)) {
+    return [];
+  }
+  for (let i = 1; i < arr.length; i++) {
+    const pre = res.slice();
+    res = [];
+    pre.forEach((item) => {
+      arr[i].forEach((curr) => {
+        res.push(item + ',' + curr);
+      });
+    });
+  }
+  return res;
 };
+
+// export const debounce = (fn: Function, delay = 500) => {
+//   let timer: any = null;
+//   return function (...args: any[]) {
+//     if (timer) {
+//       clearTimeout(timer);
+//       timer = null;
+//     }
+//     timer = setTimeout(() => {
+//       fn.apply(null, args);
+//     }, delay);
+//   };
+// };

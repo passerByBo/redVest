@@ -12,6 +12,7 @@ import logo from '../public/logo_white.png';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 const isDev = process.env.NODE_ENV === 'development';
 import { stringify } from 'querystring'
+import { debounce } from 'lodash';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -148,7 +149,7 @@ const codeMessage = {
   504: '网关超时。',
 };
 
-const pageLoginExpired = () => {
+const pageLoginExpired = debounce(() => {
   Modal.confirm({
     title: '重新登录',
     icon: <ExclamationCircleOutlined />,
@@ -169,7 +170,7 @@ const pageLoginExpired = () => {
       }
     },
   });
-}
+},100)
 
 
 /** 异常处理程序

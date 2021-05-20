@@ -7,21 +7,39 @@ import ImagePicker from '../ImagePicker'
 
 export default class Editer extends React.Component {
 
-  constructor(props:any) {
+  constructor(props: any) {
     super(props)
   }
+
+  UNSAFE_componentWillReceiveProps(nextProps:any) {
+    if(nextProps.initData !== this.props.initData){
+      console.log('xxxxxx调用啦')
+      this.setState({
+        editorState: BraftEditor.createEditorState(nextProps.initData)
+    })
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+    if( nextState.editorState === this.state.editorState ){
+      return false;
+    }
+
+    return true;
+  }
+
 
   state = {
     editorState: BraftEditor.createEditorState(null)
   }
 
   handleChange = (editorState: any) => {
-    this.setState({ editorState },() => {
+    this.setState({ editorState }, () => {
       this.triggerChange(this.state.editorState.toHTML())
     })
   }
 
-  triggerChange = (changedValue:string) => {
+  triggerChange = (changedValue: string) => {
     this.props?.onChange?.(changedValue);
   };
 
@@ -35,7 +53,7 @@ export default class Editer extends React.Component {
 
     this.setState({
       editorState: ContentUtils.insertMedias(this.state.editorState, urls)
-    },() => {
+    }, () => {
       this.triggerChange(this.state.editorState.toHTML())
     })
   }

@@ -115,7 +115,7 @@ const SpecificationModel: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
-      search:false,
+      search: false,
       render: (_, record) => {
         const checked = record.isValid === 'Y' ? true : false;
         return <Space>
@@ -187,21 +187,21 @@ const SpecificationModel: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('新增失败请重试！');
-        return;
+        return false;
       }
       hide();
       message.success('新增成功');
+      handleAddModalVisible(false);
+
+      if (actionRef.current) {
+        actionRef.current.reload();
+      }
+      return true;
     } catch (error) {
       hide();
       message.error('新增失败请重试！');
+      return false;
     }
-
-    handleAddModalVisible(false);
-
-    if (actionRef.current) {
-      actionRef.current.reload();
-    }
-
   }, [])
 
 
@@ -248,7 +248,7 @@ const SpecificationModel: React.FC = () => {
 
       <UpdateForm onCancel={handleUpdateCancel}
         onSubmit={handleUpdateSubmit}
-        values={currentRow}
+        values={currentRow as any}
         updateModalVisible={updateModalVisible} />
 
       {/* {currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => setShowDetail(false)} />} */}

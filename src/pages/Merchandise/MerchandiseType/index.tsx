@@ -17,11 +17,15 @@ export interface IMerchandiseType {
   typeNo: string;
   parentLevel: string;
   parentLevelId: string;
-  isShow: string;
-  isValid: boolean | number;
+  isShow: string | boolean;
+  isValid: boolean | string;
   orderNo: string;
   typeDescribe: string;
 }
+
+
+//保存当前页面的数据
+let loadData:IMerchandiseType[] = [];
 
 const MerchandiseType: React.FC = () => {
   /** 分布更新窗口的弹窗 */
@@ -32,13 +36,15 @@ const MerchandiseType: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   //编辑和新增选择的数据都保存在这里
-  const [currentRow, setCurrentRow] = useState<IMerchandiseType | null>(null);
+  const [currentRow, setCurrentRow] = useState<IMerchandiseType>();
   const [selectedRowsState, setSelectedRows] = useState<IMerchandiseType[]>([]);
+
+  const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
   const columns: ProColumns<IMerchandiseType>[] = [
     {
       title: '商品类型编号',
-      dataIndex: 'id',
+      dataIndex: 'typeNo',
       valueType: 'textarea',
     },
     {
@@ -112,7 +118,7 @@ const MerchandiseType: React.FC = () => {
                 </a>
           </Popconfirm>
           {
-            record.typeLevel == '1' && <a key="add" onClick={() => { }}>新增下一级</a>
+            record.typeLevel == '1' && <a key="add" onClick={() => { setCurrentRow(record); handleAddModalVisible(true) }}>新增下一级</a>
           }
         </Space>
 
@@ -122,6 +128,7 @@ const MerchandiseType: React.FC = () => {
 
   const handleUpdateCancel = useCallback(() => {
     handleUpdateModalVisible(false)
+    setCurrentRow(undefined)
   }, [])
 
   const handleDelete = async (ids: string) => {
@@ -129,10 +136,11 @@ const MerchandiseType: React.FC = () => {
     try {
       const res = await deleteMerchandiseType(ids);
       if (res.status === 200 && res.code === 200) {
+        setExpandedRowKeys([...(expandedRowKeys.filter((id) => !ids.includes(id)))])
         hide();
         message.success('删除成功！');
         if (actionRef.current) {
-          actionRef.current.reload();
+          actionRef?.current?.reload();
         }
         return;
       }
@@ -146,14 +154,14 @@ const MerchandiseType: React.FC = () => {
   }
 
   async function handleDeleteRows() {
-    if(selectedRowsState.length < 1) {
+    if (selectedRowsState.length < 1) {
       message.warning('请选择要删除的分类！')
       return;
     }
     let level1Types = selectedRowsState.filter((item) => item.typeLevel === '1');
     let content = '';
-    if(level1Types.length>0){
-      content = '将删除'+level1Types.map((item) =>item.typeName).join(',')+'下的所有二级分类。'
+    if (level1Types.length > 0) {
+      content = '将删除' + level1Types.map((item) => item.typeName).join(',') + '下的所有二级分类。'
     }
     Modal.confirm({
       title: '确定要删除选中的分类吗',
@@ -161,7 +169,7 @@ const MerchandiseType: React.FC = () => {
       content: content,
       okText: '确认',
       cancelText: '取消',
-      onOk:() => {
+      onOk: () => {
         let ids = selectedRowsState.map((item) => item.id).join(',')
         handleDelete(ids);
       }
@@ -175,24 +183,30 @@ const MerchandiseType: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('编辑失败请重试！');
+        return false;
       }
       hide();
       message.success('编辑成功');
+      handleUpdateModalVisible(false);
+      setCurrentRow(undefined);
+
+      if (actionRef.current) {
+        actionRef.current.reload();
+      }
+      return true;
     } catch (error) {
       hide();
       message.error('编辑失败请重试！');
+      return false;
     }
 
-    handleUpdateModalVisible(false);
 
-    if (actionRef.current) {
-      actionRef.current.reload();
-    }
 
   }, [])
 
   const handleAddCancel = useCallback(() => {
     handleAddModalVisible(false)
+    setCurrentRow(undefined);
   }, [])
 
   const handleAddSubmit = useCallback(async (fields) => {
@@ -202,38 +216,68 @@ const MerchandiseType: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('新增失败请重试！');
+        return false;
       }
       hide();
       message.success('新增成功');
+      handleAddModalVisible(false);
+      setCurrentRow(undefined);
+      if (actionRef.current) {
+        actionRef.current.reload();
+      }
+      return true;
     } catch (error) {
       hide();
       message.error('新增失败请重试！');
+      return false;
     }
 
-    handleAddModalVisible(false);
 
-    if (actionRef.current) {
-      actionRef.current.reload();
-    }
 
   }, [])
+
+  function handleUnfold() {
+    setExpandedRowKeys(loadData.map((item) => item.id));
+  }
+
+
 
   return (
     <PageContainer>
       <ProTable<IMerchandiseType>
+        expandable={
+          {
+            expandedRowKeys: expandedRowKeys,
+            onExpand: (expanded, record) => {
+              if (expanded) {
+                setExpandedRowKeys([...expandedRowKeys, record.id])
+              } else {
+                setExpandedRowKeys([...expandedRowKeys.filter((id) => id !== record.id)])
+              }
+            }
+          }
+        }
+        rowSelection={{
+          onChange: (selectedRowKeys, selectedRows) => {
+            setSelectedRows(selectedRows)
+          }
+        }}
+        onLoad={(dataSource) => {
+          loadData = [...dataSource]
+        }}
         actionRef={actionRef}
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
-          <Button key="unfold" onClick={() => { }}>
+          <Button key="unfold" onClick={() => { handleUnfold() }}>
             <MenuUnfoldOutlined />
             全部展开
           </Button>,
-          <Button key="fold" onClick={() => { }}>
+          <Button key="fold" onClick={() => { setExpandedRowKeys([]) }}>
             <MenuFoldOutlined />
             全部关闭
           </Button>,
-          <Button danger key="delete" onClick={() => { handleDeleteRows()}}>
+          <Button danger key="delete" onClick={() => { handleDeleteRows() }}>
             <DeleteOutlined />
             删除
           </Button>,
@@ -243,25 +287,27 @@ const MerchandiseType: React.FC = () => {
         ]}
         request={formatRequestListParams(getMerchandiseTypeList)}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
+      // rowSelection={{
+      //   onChange: (_, selectedRows) => {
+      //     setSelectedRows(selectedRows);
+      //   },
+      // }}
       >
 
       </ProTable>
-      <AddForm onCancel={handleAddCancel}
+      <AddForm
+        onCancel={handleAddCancel}
+        level={currentRow}
         onSubmit={handleAddSubmit}
         addModalVisible={addModalVisible} />
 
       <UpdateForm onCancel={handleUpdateCancel}
         onSubmit={handleUpdateSubmit}
-        values={currentRow}
+        values={currentRow as any}
         updateModalVisible={updateModalVisible} />
 
-      {currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => setShowDetail(false)} />}
-    </PageContainer>
+      { currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => { setShowDetail(false); setCurrentRow(undefined) }} />}
+    </PageContainer >
   )
 }
 

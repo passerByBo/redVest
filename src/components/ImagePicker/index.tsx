@@ -9,10 +9,11 @@ import { DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 
 export interface IImagePickerProps {
   limit?: number;
-  value?: any;
   onChange?: Function;
+  value?: any,//给表单传值使用
   type?: 'card' | 'button',
   selectedBack?: (pictures: string[]) => void;
+  initData?:any[];
 }
 
 export interface IProduct {
@@ -26,10 +27,19 @@ export interface IFormData {
 const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
 
 
-  const { type = 'card', selectedBack = () => { }, value, onChange, children, limit, ...others } = props;
+  const { type = 'card', selectedBack = () => { }, initData, onChange, children, limit, ...others } = props;
 
   const [selectPictures, setSelectPictures] = useState<IProduct[]>([]);
   const [selectPictureVisible, setSelectPictureVisible] = useState(false);
+
+
+  useEffect(() => {
+    if (initData) {
+      setSelectPictures([...initData])
+    } else {
+      setSelectPictures([]);
+    }
+  }, [initData])
 
   const triggerChange = (changedValue: string) => {
     onChange?.(changedValue)
@@ -45,7 +55,7 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
 
   const getPicturesUrls = (pictures: IProduct[]): string => {
     if (!Array.isArray(pictures) || pictures.length === 0) return '';
-    return pictures.map((picture) => picture.imgUrl).join(',');
+    return pictures.map((picture) => picture.id).join(',');
   }
 
   const getPicturesArr = (pictures: IProduct[]): string[] => {
@@ -54,11 +64,14 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
   }
 
   const handleOk = (pictures: IProduct[]) => {
+
     //不需要每次都累加选择的图片，每次返回的都是全部选项
     type === 'card' && setSelectPictures([...pictures]);
     triggerChange(getPicturesUrls(pictures));
     selectedBack(getPicturesArr(pictures))
     setSelectPictureVisible(false)
+
+    console.log(selectPictures)
   }
 
   const handleDeleteSelected = useCallback((e, picture: IProduct) => {
@@ -81,6 +94,8 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
   const IconStyle = {
     fontSize: 16
   }
+
+
 
   return (
     <>
@@ -114,7 +129,7 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
           </div>)
         }
       </div>}
-      <SelectPictureModal initData={selectPictures} limit={limit} visible={selectPictureVisible} onOk={handleOk} onCancel={() => { setSelectPictureVisible(false) }} {...others} />
+      <SelectPictureModal initData={selectPictures} limit={limit} visible={selectPictureVisible} onOk={handleOk as any} onCancel={() => { setSelectPictureVisible(false) }} {...others} />
     </>
   )
 });

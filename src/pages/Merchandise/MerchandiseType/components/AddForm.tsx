@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form } from 'antd';
 import ProForm, {
   ProFormText,
@@ -14,19 +14,30 @@ export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: IMerchandiseType) => void;
   onSubmit: (fiedls: IMerchandiseType) => {};
   addModalVisible: boolean;
+  level?: IMerchandiseType;
 };
+
 
 const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addForm] = Form.useForm();
-  const { addModalVisible, onSubmit, onCancel } = props;
+  const { addModalVisible, onSubmit, onCancel, level } = props;
+
+  useEffect(() => {
+    if (addModalVisible && level) {
+      addForm.setFieldsValue({ parentLevel: level.typeName });
+    }
+  }, [addModalVisible])
 
   return (
     <ModalForm
+      width={400}
       form={addForm}
       title={'新增品牌'}
       visible={addModalVisible}
+      initialValues={{ isShow: false, isValid: false }}
       onVisibleChange={(visible) => {
         if (!visible) {
+          addForm.resetFields();
           onCancel(false)
         }
       }}
@@ -42,27 +53,25 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         } else {
           fields.isShow = 'N';
         }
-        onSubmit(fields);
+        fields.typeLevel = '1';
+        if (level) {
+          fields.typeLevel = '2';
+        }
+        level && (fields.parentLevelId = level.id);
+        let success  = onSubmit(fields);
+        success && addForm.resetFields();
       }}
     >
-      <ProForm.Group>
-        <ProFormText width="md" name="productBrand" label="商品品牌" placeholder="请输入商品品牌" />
-        {/* 接口中没有 */}
-        <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
-      </ProForm.Group>
+      <ProFormText width="md" name="parentLevel" label="一级分类" placeholder="请输入一级分类" rules={[{ required: true, message: '请输入一级分类' }]} disabled={!!level} />
+      { level && <ProFormText width="md" name="typeName" label="二级分类" placeholder="请输入二级分类" rules={[{ required: true, message: '请输入二级分类' }]} />}
 
-      {/* 缺少图片选择器 */}
 
-      <ProForm.Group>
-        <ProFormTextArea width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
-        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
-      </ProForm.Group>
+      <ProFormTextArea width="md" name="typeDescribe" label="类型描述" placeholder="请输入类型描述" />
+      <ProFormDigit width="md" name="orderNo" label="排序" placeholder="请输入排序" />
 
       <ProForm.Group>
-        <ProFormSwitch name="isRecommend" label="是否推荐" />
-        <ProFormSwitch name="isShow" label="是否展示" />
-        <ProFormSwitch name="isvalid" label="是否有效" />
-        <ProFormSwitch name="status" label="是否审核通过" />
+        <ProFormSwitch name="isShow" label="是否展示" rules={[{ required: true, message: '请选择是否展示' }]} />
+        <ProFormSwitch name="isValid" label="是否有效" rules={[{ required: true, message: '请选择是否有效' }]} />
       </ProForm.Group>
 
     </ModalForm >

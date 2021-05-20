@@ -63,16 +63,17 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addSpecifyVisible, setAddSpecifyVisible] = useState(false);
 
 
-  const parseJsonStringToMap = (json: string) => {
-    if (!json || json === '') return new Map();
+  const parseJsonStringToMap = (json: any) => {
     try {
-      let newJSON = json.replace(/\'/g, '"');
-      let obj = JSON.parse(newJSON);
-      let newMap = new Map(Object.entries(obj));
+      // let newJSON = json.replace(/\'/g, '"');
+      // let obj = JSON.parse(newJSON);
+      let newMap = new Map(Object.entries(json));
       return newMap;
     } catch (error) {
       console.error(error)
     }
+
+    return null;
   }
 
   const getDetail = async () => {

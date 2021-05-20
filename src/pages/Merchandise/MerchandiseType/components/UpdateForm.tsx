@@ -14,7 +14,7 @@ export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: IMerchandiseType) => void;
   onSubmit: (fiedls: IMerchandiseType) => {};
   updateModalVisible: boolean;
-  values: IMerchandiseType | null;
+  values: IMerchandiseType;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
@@ -24,35 +24,31 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
 
   if (values) {
     //转换是否有效果
-    if (values.isvalid === 'Y') {
-      values.isvalid = true;
+    if (values.isValid === 'Y') {
+      values.isValid = true;
     } else {
-      values.isvalid = false;
+      values.isValid = false;
     }
     if (values.isShow === 'Y') {
       values.isShow = true;
     } else {
       values.isShow = false;
     }
-    if (values.isRecommend === 'Y') {
-      values.isRecommend = true;
-    } else {
-      values.isRecommend = false;
-    }
-    if (values.status === 'Y') {
-      values.status = true;
-    } else {
-      values.status = false;
-    }
-    updateForm.setFieldsValue(values)
+    console.log(values)
+    updateForm.setFieldsValue({
+      ...values,
+      parentLevel: values.typeLevel === '1' ? values.typeName : values.parentLevel,
+      typeName: values.typeName,
+    })
   }
 
 
 
   return (
     <ModalForm
+      width={400}
       form={updateForm}
-      title={values && values.productBrand}
+      title={values && values.typeName}
       visible={updateModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
@@ -61,49 +57,44 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
       onFinish={async (data) => {
 
-        const merge = { ...values, ...data }
-        if (merge.isRecommend === true) {
-          merge.isRecommend = 'Y';
-        } else {
-          merge.isRecommend = 'N';
-        }
+        const merge = { ...data }
+
         if (merge.isShow === true) {
           merge.isShow = 'Y';
         } else {
           merge.isShow = 'N';
         }
-        if (merge.isvalid === true) {
-          merge.isvalid = 'Y';
+        if (merge.isValid === true) {
+          merge.isValid = 'Y';
         } else {
-          merge.isvalid = 'N';
+          merge.isValid = 'N';
         }
-        if (merge.status === true) {
-          merge.status = 'Y';
+
+        if (values.typeLevel === '1') {
+          merge.id = values.id;
+          merge.parentLevelId = values.id;
+          merge.typeLevel = 1;
         } else {
-          merge.status = 'N';
+          merge.id = values.id;
+          merge.parentLevelId = values.parentLevelId;
+          merge.typeLevel = 2;
         }
+
         onSubmit(merge);
       }}
     >
-      <ProForm.Group>
-        <ProFormText width="md" name="productBrand" label="商品品牌" placeholder="请输入商品品牌" />
-        {/* 接口中没有 */}
-        <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
-      </ProForm.Group>
+      <ProFormText width="md" name="parentLevel" label="一级分类" placeholder="请输入一级分类" rules={[{ required: true, message: '请输入一级分类' }]} disabled={values && values.typeLevel === '2'} />
+      { values && values.typeLevel === '2' && <ProFormText width="md" name="typeName" label="二级分类" placeholder="请输入二级分类" rules={[{ required: true, message: '请输入二级分类' }]} />}
 
-      {/* 缺少图片选择器 */}
 
-      <ProForm.Group>
-        <ProFormTextArea width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
-        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
-      </ProForm.Group>
+      <ProFormTextArea width="md" name="typeDescribe" label="类型描述" placeholder="请输入类型描述" />
+      <ProFormDigit width="md" name="orderNo" label="排序" placeholder="请输入排序" />
 
       <ProForm.Group>
-        <ProFormSwitch name="isRecommend" label="是否推荐" />
-        <ProFormSwitch name="isShow" label="是否展示" />
-        <ProFormSwitch name="isvalid" label="是否有效" />
-        <ProFormSwitch name="status" label="是否审核通过" />
+        <ProFormSwitch name="isShow" label="是否展示" rules={[{ required: true, message: '请选择是否展示' }]} />
+        <ProFormSwitch name="isValid" label="是否有效" rules={[{ required: true, message: '请选择是否有效' }]} />
       </ProForm.Group>
+
 
     </ModalForm >
 

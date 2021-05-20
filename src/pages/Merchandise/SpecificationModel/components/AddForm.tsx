@@ -56,7 +56,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addSpecifyVisible, setAddSpecifyVisible] = useState(false);
 
 
-  function specifyChange(e, key: string) {
+  function specifyChange(e:any, key: string) {
     setSpecify({ ...specify, [key]: e.target.value })
   }
 
@@ -67,7 +67,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
 
   }
 
-  function specifyValueChange(e, index: number) {
+  function specifyValueChange(e:any, index: number) {
     let arr = [...specifyInputs];
     arr[index] = e.target.value;
     setSpecifyInputs(arr);
@@ -136,10 +136,13 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       }}
       onFinish={async (data) => {
         const fields = { ...data }
-        clearData();
-        fields.specInfo = JSON.stringify(Object.fromEntries(specifiesMap.entries()));
-        onSubmit(fields);
-        setSpecifiesMap(new Map())
+        fields.specInfo = Object.fromEntries(specifiesMap.entries());
+        let success = onSubmit(fields);
+        if(success){
+          clearData();
+          setSpecifiesMap(new Map())
+        }
+
       }}
     >
       <Form.Item
@@ -179,10 +182,10 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
 
       {
         [...specifiesMap.keys()].map((name, i) => (
-          <Specify name={name} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
+          <Specify name={name} key={i} deleteBack={(name: string) => { deleteSpecify(name, i) }}>
             {
               (specifiesMap.get(name) || []).map((value: string, index: number) => (
-                <SpecifyItem value={value} deleteBack={() => { deleteSpecifyValue(name, index) }} />
+                <SpecifyItem value={value} key={index} deleteBack={() => { deleteSpecifyValue(name, index) }} />
               ))
             }
 
