@@ -2,11 +2,8 @@
 import { defineConfig } from 'umi';
 import { join } from 'path';
 import defaultSettings from './defaultSettings';
-import proxy from './proxy';
 import routes from './routes';
-
-const { REACT_APP_ENV, SERVE_ENV = 'idc' } = process.env;
-
+const { SERVE_ENV = 'idc' } = process.env;
 const serveUrlMap = {
   dev: 'http://10.10.10.54:8168',
   pre: '',
@@ -59,7 +56,7 @@ export default defineConfig({
     '/profile': {
       target: serveUrlMap[SERVE_ENV as string],
       changeOrigin: true,
-      pathRewrite: { '^/profile': '/prod-api/profile/' }
+      pathRewrite: { '^/profile': '/prod-api/profile/' },
     },
   }, //proxy[REACT_APP_ENV || 'dev']
   manifest: {
@@ -71,5 +68,27 @@ export default defineConfig({
     // schemaPath: "https://gw.alipayobjects.com/os/antfincdn/M%24jrzTTYJN/oneapi.json"
     schemaPath: join(__dirname, 'oneapi.json'),
     mock: false,
+  },
+  chunks: ['vendors', 'umi'],
+  chainWebpack: function (config, { webpack }) {
+    config.merge({
+      optimization: {
+        splitChunks: {
+          chunks: 'all',
+          minSize: 30000,
+          minChunks: 3,
+          automaticNameDelimiter: '.',
+          cacheGroups: {
+            vendor: {
+              name: 'vendors',
+              test({ resource }) {
+                return /[\\/]node_modules[\\/]/.test(resource);
+              },
+              priority: 10,
+            },
+          },
+        },
+      }
+    });
   },
 });

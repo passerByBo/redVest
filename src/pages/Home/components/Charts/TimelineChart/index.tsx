@@ -1,22 +1,11 @@
 import React from 'react';
 import {
-    G2,
 	Chart,
 	Geom,
 	Axis,
 	Tooltip,
-	Coord,
-	Label,
 	Legend,
-	View,
-	Annotation,
-	Shape,
-	Facet,
-	Util,
-	Slider,
-    Line
 } from 'bizcharts';
-import autoHeight from '../autoHeight';
 import styles from './index.less';
 
 export interface TimelineChartProps {
@@ -38,15 +27,7 @@ export interface TimelineChartProps {
 const TimelineChart: React.FC<TimelineChartProps> = (props) => {
 
     const {
-        title,
         height,
-        padding = [60, 20, 40, 40] as [number, number, number, number],
-        titleMap = {
-            y1: 'y1',
-            y2: 'y2',
-        },
-        borderWidth = 2,
-        data: sourceData,
     } = props;
 
     const data = [
