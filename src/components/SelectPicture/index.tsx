@@ -59,7 +59,7 @@ const PictureCard: React.FC<IPictureCardProps> = (props) => {
         <EyeOutlined className={styles.iconBg} onClick={(e) => { showPreview && showPreview(e); }} />
         <DeleteOutlined onClick={(e) => { onDelete && onDelete(e); }} className={styles.iconBg} />
       </Space>
-      <div className={styles.bar}>{data.name || '---'}</div>
+      <div className={styles.bar}>{data.imgName || '---'}</div>
       <img className={styles.img} src={data.imgUrl} alt="图片玩命加载中！" />
     </div>
   )

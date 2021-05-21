@@ -42,7 +42,6 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
   }, [initData])
 
   const triggerChange = (changedValue: string) => {
-    console.log('changedValue',changedValue)
     onChange?.(changedValue)
   }
 
@@ -71,8 +70,6 @@ const ImagePicker: React.FC<IImagePickerProps> = React.memo((props) => {
     triggerChange(getPicturesUrls(pictures));
     selectedBack(getPicturesArr(pictures))
     setSelectPictureVisible(false)
-
-    console.log(selectPictures)
   }
 
   const handleDeleteSelected = useCallback((e, picture: IProduct) => {

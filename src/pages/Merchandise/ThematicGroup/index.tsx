@@ -64,7 +64,21 @@ const detailColumns = [
     title: '是否有效',
     key: 'isValid',
     dataIndex: 'isValid',
-  }
+  },
+  {
+    title: '专题组图片',
+    key: 'specialGroupImgBig',
+    dataIndex: 'specialGroupImgBig',
+    render: (_) => {
+      return (
+        <Image
+          preview={{ mask: <EyeOutlined /> }}
+          width={80}
+          src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
+        />
+      )
+    }
+  },
 ]
 
 /**
@@ -424,7 +438,7 @@ const ThematicGroup: React.FC = () => {
         closable={false}
       >
         {currentRow?.specialGroup && (
-          <ProDescriptions<API.RuleListItem>
+          <ProDescriptions
             column={2}
             title={currentRow?.specialGroup}
             request={getThematicGroupDetail}

@@ -81,10 +81,11 @@ export async function getInitialState(): Promise<{
   };
   // 如果是登录页面，不执行,注册页面也不需要走这里
   // if (history.location.pathname !== '/user/login') {!noLoginRoute()
-  if (!noLoginRoute() && history.location.pathname !== '/') {
+  // && history.location.pathname !== '/'
+  let token = sessionStorage.getItem('token') || '';
+  if (!noLoginRoute() && token !== '') {
     //不是登录页面从本地获取token，然后获取本地数据，需要根据返回的状态判断当前的token是否有效果
     //如果token失效跳转到登录页
-    let token = sessionStorage.getItem('token') || '';
     let currentUser = null;
     try {
       const res = await fetchUserInfo();

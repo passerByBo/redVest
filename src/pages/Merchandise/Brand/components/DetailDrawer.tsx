@@ -46,7 +46,7 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
             preview={{ mask: <EyeOutlined /> }}
             width={100}
             height={100}
-            src={_ as string}
+            src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
           />
         )
       }
@@ -62,7 +62,7 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
             preview={{ mask: <EyeOutlined /> }}
             width={100}
             height={100}
-            src={_ as string}
+            src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
           />
         )
       }

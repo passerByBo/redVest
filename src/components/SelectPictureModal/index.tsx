@@ -374,6 +374,14 @@ const SelectPictureModal: React.FC<ISelectPictureModalProps> = React.memo((props
 
 
   const handleDeleteSelected = useCallback(() => {
+
+    if (selectPictures.size === 0) {
+      message.warning('请选择要删除的图片!');
+      return;
+    }
+
+    console.log(selectPictures.size, selectPictures)
+
     confirm({
       title: '删除',
       icon: <ExclamationCircleOutlined />,
