@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { PlusOutlined, DeleteOutlined, ExportOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
-import { PageContainer } from '@ant-design/pro-layout';
+import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import AddCouponModal from './components/AddCouponModal';
 
 import type { TableListItem } from './data.d';
-import { getArticleSortList, addArticleSortList } from '@/services/marketing/couponProduction';
+import { getArticleSortList, addArticleSortList, removeRule } from '@/services/marketing/couponProduction';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 /**
@@ -29,9 +29,29 @@ const handleAdd = async (fields: TableListItem) => {
   }
 };
 
+/**
+ * 删除节点
+ */
+const handleRemove = async (selectedRows: TableListItem[]) => {
+  const hide = message.loading('正在删除');
+  try {
+    await removeRule({
+      ids: selectedRows.map((row) => row.id).join(','),
+    });
+    hide();
+    message.success('删除成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('删除失败！');
+    return false;
+  }
+};
+
 const CouponProduction: React.FC = () => {
   const [statusKey, setStatusKey] = useState<string>('审核通过');
   const [addCouponModalVisible, setAddCouponModalVisible] = useState<boolean>(false);
+  const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
   const actionRef = useRef<ActionType>();
 
   const confirmAdd = (newData: TableListItem) => {
@@ -39,6 +59,11 @@ const CouponProduction: React.FC = () => {
     handleAdd(newData);
     actionRef.current?.reloadAndRest?.();
   };
+
+  const removeSingleRow = async (selectedRows: TableListItem[]) => {
+    setSelectedRows([]);
+    await handleRemove(selectedRows) && actionRef.current?.reloadAndRest?.();
+  }
 
   const onTabChange = (key: string) => {
     setStatusKey(key)
@@ -56,7 +81,9 @@ const CouponProduction: React.FC = () => {
       <PlusOutlined />
       新建
     </Button>,
-    <Button key="delete" danger onClick={() => { }}>
+    <Button key="delete" danger onClick={() => {
+      removeSingleRow(selectedRowsState);
+    }}>
       <DeleteOutlined />
       删除
     </Button>,
@@ -138,7 +165,7 @@ const CouponProduction: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [<a onClick={() => { }}>编辑</a>, <a onClick={() => { }}>下架</a>],
+      render: (_, record) => [<a onClick={() => { }}>下架</a>],
     },
   ];
   return (
@@ -170,9 +197,24 @@ const CouponProduction: React.FC = () => {
         request={formatRequestListParams(getArticleSortList, { status: statusKey })}
         columns={columns}
         rowSelection={{
-          onChange: (_, selectedRows) => { },
+          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
         }}
       />
+      {selectedRowsState?.length > 0 && (
+        <FooterToolbar
+          extra={
+            <div>
+              已选择 <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a> 项
+                        </div>
+          }
+        >
+          <Button
+            onClick={() => {
+              removeSingleRow(selectedRowsState);
+            }}
+          >批量删除</Button>
+        </FooterToolbar>
+      )}
       <AddCouponModal
         visible={addCouponModalVisible}
         onCancel={() => setAddCouponModalVisible(false)}
