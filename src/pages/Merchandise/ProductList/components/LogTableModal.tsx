@@ -1,53 +1,62 @@
+import { getLoggerList } from '@/services/merchandise/product';
+import formatRequestListParams from '@/utils/formatRequestListParams';
+import ProTable, { ActionType } from '@ant-design/pro-table';
 import { Modal, Table } from 'antd';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export interface LogTableModelProps {
   visible: boolean;
   onOk(): void;
-  onCancel(): void
+  onCancel(): void;
+  id?: string;
 }
 
 
 const columns = [
   {
     title: '商品编码',
-    dataIndex: 'code',
-    key: 'code',
+    dataIndex: 'productNo',
+    key: 'productNo',
   },
   {
-    title: '销售价',
-    dataIndex: 'price',
-    key: 'price',
+    title: '商品名称',
+    dataIndex: 'productName',
+    key: 'productName',
   },
   {
-    title: '划线价',
-    dataIndex: 'price2',
-    key: 'price2',
+    title: '商品规格',
+    dataIndex: 'skuName',
+    key: 'skuName',
   },
   {
-    title: '上下架',
-    dataIndex: 'aaa',
-    key: 'aaa',
+    title: '修改内容',
+    dataIndex: 'fieldValue',
+    key: 'fieldValue',
   },
   {
-    title: '审核状态',
-    dataIndex: 'status',
-    key: 'status',
+    title: '原值',
+    dataIndex: 'updateBefore',
+    key: 'updateBefore',
+  },
+  {
+    title: '现值',
+    dataIndex: 'updateAfter',
+    key: 'updateAfter',
   },
   {
     title: '操作人',
-    dataIndex: 'person',
-    key: 'person',
-  },
-  {
-    title: '操作时间',
-    dataIndex: 'date',
-    key: 'date',
+    dataIndex: 'createUser',
+    key: 'createUser',
   },
 ]
 
 const LogTableModal: React.FC<LogTableModelProps> = (props) => {
-  const { visible, onOk, onCancel } = props;
+  const { visible, onOk, onCancel, id } = props;
+  const actionRef = useRef<ActionType>();
+  useEffect(() => {
+    actionRef.current?.reload();
+  }, [id])
+
   return (
     <Modal
       title='操作日志'
@@ -56,7 +65,15 @@ const LogTableModal: React.FC<LogTableModelProps> = (props) => {
       onCancel={onCancel}
       width='80%'
     >
-      <Table bordered dataSource={[]} columns={columns}></Table>
+      <ProTable
+        bordered
+        actionRef={actionRef}
+        columns={columns}
+        request={formatRequestListParams(getLoggerList, { id: id })}
+        rowKey="productNo"
+        search={false}
+        toolBarRender={false}
+      />
     </Modal>
   )
 }

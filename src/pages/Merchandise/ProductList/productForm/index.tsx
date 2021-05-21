@@ -64,6 +64,11 @@ const smallItemLayout = {
 export interface IProductAttr {
   [key: string]: string;
 }
+
+//保存预览使用的图片
+let proRotationImg1: any = [];
+let proLogoImg1: any = [];
+
 const TableTitle: React.FC<{ title: string, callback: Function }> = React.memo(({ title, callback }) => {
   const [visible, setVisible] = useState(false);
   const inputRef = useRef<Input>(null);
@@ -139,6 +144,10 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   //商品详细信息编辑时使用
   const [productDetail, setProductDetail] = useState<any>(null);
 
+
+  //sku属性图片map
+  const [skuPictureMap, setSkuPictureMap] = useState(new Map<string, any>())
+
   const [form] = Form.useForm();
 
 
@@ -210,14 +219,40 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     }
   }, [treeData]);
 
+
+  const formatProductSkuInfo = (arr: any) => {
+    let result = [...arr];
+
+    return result.map((item) => {
+      let skuImg = item.skuImg;
+      let id = '';
+      if (Array.isArray(skuImg) && skuImg[0]) {
+        id = skuImg[0].id;
+        //捎带把数据同步到图片map中
+        skuPictureMap.set(id, skuImg[0])
+        setSkuPictureMap(skuPictureMap)
+      }
+      return {
+        ...item,
+        skuImg: id
+      }
+    })
+  }
+
   const initPageContent = (data: any) => {
 
     data.isRecommend = data.isRecommend === 'Y' ? true : false;
     data.isBoutique = data.isBoutique === 'Y' ? true : false;
-    console.log('xxxx', data)
 
     form.setFieldsValue(data)
     const { productDetail, qualityReport1, productSkuInfo, productSpecObj, commissionSetting } = data;
+
+    //初始化预览的图片啊
+    //保存预览使用的图片
+    proRotationImg1 = data.proRotationImg1.map(((item: any) => item.imgUrl));
+    proLogoImg1 = data.proLogoImg1.map(((item: any) => item.imgUrl));;
+
+    //初始化SKU属性列表使用的图片map
     //需要初始化设置选中的图片,通过表单初始化,表单初始化数据不一致不可使用需自定义initData来实现
 
     //初始化设置规格模板
@@ -230,9 +265,11 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     //初始化设置商品详情和质检报告
     form.setFieldsValue({ productDetail, qualityReport1 });
     //需要初始化设置SKU属性表格和自定义佣金表格
-    setProductsAttr([...productSkuInfo]);
+    setProductsAttr([...formatProductSkuInfo(productSkuInfo)]);
     //初始化自定义设置佣金
     setCommission(commissionSetting);
+
+
   }
 
   const initProRotationImg = useMemo(() => {
@@ -397,7 +434,6 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   const initSpecifiesData = (arr: string[]): any[] => {
     const keys = [...specifiesMap.keys()]
     return arr.map((name, index) => {
-      console.log(name)
       const skuNameArr = name.split(',');
       let propertiesObj = Object.create(null);
       keys.forEach((key, index) => {
@@ -551,13 +587,26 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
   //编辑行图片信息
   const selectPictureCallback = (imgs: any) => {
     setSelectPictureVisible(false);
-    let urlArr = imgs.map((item: any) => item.imgUrl);
+    let urlArr = imgs.map((item: any) => item.id);
+    let pictureId = productsAttr[skuRowIndex].skuImg;
+    //如果当前已经选择了图片做替换操作，需要同步清空原来存储的map值
+    if (pictureId !== '' && skuPictureMap.has(pictureId)) {
+      skuPictureMap.delete(pictureId);
+      setSkuPictureMap(skuPictureMap)
+    }
+
     productsAttr[skuRowIndex].skuImg = urlArr[0];
+
+    //当前选中的图片存储在图片的map中
+    //这里目前只支持一张图片的上传和保存
+    skuPictureMap.set(imgs[0].id, imgs[0])
+    setSkuPictureMap(skuPictureMap)
+
     setProductsAttr([...productsAttr]);
   }
 
   //保存当前正在编辑的行
-  const skuRowSelectPicture = (imgUrl: string, row: any) => {
+  const skuRowSelectPicture = (id: string, row: any) => {
 
     for (let i = 0, length = productsAttr.length; i < length; i++) {
       let item = productsAttr[i];
@@ -575,7 +624,16 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     for (let i = 0, length = productsAttr.length; i < length; i++) {
       let item = productsAttr[i];
       if (item.skuName === row.skuName) {
+        const pictureId = productsAttr[skuRowIndex].skuImg;
+        //默认为一张图片，如果多张图片请遍历删除
+        if (skuPictureMap.has(pictureId)) {
+          skuPictureMap.delete(pictureId)
+          setSkuPictureMap(skuPictureMap)
+        }
+
+
         productsAttr[skuRowIndex].skuImg = '';
+
         setProductsAttr([...productsAttr]);
         break;
       }
@@ -593,8 +651,13 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
       dataIndex: 'skuImg',
       editable: false,
       render: (_: any, row: any) => {
+        let pictures: any = null;
+        if (skuPictureMap.has(_)) {
+          pictures = skuPictureMap.get(_);
+        }
+
         return <Space>
-          {row.skuImg !== "" && <Image preview={{ mask: <EyeOutlined /> }} src={_} className={styles.tableItemImage} />}
+          {row.skuImg !== "" && <Image preview={{ mask: <EyeOutlined /> }} src={pictures && pictures.imgUrl} className={styles.tableItemImage} />}
           {row.skuImg !== "" && < Button onClick={() => { deleteSkuImg(row) }} size="small" shape="circle" icon={<DeleteOutlined />} />}
           {/* {row.skuImg === "" && <Button size="small" shape="circle" icon={<PlusOutlined />} onClick={() => skuRowSelectPicture(_, row)} />} */}
           <Button size="small" shape="circle" icon={<PlusOutlined />} onClick={() => skuRowSelectPicture(_, row)} />
@@ -668,6 +731,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
 
   const submitData = async (values: any) => {
+    console.log('xxx', productsAttr, skuPictureMap)
     await form.validateFields();
     let tag = '创建';
     if (query && query.id) {
@@ -809,7 +873,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   rules={[{ required: true, message: '请选择商品封面主图' }]}
                   extra="建议图片大小不超过250kb"
                 >
-                  <ImagePicker initData={initProRotationImg} limit={5} />
+                  <ImagePicker selectedBack={(pictures: any) => { proLogoImg1 = pictures }} initData={initProRotationImg} limit={5} />
                 </Form.Item>
               </Col>
             </Row>
@@ -822,7 +886,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   rules={[{ required: true, message: '请选择商品轮播图' }]}
                   extra="建议图片大小不超过250kb"
                 >
-                  <ImagePicker initData={initProLogoImg} limit={5}></ImagePicker>
+                  <ImagePicker selectedBack={(pictures: any) => { proRotationImg1 = pictures }} initData={initProLogoImg} limit={5}></ImagePicker>
                 </Form.Item>
               </Col>
             </Row>
@@ -1017,10 +1081,8 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
         </Button>
         </FooterToolbar>
       </Form >
-
-
       <SelectPictureModal initData={[]} limit={1} visible={selectPictureVisible} onOk={selectPictureCallback} onCancel={() => { setSelectPictureVisible(false) }} />
-      <Preview product={form?.getFieldsValue()} visible={previewProductVisible} onCancel={() => { setPreviewProductVisible(false) }} />
+      <Preview product={{ ...form?.getFieldsValue(), proRotationImg1, proLogoImg1, productsAttr }} visible={previewProductVisible} onCancel={() => { setPreviewProductVisible(false) }} />
     </>
 
   )

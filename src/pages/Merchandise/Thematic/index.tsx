@@ -85,12 +85,12 @@ const Thematic: React.FC = () => {
       sorter: true,
       search: false,
       dataIndex: 'specialNameImg1',
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+            src={_ && _[0].imgUrl}
           />
         )
       }
@@ -110,12 +110,12 @@ const Thematic: React.FC = () => {
       title: '专题类型图片',
       search: false,
       dataIndex: 'specialTypeImg',
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+            src={_ && _[0].imgUrl}
           />
         )
       }

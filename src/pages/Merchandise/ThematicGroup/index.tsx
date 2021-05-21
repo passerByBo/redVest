@@ -178,12 +178,12 @@ const ThematicGroup: React.FC = () => {
       title: '专题组图片',
       dataIndex: 'specialGroupImgBig',
       search: false,
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+            src={_ && _[0].imgUrl}
           />
         )
       }

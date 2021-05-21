@@ -1,6 +1,6 @@
 import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useCallback } from 'react';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
@@ -62,12 +62,12 @@ const Brand: React.FC = () => {
       title: '品牌logo',
       dataIndex: 'logo',
       search: false,
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+            src={Array.isArray(_) && _[0] && _[0].imgUrl}
           />
         )
       }
@@ -76,12 +76,12 @@ const Brand: React.FC = () => {
       title: '品牌专区大图',
       dataIndex: 'brandImg',
       search: false,
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+            src={Array.isArray(_) && _[0] && _[0].imgUrl}
           />
         )
       }
@@ -181,6 +181,7 @@ const Brand: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('编辑失败请重试！');
+        return;
       }
       hide();
       message.success('编辑成功');
@@ -208,6 +209,7 @@ const Brand: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('新增失败请重试！');
+        return;
       }
       hide();
       message.success('新增成功');

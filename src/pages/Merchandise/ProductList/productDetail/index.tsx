@@ -25,43 +25,48 @@ interface productDetail {
 const productYColumn = [
   {
     title: 'SKU属性',
-    dataIndex: '1',
+    dataIndex: 'skuName',
   },
   {
     title: '商品图片',
-    dataIndex: '2',
+    dataIndex: 'skuImg',
+    render: (_: string, record: any) => {
+      return (
+        <Image
+          preview={{ mask: <EyeOutlined /> }}
+          width={40}
+          src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
+        />
+      )
+    }
   },
   {
     title: '货号',
-    dataIndex: '3',
+    dataIndex: 'articleNo',
   },
   {
     title: '销售价',
-    dataIndex: '4',
+    dataIndex: 'salePrice',
   },
   {
     title: '成本价',
-    dataIndex: '5',
+    dataIndex: 'supplyPrice',
   },
   {
     title: '划线价',
-    dataIndex: '6',
+    dataIndex: 'marketPrice',
   },
   {
-    title: '库存价',
-    dataIndex: '7',
+    title: '库存',
+    dataIndex: 'marketPrice',
   },
   {
     title: '重量',
-    dataIndex: '8',
+    dataIndex: 'marketPrice',
   },
   {
     title: '体积',
-    dataIndex: '9',
-  },
-  {
-    title: '体积',
-    dataIndex: '9',
+    dataIndex: 'marketPrice',
   },
   {
     title: '一级返佣',
@@ -81,12 +86,12 @@ const productAttrColumn = [
   {
     title: '商品图片',
     dataIndex: 'skuImg',
-    render: (_, record) => {
+    render: (_: string, record: any) => {
       return (
         <Image
           preview={{ mask: <EyeOutlined /> }}
           width={40}
-          src={_ as string}
+          src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
         />
       )
     }
@@ -157,6 +162,7 @@ const ProductDetail: React.FC<IProductDetailProps> = (props) => {
     onSuccess: (result, params) => {
       if (result) {
         setDetail({ ...result });
+        setInnerHtml((result && result.productDetail) || '');
         return;
       }
       message.error('初始化商品详情失败，请重试！')
@@ -196,14 +202,14 @@ const ProductDetail: React.FC<IProductDetailProps> = (props) => {
     }
 
     if (key == '2') {
-      setInnerHtml((detail && detail.qualityReport1) ||'');
+      setInnerHtml((detail && detail.qualityReport1) || '');
     }
   }
 
 
   return (
     <PageContainer
-      title={'	中国蓝星BLUESTAR除菌除臭剂50g*12块 双色蓝泡泡马桶除臭去异味神器厕所家用卫生间清香型味清洁剂宝99'}
+      title={`${(detail && detail.productName) || (simpleDetail && simpleDetail.productName)}详细信息`}
       className={styles.pageHeader}
       content={description}
     >
@@ -214,7 +220,7 @@ const ProductDetail: React.FC<IProductDetailProps> = (props) => {
               <Col>
                 <Space>
                   <span className={styles.spanLabel}>商品封面主图:</span>
-                  <Pictures list={detail && detail.proLogoImg1.split(',')} />
+                  <Pictures list={detail && detail.proLogoImg1} />
                 </Space>
               </Col>
             </Row>
@@ -223,7 +229,7 @@ const ProductDetail: React.FC<IProductDetailProps> = (props) => {
               <Col>
                 <Space>
                   <span className={styles.spanLabel}>商品轮播图:</span>
-                  <Pictures list={detail && detail.proRotationImg1.split(',')} />
+                  <Pictures list={detail && detail.proRotationImg1} />
                 </Space>
               </Col>
             </Row>

@@ -26,7 +26,7 @@ export type FormValueType = {
   sort?: number;
   specialNameImg1?: string;
   specialDescribe?: string;
-  specialTypeImg?: string;
+  specialTypeImg?: any;
 };
 
 export type UpdateFormProps = {
@@ -136,7 +136,7 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         label="专题图片"
         extra="建议图片大小不超过250kb"
       >
-        <ImagePicker limit={1} />
+        <ImagePicker initData={values && values.specialNameImg1} limit={1} />
       </Form.Item>
       <ProForm.Group>
         <ProFormTextArea width="xl" label="专题组描述" name="specialDescribe"  placeholder="请输入专题组描述" />
@@ -144,7 +144,7 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
 
 
       <ProForm.Group>
-        <ProFormDigit width="md" name="contract" label="排序" placeholder="请输入排序" />
+        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
         <ProFormSwitch rules={[{ required: true, message: '请选择是否有效!' }]}  name="isValid" label="是否有效" />
       </ProForm.Group>
 

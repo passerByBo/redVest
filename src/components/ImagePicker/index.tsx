@@ -13,7 +13,7 @@ export interface IImagePickerProps {
   value?: any,//给表单传值使用
   type?: 'card' | 'button',
   selectedBack?: (pictures: string[]) => void;
-  initData?:any[];
+  initData?:any;
 }
 
 export interface IProduct {

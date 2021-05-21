@@ -1,7 +1,7 @@
 import { DownOutlined } from '@ant-design/icons';
 import { Carousel, Dropdown, Menu, Modal, Radio, Space, Tabs } from 'antd';
 import classnames from 'classnames';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // import devices from './devices.min.css';
 import styles from './style.less';
 
@@ -55,12 +55,12 @@ export interface IPreviewProps {
 
 
 const Preview: React.FC<IPreviewProps> = (props) => {
-  const { product, ...others } = props;
+  const { product, visible, ...others } = props;
   const [device, setDevices] = useState(DEVICES[0]);
   const [deviceColors, setDeviceColors] = useState<IColor[]>([]);
   const [deviceColorClass, setDeviceColorClass] = useState('');
-  const { productName, productDescribe, productTitle, proRotationImg1, proLogoImg1, qualityReport1, productDetail } = product;
-
+  const [priceInterval, setPriceInterval] = useState<string>('')
+  const { productName, proRotationImg1, qualityReport1, productDetail, productTitle, productsAttr } = product as any;
 
   const handleDeviceSelect = (key: string) => {
     for (let i = 0, length = DEVICES.length; i < length; i++) {
@@ -89,10 +89,34 @@ const Preview: React.FC<IPreviewProps> = (props) => {
   )
 
 
+  const getPrice = (productsAttr: any): number[] => {
+    if (!productsAttr || !Array.isArray(productsAttr) || productsAttr.length === 0) {
+      return [0.00];
+    }
+    let prices = productsAttr.map((item: any) => item.salePrice);
+    return [Math.min(...prices), Math.max(...prices)]
+  }
+
+
+  useEffect(() => {
+    if (visible) {
+      let priceInterval;
+      let [min, max] = getPrice(productsAttr);
+      if (max !== undefined && max !== min) {
+        priceInterval = min + '-' + max;
+      } else {
+        priceInterval = min + '';
+      }
+      setPriceInterval(priceInterval)
+    }
+
+  }, [visible])
+
+
 
 
   return (
-    <Modal title={'商品预览'} footer={null} {...others} width={800}>
+    <Modal title={'商品预览'} footer={null} {...others} visible={visible} width={800}>
 
       <div className={styles.previeWrap}>
 
@@ -118,9 +142,9 @@ const Preview: React.FC<IPreviewProps> = (props) => {
               </header>
               <div className={styles.container}>
 
-                <Carousel autoplay>
+                <Carousel autoplay style={{minHeight: 348}}>
                   {
-                    proRotationImg1 && proRotationImg1.split(',').map((url: string) => (
+                    proRotationImg1 && Array.isArray(proRotationImg1) && proRotationImg1.map((url: string) => (
                       <img className={styles.carouselImg} src={url}
                         alt="" />
                     ))
@@ -129,14 +153,20 @@ const Preview: React.FC<IPreviewProps> = (props) => {
                 <div className={styles['title-box']}>
                   <div className={styles["price-label"]}>本店售价</div>
                   <div className={styles["price-info"]}>
-                    <span className={styles["integer-part"]}>68<span className={styles["decimal-part"]}>.99</span></span>
-                    <span className={styles["retail-price"]}>99.99</span>
+                    <span className={styles["integer-part"]}>{priceInterval}</span>
+                    {/* <span className={styles["integer-part"]}>68<span className={styles["decimal-part"]}>.99</span></span> */}
+                    {/* <span className={styles["retail-price"]}>99.99</span> */}
                   </div>
                   <div className={styles["product-title"]}>
                     {productName}
                   </div>
+                  <div className={styles.subTitle}>
+                    {
+                      productTitle
+                    }
+                  </div>
+                  <div></div>
                 </div>
-
 
                 <Tabs defaultActiveKey="1" onChange={() => { }} tabBarStyle={{ backgroundColor: 'white' }} centered >
                   <TabPane tab="商品参数" key="1" >

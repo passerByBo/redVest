@@ -71,7 +71,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       <ProForm.Group>
         <ProFormText  rules={[{required: true, message:"请输入品牌名称"}]} width="md" name="productBrand" label="商品品牌" placeholder="请输入品牌名称" />
         {/* 接口中没有 */}
-        <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
+        <ProFormText width="md" name="siteUrl" label="品牌地址" placeholder="请输专题入品牌地址" />
       </ProForm.Group>
 
       {/* 缺少图片选择器 */}

@@ -200,7 +200,7 @@ const Register: React.FC = () => {
         <div className={styles.main}>
           {/* <h3> 注册</h3> */}
           <Form
-            initialValues={initData}
+            // initialValues={initData}
             {...layout}
             form={form}
             onFinish={async (values) => {

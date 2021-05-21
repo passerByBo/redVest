@@ -14,8 +14,8 @@ export type FormValueType = {
   brandDescribe: string;
   productBrand: string;
   brandNo: string;
-  logo: string;
-  brandImg: string;
+  logo: any;
+  brandImg: any;
   isvalid: string | boolean;
   sort: string;
   isShow: string | boolean;
@@ -34,33 +34,35 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [updateForm] = Form.useForm();
   const { values, updateModalVisible, onSubmit, onCancel } = props;
 
-
-  if (values) {
-    //转换是否有效果
-    if (values.isvalid === 'Y') {
-      values.isvalid = true;
-    } else {
-      values.isvalid = false;
+  useEffect(() => {
+    if (values) {
+      let data = { ...values }
+      //转换是否有效果
+      if (data.isvalid === 'Y') {
+        data.isvalid = true;
+      } else {
+        data.isvalid = false;
+      }
+      if (data.isShow === 'Y') {
+        data.isShow = true;
+      } else {
+        data.isShow = false;
+      }
+      if (data.isRecommend === 'Y') {
+        data.isRecommend = true;
+      } else {
+        data.isRecommend = false;
+      }
+      if (data.status === 'Y') {
+        data.status = true;
+      } else {
+        data.status = false;
+      }
+      data.logo = (Array.isArray(values.logo) && values.logo.map((item: any) => item.id).join(',')) || ''
+      data.brandImg = (Array.isArray(values.brandImg) && values.brandImg.map((item: any) => item.id).join(',')) || ''
+      updateForm.setFieldsValue(data)
     }
-    if (values.isShow === 'Y') {
-      values.isShow = true;
-    } else {
-      values.isShow = false;
-    }
-    if (values.isRecommend === 'Y') {
-      values.isRecommend = true;
-    } else {
-      values.isRecommend = false;
-    }
-    if (values.status === 'Y') {
-      values.status = true;
-    } else {
-      values.status = false;
-    }
-    updateForm.setFieldsValue(values)
-  }
-
-
+  }, [values])
 
   return (
     <ModalForm
@@ -98,10 +100,10 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         onSubmit(merge);
       }}
     >
-       <ProForm.Group>
-        <ProFormText  rules={[{required: true, message:"请输入品牌名称"}]} width="md" name="productBrand" label="商品品牌" placeholder="请输入品牌名称" />
+      <ProForm.Group>
+        <ProFormText rules={[{ required: true, message: "请输入品牌名称" }]} width="md" name="productBrand" label="商品品牌" placeholder="请输入品牌名称" />
         {/* 接口中没有 */}
-        <ProFormText width="md" name="specialAddress" label="品牌地址" placeholder="请输专题入品牌地址" />
+        <ProFormText width="md" name="siteUrl" label="品牌地址" placeholder="请输专题入品牌地址" />
       </ProForm.Group>
 
       {/* 缺少图片选择器 */}
@@ -110,7 +112,7 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         label="品牌Logo"
         extra="建议图片大小不超过250kb"
       >
-        <ImagePicker limit={1} />
+        <ImagePicker initData={values && values.logo} limit={1} />
       </Form.Item>
 
       <Form.Item
@@ -118,11 +120,11 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         label="品牌区大图"
         extra="建议图片大小不超过250kb"
       >
-        <ImagePicker limit={1} />
+        <ImagePicker initData={values && values.brandImg} limit={1} />
       </Form.Item>
 
       <ProForm.Group>
-        <ProFormTextArea rules={[{required: true, message:"请输入品牌描述"}]} width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
+        <ProFormTextArea rules={[{ required: true, message: "请输入品牌描述" }]} width="md" name="brandDescribe" label="品牌描述" placeholder="请输入描述" />
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
       </ProForm.Group>
 

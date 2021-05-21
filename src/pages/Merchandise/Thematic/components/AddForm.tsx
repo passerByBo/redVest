@@ -127,7 +127,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
 
 
       <ProForm.Group>
-        <ProFormDigit width="md" name="contract" label="排序" placeholder="请输入排序" />
+        <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
         <ProFormSwitch rules={[{ required: true, message: '请选择是否有效!' }]} name="isValid" label="是否有效" />
       </ProForm.Group>
 

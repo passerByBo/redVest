@@ -98,11 +98,11 @@ const Recycle: React.FC = () => {
       dataIndex: 'shopname',
       valueType: 'textarea',
     },
-    {
-      title: '专题名称',
-      dataIndex: 'xxxxxxx',
-      valueType: 'textarea',
-    },
+    // {
+    //   title: '专题名称',
+    //   dataIndex: 'xxxxxxx',
+    //   valueType: 'textarea',
+    // },
     {
       title: '商品分类',
       dataIndex: 'typeName',
@@ -112,11 +112,11 @@ const Recycle: React.FC = () => {
       dataIndex: 'productBrand',
       valueType: 'textarea',
     },
-    {
-      title: 'SKU库存',
-      dataIndex: 'xxxxxxx',
-      search: false,
-    },
+    // {
+    //   title: 'SKU库存',
+    //   dataIndex: 'xxxxxxx',
+    //   search: false,
+    // },
 
     {
       title: '销量',

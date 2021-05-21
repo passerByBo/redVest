@@ -13,7 +13,6 @@ export default class Editer extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps:any) {
     if(nextProps.initData !== this.props.initData){
-      console.log('xxxxxx调用啦')
       this.setState({
         editorState: BraftEditor.createEditorState(nextProps.initData)
     })

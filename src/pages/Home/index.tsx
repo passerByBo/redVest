@@ -29,8 +29,6 @@ const Home: React.FC = () => {
     return getHomeData();
   })
 
-  console.log('homeData',homeData, loading)
-
   const isActive = (type: 'today' | 'week' | 'month' | 'year') => {
 
   };

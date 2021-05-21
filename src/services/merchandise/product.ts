@@ -16,10 +16,42 @@ export async function getProductList(
   });
 }
 
-export async function getSepcModel (){
+export async function getLoggerList(
+  params: {
+    current?: number;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request('/product/info/proUpLog', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+export async function getSKUList(
+  params: {
+    current?: number;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request('/product/info/skulist', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+export async function getSepcModel() {
   return request('/product/specModel/product', {
     method: 'GET',
-  })
+  });
 }
 
 export async function onAndOffShelves(
@@ -44,33 +76,28 @@ export async function getProductDetail(
     params: {
       ...params,
     },
-    ...(options || {})
+    ...(options || {}),
   });
 }
 
-
-export async function submitForm(
-  body: { [key: string]: any },
-  options?: { [key: string]: any }){
-    return request('/product/info', {
-      method: 'POST',
-      data: {
-        ...body,
-      },
-      ...(options || {}),
-    });
+export async function submitForm(body: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request('/product/info', {
+    method: 'POST',
+    data: {
+      ...body,
+    },
+    ...(options || {}),
+  });
 }
 
-export async function editForm(
-  body: { [key: string]: any },
-  options?: { [key: string]: any }){
-    return request('/product/info/edit', {
-      method: 'PUT',
-      data: {
-        ...body,
-      },
-      ...(options || {}),
-    });
+export async function editForm(body: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request('/product/info/edit', {
+    method: 'PUT',
+    data: {
+      ...body,
+    },
+    ...(options || {}),
+  });
 }
 
 /** 商品类型列表 */

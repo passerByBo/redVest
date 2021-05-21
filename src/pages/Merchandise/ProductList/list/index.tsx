@@ -215,12 +215,12 @@ const List: React.FC = (props) => {
     {
       title: '商品主图',
       dataIndex: 'proLogoImg1',
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+             src={_ && Array.isArray(_) &&  _[0] && _[0].imgUrl}
           />
         )
       },
@@ -228,7 +228,7 @@ const List: React.FC = (props) => {
     },
     {
       title: '商品副标题',
-      dataIndex: 'xxxxxxxxxxx',
+      dataIndex: 'productTitle',
       search: false
     },
     {
@@ -238,7 +238,7 @@ const List: React.FC = (props) => {
     },
     {
       title: '商品品牌',
-      dataIndex: 'xxxxxxxxxxxxxx',
+      dataIndex: 'productBrand',
       valueType: 'textarea',
     },
     {
@@ -252,29 +252,29 @@ const List: React.FC = (props) => {
       dataIndex: 'skuCount',
       search: false,
       render: (_, record) => (
-        <a onClick={() => { setSKUTableModalVisible(true) }}>{_}</a>
+        <a onClick={() => { setCurrentRow(record);setSKUTableModalVisible(true) }}>{_}</a>
       )
     },
     {
       title: 'SKU告急库存',
       dataIndex: 'skuHurryCount',
       search: false,
-      render: (_, record) => (
-        <a onClick={() => { setSKUTableModalVisible(true) }}>{_}</a>
-      )
+      // render: (_, record) => (
+      //   <a onClick={() => { setSKUTableModalVisible(true) }}>{_}</a>
+      // )
     },
 
-    {
-      title: 'SPU销量',
-      tip: SKUTip,
-      dataIndex: 'xxxxxxxxxx',
-      search: false,
-    },
-    {
-      title: '销售价',
-      dataIndex: '12323',
-      search: false
-    },
+    // {
+    //   title: 'SPU销量',
+    //   tip: SKUTip,
+    //   dataIndex: 'xxxxxxxxxx',
+    //   search: false,
+    // },
+    // {
+    //   title: '销售价',
+    //   dataIndex: '12323',
+    //   search: false
+    // },
     {
       title: '操作',
       dataIndex: 'option',
@@ -282,7 +282,7 @@ const List: React.FC = (props) => {
       render: (_, record) => {
         let { productStatus } = record;
         return <>
-          <a onClick={() => setLogTableModalVisible(true)}>日志</a>
+          <a onClick={() => {setCurrentRow(record);setLogTableModalVisible(true)}}>日志</a>
           <Divider type="vertical" />
           <a onClick={() => { history.push(`/merchandise/product/edit?id=${record.id}`) }}>编辑</a>
           <Divider type="vertical" />
@@ -390,8 +390,8 @@ const List: React.FC = (props) => {
         )
       }
 
-      <LogTableModal visible={logTableModalVisible} onOk={() => { setLogTableModalVisible(false) }} onCancel={() => { setLogTableModalVisible(false) }} />
-      <SKUTableModal visible={skuTableModalVisible} onOk={() => { setSKUTableModalVisible(false) }} onCancel={() => { setSKUTableModalVisible(false) }} />
+      <LogTableModal id={currentRow && currentRow.id} visible={logTableModalVisible} onOk={() => { setLogTableModalVisible(false) }} onCancel={() => { setLogTableModalVisible(false) }} />
+      <SKUTableModal id={currentRow && currentRow.id} visible={skuTableModalVisible} onOk={() => { setSKUTableModalVisible(false) }} onCancel={() => { setSKUTableModalVisible(false) }} />
     </PageContainer >
   )
 }

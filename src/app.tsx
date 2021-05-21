@@ -56,7 +56,6 @@ const noTokenByUrl = (url: string) => {
 
 
 /**
- * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<{
   token?: string,
@@ -82,7 +81,7 @@ export async function getInitialState(): Promise<{
   };
   // 如果是登录页面，不执行,注册页面也不需要走这里
   // if (history.location.pathname !== '/user/login') {!noLoginRoute()
-  if (!noLoginRoute()) {
+  if (!noLoginRoute() && history.location.pathname !== '/') {
     //不是登录页面从本地获取token，然后获取本地数据，需要根据返回的状态判断当前的token是否有效果
     //如果token失效跳转到登录页
     let token = sessionStorage.getItem('token') || '';
@@ -170,7 +169,7 @@ const pageLoginExpired = debounce(() => {
       }
     },
   });
-},100)
+}, 500)
 
 
 /** 异常处理程序
@@ -192,8 +191,6 @@ const errorHandler = (error: ResponseError) => {
       description: errorText,
     });
   }
-
-  console.log('res', response)
 
   if (!response) {
     notification.error({
