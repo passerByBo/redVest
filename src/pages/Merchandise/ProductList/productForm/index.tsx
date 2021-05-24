@@ -241,16 +241,20 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
 
   const initPageContent = (data: any) => {
 
-    data.isRecommend = data.isRecommend === 'Y' ? true : false;
-    data.isBoutique = data.isBoutique === 'Y' ? true : false;
-
-    form.setFieldsValue(data)
-    const { productDetail, qualityReport1, productSkuInfo, productSpecObj, commissionSetting } = data;
-
-    //初始化预览的图片啊
+     //初始化预览的图片啊
     //保存预览使用的图片
     proRotationImg1 = data.proRotationImg1.map(((item: any) => item.imgUrl));
     proLogoImg1 = data.proLogoImg1.map(((item: any) => item.imgUrl));;
+
+    data.isRecommend = data.isRecommend === 'Y' ? true : false;
+    data.isBoutique = data.isBoutique === 'Y' ? true : false;
+
+
+    data.proRotationImg1 = (data.proRotationImg1 !== '' && Array.isArray(data.proRotationImg1)) ? data.proRotationImg1.map((item: any) => item.id).join(',') : '';
+    data.proLogoImg1 = (data.proLogoImg1 !== '' && Array.isArray(data.proLogoImg1)) ? data.proLogoImg1.map((item: any) => item.id).join(',') : '';
+
+    form.setFieldsValue(data)
+    const { productDetail, qualityReport1, productSkuInfo, productSpecObj, commissionSetting } = data;
 
     //初始化SKU属性列表使用的图片map
     //需要初始化设置选中的图片,通过表单初始化,表单初始化数据不一致不可使用需自定义initData来实现

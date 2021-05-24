@@ -14,7 +14,7 @@ body,
   min-height: 100vh;
 }
 .ant-pro-global-header {
-  background-color: #325beb;
+  background-color: @primary-color;
 }
 
 canvas {
@@ -31,6 +31,14 @@ ul,
 ol {
   list-style: none;
 }
+
+#root .ant-pro-global-header-layout-mix {
+  // background-color: #262F3E !important;
+  background: @primary-color !important;
+  background: -webkit-linear-gradient(to right, @primary-color, @primary-color) !important;
+  background: linear-gradient(to right, @primary-color, @primary-color) !important;
+}
+
 
 @media (max-width: @screen-xs) {
   .ant-table {
@@ -60,3 +68,4 @@ ol {
   border: 1px solid #d1d1d1;
   border-radius: 5px;
 }
+

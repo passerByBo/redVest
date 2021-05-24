@@ -5,8 +5,8 @@ const Settings: LayoutSettings & {
   logo?: string;
 } = {
   navTheme: 'light',
-  // 拂晓蓝
-  primaryColor: '#325BEB',
+  // primaryColor: '#325BEB',
+  primaryColor: 'red',
   layout: 'mix',
   contentWidth: 'Fluid',
   fixedHeader: false,
