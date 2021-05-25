@@ -195,11 +195,11 @@ const Brand: React.FC = () => {
                 ]}
                 request={formatRequestListParams(getBannerList)}
                 columns={columns}
-                rowSelection={{
-                    onChange: (_, selectedRows) => {
-                        setSelectedRows(selectedRows);
-                    },
-                }}
+                // rowSelection={{
+                //     onChange: (_, selectedRows) => {
+                //         setSelectedRows(selectedRows);
+                //     },
+                // }}
             >
 
             </ProTable>
