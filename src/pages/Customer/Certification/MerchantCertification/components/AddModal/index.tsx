@@ -81,6 +81,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
 
     // 保存
     const handleFinish = async (values: any) => {
+        values.region = values.region.pop();
         onFinish(values);
     }
 
@@ -109,7 +110,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         } catch (error) {
             message.error('加载省市区数据出错，刷新后重试')
         }
-
     }
 
     useEffect(() => {

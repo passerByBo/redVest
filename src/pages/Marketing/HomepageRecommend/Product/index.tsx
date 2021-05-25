@@ -192,11 +192,11 @@ const Brand: React.FC = () => {
         ]}
         request={formatRequestListParams(getProductList)}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
+        // rowSelection={{
+        //   onChange: (_, selectedRows) => {
+        //     setSelectedRows(selectedRows);
+        //   },
+        // }}
       >
 
       </ProTable>
