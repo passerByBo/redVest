@@ -10,7 +10,6 @@ export default function formatRequestListParams(request: Function, other?: any) 
       pageNum: current,
       ...other
     });
-    console.log(res);
     return {
       data: res.data.rows || res.rows,
       success: true, //根据res判断为true还是false，false不会解析列表

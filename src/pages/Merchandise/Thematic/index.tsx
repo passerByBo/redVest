@@ -4,12 +4,12 @@ import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import type { FormValueType } from './components/UpdateForm';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { addThematic, deleteThematic,  getThematicList, updateThematic } from '@/services/merchandise/thematic';
 import UpdateForm from './components/UpdateForm'
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
+import { formatYAndN } from '@/utils/utils';
 export type ProductListItem = {
   id?: string;
   specialGroupId?: string;
@@ -71,18 +71,17 @@ const Thematic: React.FC = () => {
       title: '是否有效',
       dataIndex: 'isValid',
       search: false,
-      valueType: 'textarea',
+      render: (_) => {
+        return <span>{formatYAndN(_ as any)}</span>
+      }
     },
     {
       title: '专题描述',
-      sorter: true,
       search: false,
       dataIndex: 'specialDescribe',
-      valueType: 'dateTime',
     },
     {
       title: '专题名称图片',
-      sorter: true,
       search: false,
       dataIndex: 'specialNameImg1',
       render: (_:any, record:any) => {
@@ -186,6 +185,7 @@ const Thematic: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('编辑失败请重试！');
+        return;
       }
       hide();
       message.success('编辑成功');
@@ -244,15 +244,15 @@ const Thematic: React.FC = () => {
         ]}
         request={formatRequestListParams(getThematicList)}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
+        // rowSelection={{
+        //   onChange: (_, selectedRows) => {
+        //     setSelectedRows(selectedRows);
+        //   },
+        // }}
       >
 
       </ProTable>
-      {
+      {/* {
         selectedRowsState?.length > 0 && (
           <FooterToolbar
             extra={
@@ -282,7 +282,7 @@ const Thematic: React.FC = () => {
             <Button type="primary">批量审批</Button>
           </FooterToolbar>
         )
-      }
+      } */}
 
 
       <AddForm onCancel={handleAddCancel}

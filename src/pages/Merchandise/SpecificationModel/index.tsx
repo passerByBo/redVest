@@ -11,6 +11,7 @@ import { getSpecModelList, addSpecModel, deleteSpecMode, updateSpecMode, disable
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
+import { formatYAndN } from '@/utils/utils';
 
 export interface ISpecationModel {
   id?: string;
@@ -52,6 +53,10 @@ const SpecificationModel: React.FC = () => {
   const handleValid = useCallback(async (data: ISpecationModel | ISpecationModel[], flag: boolean) => {
     const valid = flag;
     const tap = valid ? '启用' : '禁用'
+    if (Array.isArray(data) && data.length === 0) {
+      message.warning(`请选择要${tap}的规格模板`)
+      return;
+    }
     const hide = message.loading(`正在${tap}`);
     try {
       const body = parseBody(data, valid)
@@ -106,9 +111,9 @@ const SpecificationModel: React.FC = () => {
       title: '是否启用',
       dataIndex: 'isValid',
       search: false,
-      render: (_, record) => {
+      render: (_: any) => {
         return (
-          <span>{_}</span>
+          <span>{formatYAndN(_)}</span>
         )
       }
     },
@@ -116,7 +121,7 @@ const SpecificationModel: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       search: false,
-      render: (_, record) => {
+      render: (_: string, record: any) => {
         const checked = record.isValid === 'Y' ? true : false;
         return <Space>
           <a onClick={() => handleEdit(record)}>编辑</a>
@@ -159,19 +164,19 @@ const SpecificationModel: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('编辑失败请重试！');
-        return;
+        return false;
       }
       hide();
       message.success('编辑成功');
+      handleUpdateModalVisible(false);
+      if (actionRef.current) {
+        actionRef.current.reload();
+      }
+      return true;
     } catch (error) {
       hide();
       message.error('编辑失败请重试！');
-    }
-
-    handleUpdateModalVisible(false);
-
-    if (actionRef.current) {
-      actionRef.current.reload();
+      return false;
     }
 
   }, [])
@@ -225,9 +230,9 @@ const SpecificationModel: React.FC = () => {
           <Button onClick={() => { handleValid(selectedRowsState, false) }}>
             <PlusOutlined /> 禁用
         </Button>,
-          <Button type="primary" onClick={() => { }}>
-            <ExportOutlined /> 导出
-          </Button>,
+          // <Button type="primary" onClick={() => { }}>
+          //   <ExportOutlined /> 导出
+          // </Button>,
           <Button type="primary" onClick={() => { handleAddModalVisible(true) }}>
             <PlusOutlined /> 新建
           </Button>,

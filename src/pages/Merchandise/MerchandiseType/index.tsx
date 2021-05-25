@@ -9,6 +9,7 @@ import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
 import formatRequestListParams from '@/utils/formatRequestListParams';
+import { formatYAndN } from '@/utils/utils';
 
 export interface IMerchandiseType {
   id: string;
@@ -73,6 +74,9 @@ const MerchandiseType: React.FC = () => {
       title: '是否有效',
       dataIndex: 'isValid',
       valueType: 'textarea',
+      render: (_,data) => {
+        return <span>{formatYAndN((data as any).isValid)}</span>
+      }
     },
     {
       title: '排序号',
@@ -83,8 +87,10 @@ const MerchandiseType: React.FC = () => {
     {
       title: '是否展示',
       dataIndex: 'isShow',
-      valueType: 'textarea',
       search: false,
+      render: (_) => {
+        return <span>{formatYAndN(_ as any)}</span>
+      }
     },
     {
       title: '操作',

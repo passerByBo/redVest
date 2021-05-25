@@ -16,6 +16,7 @@ import { getThematicGroupList, addThematicGroup, editThematicGroup, getThematicG
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import ImagePicker from '@/components/ImagePicker';
+import { formatYAndN } from '@/utils/utils';
 type ThematicGroupListItem = {
   id: string,
   isValid: string | boolean,
@@ -64,6 +65,9 @@ const detailColumns = [
     title: '是否有效',
     key: 'isValid',
     dataIndex: 'isValid',
+    render: (_: any) => {
+      return formatYAndN(_)
+    }
   },
   {
     title: '专题组图片',
@@ -179,8 +183,10 @@ const ThematicGroup: React.FC = () => {
     {
       title: '是否有效',
       dataIndex: 'isValid',
-      valueType: 'textarea',
       search: false,
+      render: (_) => {
+        return <span>{formatYAndN(_ as any)}</span>
+      }
     },
     {
       title: '排序',
@@ -192,7 +198,7 @@ const ThematicGroup: React.FC = () => {
       title: '专题组图片',
       dataIndex: 'specialGroupImgBig',
       search: false,
-      render: (_:any, record:any) => {
+      render: (_: any, record: any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
@@ -206,13 +212,13 @@ const ThematicGroup: React.FC = () => {
       title: '开始日期',
       sorter: true,
       dataIndex: 'startDate',
-      valueType: 'dateTime',
+      valueType: 'date',
     },
     {
       title: '结束日期',
       sorter: true,
       dataIndex: 'endDate',
-      valueType: 'dateTime',
+      valueType: 'date',
     },
     {
       title: '专题组描述',
@@ -318,15 +324,15 @@ const ThematicGroup: React.FC = () => {
         // request={getThematicGroupList}
         request={formatRequestListParams(getThematicGroupList)}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            console.log(_, selectedRows);
-            setSelectedRows(selectedRows);
-          },
-        }}
+        // rowSelection={{
+        //   onChange: (_, selectedRows) => {
+        //     console.log(_, selectedRows);
+        //     setSelectedRows(selectedRows);
+        //   },
+        // }}
       >
       </ProTable>
-      {
+      {/* {
         false && selectedRowsState?.length > 0 && (
           <FooterToolbar
             extra={
@@ -339,7 +345,7 @@ const ThematicGroup: React.FC = () => {
                 </a>
                                     项 &nbsp;&nbsp;
                                     <span>
-                  {/* 这里可以统计已选项的一些参数{selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)} 万 */}
+                  这里可以统计已选项的一些参数{selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)} 万
                 </span>
               </div>
             }
@@ -356,7 +362,7 @@ const ThematicGroup: React.FC = () => {
             <Button type="primary">批量审批</Button>
           </FooterToolbar>
         )
-      }
+      } */}
       <ModalForm
         form={updateForm}
         // initialValues={editProduct || { isValid: false }}

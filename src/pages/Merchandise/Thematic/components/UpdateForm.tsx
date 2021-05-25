@@ -24,14 +24,14 @@ export type FormValueType = {
   labelname?: string;
   isValid?: boolean | string;
   sort?: number;
-  specialNameImg1?: string;
+  specialNameImg1?: any;
   specialDescribe?: string;
   specialTypeImg?: any;
 };
 
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
-  onSubmit: (fiedls:FormValueType) => {};
+  onSubmit: (fiedls: FormValueType) => {};
   updateModalVisible: boolean;
   values: FormValueType | null;
 };
@@ -51,6 +51,8 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
     } else {
       values.isValid = false;
     }
+
+
     updateForm.setFieldsValue(values)
   }
 
@@ -103,19 +105,24 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         }
       }}
       onFinish={async (data) => {
-
-        const merge = { ...values, ...data }
+        const merge = { id: values?.id, ...data }
         if (merge.isValid === true) {
           merge.isValid = 'Y';
         } else {
           merge.isValid = 'N';
         }
-        merge.specialGroup =getNameById( merge.specialGroupId);
+        //图片转换
+        if (typeof merge.specialNameImg1 !== 'string') {
+          merge.specialNameImg1 =  merge.specialNameImg1.map((item: any) => item.id).join(',')
+        }
+
+        merge.specialGroup = getNameById(merge.specialGroupId);
+
         onSubmit(merge);
       }}
     >
       <ProForm.Group>
-      <ProFormSelect
+        <ProFormSelect
           width="md"
           name="specialGroupId"
           label="专题组"
@@ -123,7 +130,7 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
           request={async () => getThematicGroup()}
           rules={[{ required: true, message: '请输入专题组名称!' }]}
         />
-        <ProFormText width="md"  rules={[{ required: true, message: '请输入专题名称!' }]} name="specialName" label="专题名称" placeholder="请输专题入名称" />
+        <ProFormText width="md" rules={[{ required: true, message: '请输入专题名称!' }]} name="specialName" label="专题名称" placeholder="请输专题入名称" />
       </ProForm.Group>
 
       <ProForm.Group>
@@ -139,13 +146,13 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         <ImagePicker initData={values && values.specialNameImg1} limit={1} />
       </Form.Item>
       <ProForm.Group>
-        <ProFormTextArea width="xl" label="专题组描述" name="specialDescribe"  placeholder="请输入专题组描述" />
+        <ProFormTextArea width="xl" label="专题组描述" name="specialDescribe" placeholder="请输入专题组描述" />
       </ProForm.Group>
 
 
       <ProForm.Group>
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
-        <ProFormSwitch rules={[{ required: true, message: '请选择是否有效!' }]}  name="isValid" label="是否有效" />
+        <ProFormSwitch rules={[{ required: true, message: '请选择是否有效!' }]} name="isValid" label="是否有效" />
       </ProForm.Group>
 
     </ModalForm >

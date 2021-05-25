@@ -9,6 +9,7 @@ import formatRequestListParams from '@/utils/formatRequestListParams';
 import DetailDrawer from './components/DetailDrawer';
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
+import { formatYAndN } from '@/utils/utils';
 
 const isvalidEnum = {
   pass: { text: '通过', status: 'Y' },
@@ -97,22 +98,35 @@ const Brand: React.FC = () => {
       title: '是否推荐',
       search: false,
       dataIndex: 'isRecommend',
+      render: (_) => {
+        return <span>{formatYAndN(_ as any)}</span>
+      }
+
     },
     {
       title: '是否展示',
       search: false,
       dataIndex: 'isShow',
+      render: (_) => {
+        return <span>{formatYAndN(_ as any)}</span>
+      }
     },
     {
       title: '是否有效',
       dataIndex: 'isvalid',
       search: false,
+      render: (_) => {
+        return <span>{formatYAndN(_ as any)}</span>
+      }
     },
     {
       title: '是否审核通过',
       dataIndex: 'status',
       valueType: 'select',
       valueEnum: isvalidEnum,
+      render: (_,data) => {
+        return <span>{formatYAndN((data as any).status)}</span>
+      }
     },
     {
       title: '操作',
@@ -241,11 +255,11 @@ const Brand: React.FC = () => {
         ]}
         request={formatRequestListParams(getBrandList)}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
+        // rowSelection={{
+        //   onChange: (_, selectedRows) => {
+        //     setSelectedRows(selectedRows);
+        //   },
+        // }}
       >
 
       </ProTable>

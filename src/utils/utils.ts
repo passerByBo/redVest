@@ -58,3 +58,6 @@ export const fullCombination = (arr): any[] => {
 //     }, delay);
 //   };
 // };
+export function formatYAndN(tag: 'Y' | 'N'){
+  return  tag === 'Y' ? '是' : '否'
+}

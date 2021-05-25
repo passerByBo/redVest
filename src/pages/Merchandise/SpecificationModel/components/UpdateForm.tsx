@@ -187,10 +187,12 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         const fields = { ...data }
         fields.id = detail.id;
         clearData();
-        fields.specInfo = JSON.stringify(Object.fromEntries(specifiesMap.entries()));
-        onSubmit(fields);
-        setSpecifiesMap(new Map())
-        clearData();
+        fields.specInfo = Object.fromEntries(specifiesMap.entries());
+        let success = await onSubmit(fields);
+        if (success) {
+          setSpecifiesMap(new Map())
+          clearData();
+        }
       }}
     >
       <Form.Item
