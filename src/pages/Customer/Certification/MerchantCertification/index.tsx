@@ -180,7 +180,7 @@ const MerchantCertification: React.FC = () => {
                     headerTitle="商家认证管理"
                     actionRef={actionRef}
                     options={{ search: false, fullScreen: false, reload: true, setting: false, density: false }}
-                    rowKey="key"
+                    rowKey="id"
                     search={{
                         labelWidth: 100,
                         defaultCollapsed: false,

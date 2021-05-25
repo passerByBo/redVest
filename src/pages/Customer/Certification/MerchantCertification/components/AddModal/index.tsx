@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Input, Form, Select, DatePicker, Upload, Button, Radio, Image } from 'antd';
+import { Modal, Input, Form, Select, DatePicker, message, Button, Radio, Cascader } from 'antd';
+import { getProvinceList } from '@/services/user/register';
 import SelectPictureModal from '@/components/SelectPictureModal';
 import { PlusOutlined } from '@ant-design/icons';
 import styles from '../../style.less'
@@ -14,6 +15,15 @@ export interface AddModalProps {
     onFinish: (values: any) => void;
 }
 
+interface IOptions {
+    value: number;
+    label: string;
+    isLeaf?: boolean;
+}
+function getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
+}
+
 const nowTime = new Date();
 const timePoint = nowTime.getFullYear() + "" + (nowTime.getMonth() + 1) + nowTime.getDay();
 
@@ -26,21 +36,23 @@ const initData = {
     "inprovinces": "北京市",
     "incities": "北京市",
     "region": [],
+    "selfSupport": "是",
     "nameAgent": "北京代理",
     "adressOffice": "北京市通州区物流基地兴贸二街16号581室",
     "businesslicense": "红背心fg_logo.png",
     "companyprofile": "红背心成立于2014年，是汇安居（北京）信息科技有限公司打造的一个为全国家居电商提供专业的仓储、配送、安装、维修以及售后服务一体化的服务平台。红背心以“专注服务，安全高效”为品牌理念，为商家提供一站式售后解决方案，帮助商家为消费者提供高标准的家具送装服务体验。同时结合互联网应用技术实现全供应链的全程节点管控和信息管理同步，为商家提供全链数据和信息支持，进一步降低商家物流、售后服务成本。也为全国师傅提供行业内标准化、规范化的事业平台。",
     "shopname": "红背心自营商城",
-    "shopmobile": "17600133016",
+    "shopmobile": "176001330" + getRandomInt(9) + getRandomInt(9),
     "authorizedFile": "红背心fg_logo.png",
     "authorizedUsername": "红背心自营店长",
-    "authorizedUserTel": "15210140885",
+    "authorizedUserTel": "152101885" + getRandomInt(9) + getRandomInt(9),
     "authorizedUserMail": "jianghua@hongbeixin.com",
-    "officeTel": "15210140885",
+    "officeTel": "152101408" + getRandomInt(9) + getRandomInt(9),
     "contaccessory": "红背心fg_logo.png",
     "bankDeposit": "招商银行",
     "accountName": "科技信息公司",
     "bankAccount": "621010101010101010",
+    "settlementtype": "按周结算"
 }
 
 
@@ -53,11 +65,19 @@ const tailLayout = {
     wrapperCol: { offset: 6, span: 6 },
 };
 
+function formatCascaderData<T>(arr: T[], tag: boolean = false) {
+    if (!arr || !Array.isArray(arr)) return [];
+    return arr.map((item) => {
+        return { ...item, isLeaf: tag }
+    })
+}
+
 const AddModal: React.FC<AddModalProps> = (props) => {
     const [form] = Form.useForm();
     const [transactForm] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
     const [transactVisible, setTransactVisible] = useState<boolean>(false);
+    const [chinaDivisionsOptions, setChinaDivisionsOptions] = useState<IOptions[]>([]);
 
     // 保存
     const handleFinish = async (values: any) => {
@@ -73,6 +93,34 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         const values = await transactForm.validateFields();
         console.log(values)
     }
+
+    const loadDivisionsData = async (selectedOptions: any) => {
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        try {
+            const res = await getProvinceList({ pNo: targetOption.value });
+            if (res.status === 200 && res.code === 200) {
+                targetOption.children = formatCascaderData<IOptions>([...res.data], targetOption.value.length >= 4);
+                targetOption.loading = false;
+                setChinaDivisionsOptions([...chinaDivisionsOptions]);
+            } else {
+                message.error(res.msg)
+            }
+        } catch (error) {
+            message.error('加载省市区数据出错，刷新后重试')
+        }
+
+    }
+
+    useEffect(() => {
+        getProvinceList().then(res => {
+            if (res.status === 200 && res.code === 200) {
+                setChinaDivisionsOptions(formatCascaderData<IOptions>([...res.data]))
+            }
+        }, error => {
+            message.error('加载省市区数据出错！')
+        })
+    }, [])
 
     return (
         <Modal
@@ -145,35 +193,21 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     <Input placeholder="请输入纳税人识别号" allowClear />
                 </FormItem>
 
-                <FormItem
-                    label="所在省"
-                    name="inprovinces"
+                <Form.Item name='region' label="所在省市区"
+                    rules={[
+                        {
+                            required: true,
+                            message: '所在省市不能为空！',
+                        }
+                    ]}
                 >
-                    <Select>
-                        <Option value="0">是</Option>
-                        <Option value="1">否</Option>
-                    </Select>
-                </FormItem>
-
-                <FormItem
-                    label="所在市"
-                    name="incities"
-                >
-                    <Select>
-                        <Option value="0">是</Option>
-                        <Option value="1">否</Option>
-                    </Select>
-                </FormItem>
-
-                <FormItem
-                    label="所在区"
-                    name="region"
-                >
-                    <Select>
-                        <Option value="0">是</Option>
-                        <Option value="1">否</Option>
-                    </Select>
-                </FormItem>
+                    <Cascader
+                        placeholder="请选择所在省市区"
+                        options={chinaDivisionsOptions}
+                        loadData={loadDivisionsData}
+                        changeOnSelect
+                    />
+                </Form.Item>
 
                 <FormItem
                     label="详细地址"
@@ -207,7 +241,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     label="是否自营"
                     name="selfSupport"
                 >
-                    <Select defaultValue="是">
+                    <Select>
                         <Option value="是">是</Option>
                         <Option value="否">否</Option>
                     </Select>
