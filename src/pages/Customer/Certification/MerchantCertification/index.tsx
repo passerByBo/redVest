@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
+import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import { PlusOutlined } from '@ant-design/icons';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import { message, Button } from 'antd';
@@ -8,7 +8,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import FlowStep from './components/FlowStep';
 import AddModal from './components/AddModal';
 
-import { getMerchantCertificateList, saveApply } from '@/services/customer/index';
+import { getMerchantCertificateList, saveApply, removeRule } from '@/services/customer/index';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import type { TableListItem, TableListParams } from './data';
 
@@ -60,24 +60,25 @@ const handleAdd = async (fields: TableListParams) => {
  * @param selectedRows
  */
 const handleRemove = async (selectedRows: TableListItem[]) => {
-    // const hide = message.loading('正在删除');
-    // try {
-    //     await removeRule({
-    //         ids: selectedRows.map((row) => row.id).join(','),
-    //     });
-    //     hide();
-    //     message.success('删除成功');
-    //     return true;
-    // } catch (error) {
-    //     hide();
-    //     message.error('删除失败！');
-    //     return false;
-    // }
+    const hide = message.loading('正在删除');
+    try {
+        await removeRule({
+            ids: selectedRows.map((row) => row.id).join(','),
+        });
+        hide();
+        message.success('删除成功');
+        return true;
+    } catch (error) {
+        hide();
+        message.error('删除失败！');
+        return false;
+    }
 };
 
 const MerchantCertification: React.FC = () => {
     const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
     const [flowStepVisible, setFlowStepVisible] = useState<boolean>(false);
+    const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
     const [statusKey, setStatusKey] = useState<string>('代办');
     const [btnIndex, setBtnIndex] = useState<number>(0);
     const actionRef = useRef<ActionType>();
@@ -100,6 +101,13 @@ const MerchantCertification: React.FC = () => {
     const onCancel = () => {
         setFlowStepVisible(false);
     };
+
+    // 删除
+    const removeSingleRow = (selectedRows: TableListItem[]) => {
+        handleRemove(selectedRows)
+        setSelectedRows([]);
+        actionRef.current?.reloadAndRest?.();
+    }
 
     const columns: ProColumns<TableListItem>[] = [
         {
@@ -200,9 +208,28 @@ const MerchantCertification: React.FC = () => {
                     columns={columns}
                     rowSelection={{
                         onChange: (_, selectedRows) => {
+                            setSelectedRows(selectedRows)
                         },
                     }}
                 />
+                {
+                    selectedRowsState?.length > 0 && (
+                        <FooterToolbar
+                            extra={
+                                <div>
+                                    已选择 <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a> 项
+              </div>
+                            }
+                        >
+                            <Button
+                                onClick={() => {
+                                    removeSingleRow(selectedRowsState);
+                                }}
+                                type='primary'
+                                danger>批量删除</Button>
+                        </FooterToolbar>
+                    )
+                }
             </PageContainer>
             <AddModal
                 visible={addModalVisible}
