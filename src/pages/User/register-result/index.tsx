@@ -7,13 +7,13 @@ import styles from './style.less';
 
 const actions = (
   <div className={styles.actions}>
-    <a href="/">
+    {/* <a href="/">
       <Button size="large" type="primary">
         查看表单
       </Button>
-    </a>
+    </a> */}
     <Link to="/">
-      <Button size="large">
+      <Button size="large" type="primary">
         返回首页
       </Button>
     </Link>

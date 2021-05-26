@@ -7,6 +7,7 @@ import { addLabel, deleteLabel, getLabelList, updateLabel, validLabel } from '@/
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import AddForm from './component/AddForm';
 import UpdateForm from './component/UpdateForm';
+import { formatYAndN } from '@/utils/utils';
 
 export interface ILabel {
   id: string;
@@ -74,12 +75,15 @@ const Label: React.FC = () => {
       title: '标签名称',
       dataIndex: 'labelname',
       valueType: 'textarea',
-      tip: '规则名称是唯一的 key',
+      // tip: '规则名称是唯一的 key',
     },
     {
       title: '是否有效',
       dataIndex: 'isValid',
-      search: false
+      search: false,
+      render: (_) => {
+        return <span>{formatYAndN(_ as 'Y' | 'N')}</span>
+      }
     },
     {
       title: '操作',

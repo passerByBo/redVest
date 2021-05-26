@@ -78,15 +78,15 @@ const Recycle: React.FC = () => {
       title: '商品图片',
       dataIndex: 'imgUrl',
       search: false,
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+             src={_ && Array.isArray(_) &&  _[0] && _[0].imgUrl}
           />
         )
-      }
+      },
     },
     {
       title: '商品名称',

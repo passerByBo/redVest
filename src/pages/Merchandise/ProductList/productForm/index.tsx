@@ -25,7 +25,8 @@ const initData = {
   "isBoutique": "Y",
   "commissionSetting": "默认设置",
   "freightSetting": "免费包邮",
-  "productStatus": "上架"
+  "productStatus": "待上架",
+  "sort": 999,
 }
 
 const { SHOW_ALL } = TreeSelect;
@@ -1008,10 +1009,11 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Row gutter={16}>
               <Col  {...smallItemLayout}>
                 <Form.Item name="productStatus" label="商品状态">
-                  <Radio.Group onChange={() => { }} value={1}>
+                  <span>待上架</span>
+                  {/* <Radio.Group onChange={() => { }} value={1}>
                     <Radio value={'上架'}>上架</Radio>
                     <Radio value={'下架'}>下架</Radio>
-                  </Radio.Group>
+                  </Radio.Group> */}
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>

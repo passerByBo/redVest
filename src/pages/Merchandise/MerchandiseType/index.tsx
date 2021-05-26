@@ -52,11 +52,11 @@ const MerchandiseType: React.FC = () => {
       title: '商品类型名称',
       dataIndex: 'typeName',
       valueType: 'textarea',
-      render: ((_, item) => {
-        return (
-          <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
-        )
-      })
+      // render: ((_, item) => {
+      //   return (
+      //     <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
+      //   )
+      // })
     },
     {
       title: '级别',
