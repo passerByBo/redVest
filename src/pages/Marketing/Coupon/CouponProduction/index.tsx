@@ -81,9 +81,13 @@ const CouponProduction: React.FC = () => {
       <PlusOutlined />
       新建
     </Button>,
-    <Button key="delete" danger onClick={() => {
-      removeSingleRow(selectedRowsState);
-    }}>
+    <Button
+      type="primary"
+      key="delete" 
+      danger 
+      onClick={() => {
+        removeSingleRow(selectedRowsState);
+      }}>
       <DeleteOutlined />
       删除
     </Button>,

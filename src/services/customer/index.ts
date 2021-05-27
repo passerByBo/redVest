@@ -48,13 +48,25 @@ export async function getMerchantCertificateList(
 }
 
 /**
- * 新建（保存）
+ * 新建
  */
-export async function saveApply(body: any) {
+export async function updateItem(params: any) {
     return request('/customer/shopInfo/insert', {
         method: 'POST',
         data: {
-            ...body,
+            ...params,
+        }
+    });
+}
+
+/**
+ * 办理
+ */
+export async function transactItem(params: any) {
+    return request('/customer/shopInfo/handle', {
+        method: 'POST',
+        data: {
+            ...params,
         }
     });
 }
@@ -62,20 +74,21 @@ export async function saveApply(body: any) {
 /**
  * 删除
  */
-export async function removeRule(params: { ids: string }) {
-    return request(`/customer/journalismType/${params.ids}`, {
+export async function removeItem(params: { ids: string }) {
+    return request(`/customer/shopInfo/${params.ids}`, {
         method: 'delete',
     });
 }
 
 /**
- * 更新
+ * 获取详情
  */
-export async function updateRule(params: any) {
-    return request('/customer/journalismType', {
-        method: 'put',
-        data: {
-            ...params,
-        },
+export async function getItemDetail(
+    params: { [key: string]: unknown },
+    options?: { [key: string]: unknown },
+) {
+    return request(`/customer/shopInfo/${params.id}`, {
+        method: 'GET',
+        ...(options || {}),
     });
 }
