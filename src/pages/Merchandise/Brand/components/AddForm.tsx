@@ -40,7 +40,8 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       visible={addModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
-          onCancel(false)
+          onCancel(false);
+          addForm.resetFields();
         }
       }}
       onFinish={async (data) => {
@@ -65,7 +66,10 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         } else {
           fields.status = 'N';
         }
-        onSubmit(fields);
+        let success = await onSubmit(fields);
+        if(success) {
+          addForm.resetFields();
+        }
       }}
     >
       <ProForm.Group>

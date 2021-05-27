@@ -78,15 +78,15 @@ const Recycle: React.FC = () => {
       title: '商品图片',
       dataIndex: 'imgUrl',
       search: false,
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ as string}
+             src={_ && Array.isArray(_) &&  _[0] && _[0].imgUrl}
           />
         )
-      }
+      },
     },
     {
       title: '商品名称',
@@ -155,8 +155,10 @@ const Recycle: React.FC = () => {
         title: '商品回收站',
       }}>
       <ProTable<ProductListItem, API.PageParams>
+        tableAlertOptionRender={false}
+        tableAlertRender={false}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{ labelWidth: 120 }}
         request={formatRequestListParams(getProductList, { productStatus: '已回收' })}
         columns={columns}
@@ -164,6 +166,7 @@ const Recycle: React.FC = () => {
           onChange: (_, selectedRows) => {
           },
         }}
+
       >
 
       </ProTable>

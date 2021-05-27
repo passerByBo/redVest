@@ -77,3 +77,11 @@ export async function updateDeliveryInfo(body: any, options?: { [key: string]: a
     ...(options || {}),
   });
 }
+
+export async function refundOrder(body?:{[key:string]: any}, options?: { [key: string]: any }){
+  return request('/order/refundOrder', {
+    method: 'POST',
+    data: { ...body },
+    ...(options || {}),
+  });
+}

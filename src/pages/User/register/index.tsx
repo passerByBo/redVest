@@ -124,9 +124,9 @@ const Register: React.FC = () => {
     // fields.businesslicense = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
     // fields.authorizedFile = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';
 
-    fields.contaccessory = fields.contaccessory.map((item:any) => item.response.fileName).join(',')
-    fields.businesslicense = fields.businesslicense.map((item:any) => item.response.fileName).join(',')
-    fields.authorizedFile = fields.authorizedFile.map((item:any) => item.response.fileName).join(',')
+    fields.contaccessory = fields.contaccessory.map((item: any) => item.response.fileName).join(',')
+    fields.businesslicense = fields.businesslicense.map((item: any) => item.response.fileName).join(',')
+    fields.authorizedFile = fields.authorizedFile.map((item: any) => item.response.fileName).join(',')
 
     let hide = message.loading('正在注册中！')
     try {
@@ -172,7 +172,7 @@ const Register: React.FC = () => {
     return e && e.fileList;
   };
 
-  const uploadChange = (info:any) => {
+  const uploadChange = (info: any) => {
     const { status } = info.file;
     if (status !== 'uploading') {
     }
@@ -204,7 +204,7 @@ const Register: React.FC = () => {
             {...layout}
             form={form}
             onFinish={async (values) => {
-              console.log('values',values)
+              console.log('values', values)
               let success = await submit(values);
               if (success) {
                 history.push('/user/register-result?name=' + form.getFieldValue('compName'))
@@ -252,7 +252,7 @@ const Register: React.FC = () => {
                 }
               ]}
             >
-              <TextArea  placeholder='请输入主营业务' rows={8} />
+              <TextArea placeholder='请输入主营业务' rows={8} />
             </Form.Item>
 
             <FormItem
@@ -312,7 +312,7 @@ const Register: React.FC = () => {
                     message: '营业执照不能为空！',
                   }
                 ]}>
-                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info:any) => uploadChange(info)}>
+                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info: any) => uploadChange(info)}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                   </p>
@@ -333,7 +333,7 @@ const Register: React.FC = () => {
                 }
               ]}
             >
-              <TextArea  placeholder='请输入企业简介' rows={8} />
+              <TextArea placeholder='请输入企业简介' rows={8} />
             </Form.Item>
 
             <FormItem
@@ -377,7 +377,7 @@ const Register: React.FC = () => {
                     message: '公司授权书不能为空！',
                   }
                 ]}>
-                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info:any) => uploadChange(info)}>
+                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info: any) => uploadChange(info)}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                   </p>
@@ -425,6 +425,10 @@ const Register: React.FC = () => {
               name="authorizedUserMail"
               rules={[
                 {
+                  pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
+                  message: '邮箱格式不正确',
+                },
+                {
                   required: true,
                   message: '授权联系人邮箱不能为空！',
                 }
@@ -461,7 +465,7 @@ const Register: React.FC = () => {
                     message: '合同附件不能为空！',
                   }
                 ]}>
-                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info:any) => uploadChange(info)}>
+                <Upload.Dragger multiple={true} name="file" action="/prod-api/mall/common/upload" onChange={(info: any) => uploadChange(info)}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                   </p>

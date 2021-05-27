@@ -43,8 +43,8 @@ const detailColumns = [
   },
   {
     title: '开始日期',
-    key: 'specialGroup',
-    dataIndex: 'specialGroup',
+    key: 'startDate',
+    dataIndex: 'startDate',
   },
   {
     title: '结束日期',
@@ -324,12 +324,12 @@ const ThematicGroup: React.FC = () => {
         // request={getThematicGroupList}
         request={formatRequestListParams(getThematicGroupList)}
         columns={columns}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => {
-        //     console.log(_, selectedRows);
-        //     setSelectedRows(selectedRows);
-        //   },
-        // }}
+      // rowSelection={{
+      //   onChange: (_, selectedRows) => {
+      //     console.log(_, selectedRows);
+      //     setSelectedRows(selectedRows);
+      //   },
+      // }}
       >
       </ProTable>
       {/* {
@@ -371,13 +371,15 @@ const ThematicGroup: React.FC = () => {
         onVisibleChange={(visible) => {
           if (!visible) {
             setEditProduct(null);
+            updateForm.resetFields();
           }
           handleModalVisible(visible)
         }}
         onFinish={async (value) => {
-          value.isValid = 'N';
           if (value.hasOwnProperty('isValid') && value.isValid) {
             value.isValid = 'Y';
+          } else {
+            value.isValid = 'N';
           }
 
           let success;

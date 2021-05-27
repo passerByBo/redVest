@@ -1,8 +1,8 @@
-import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined, EyeOutlined, ConsoleSqlOutlined } from '@ant-design/icons';
+import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined, EyeOutlined, ConsoleSqlOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Image, Divider } from 'antd';
+import { Button, message, Image, Divider, Modal, notification } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import type { FormValueType } from '../components/UpdateForm';
 import { getProductList, onAndOffShelves } from '@/services/merchandise/product';
@@ -10,7 +10,7 @@ import { SKUTip, SPUTip } from '../tips';
 
 import LogTableModal from '../components/LogTableModal';
 import SKUTableModal from '../components/SKUTableModal';
-import { history , useModel} from 'umi';
+import { history, useModel } from 'umi';
 import 'braft-editor/dist/index.css';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { getIds } from '@/utils/utils';
@@ -137,6 +137,7 @@ const List: React.FC = (props) => {
 
   const updateShelves = async (data: ProductListItem | ProductListItem[], shelves: string) => {
     if (!data || data.length === 0) return;
+
     let hide = message.loading('正在' + shelves + '中!');
     let ids = getIds<ProductListItem>(data);
     try {
@@ -156,41 +157,116 @@ const List: React.FC = (props) => {
     }
   }
 
-  const gen = () => {
-    console.log('|', selectedRowsState)
+  const productRecycle = async (data: ProductListItem | ProductListItem[]) => {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      message.warning('请选择要删除的商品')
+      return;
+    };
+
+    Modal.confirm({
+      title: '提示',
+      icon: <ExclamationCircleOutlined />,
+      content: '是否确认删除商品，删除后的商品可在回收站查看！',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        let hide = message.loading('正在回收中!');
+        let ids = getIds<ProductListItem>(data);
+        try {
+          let res = await onAndOffShelves({ action: '回收', ids });
+          if (res.status === 200 && res.code !== 200) {
+            hide();
+            message.error('回收失败，' + res.msg);
+            return;
+          }
+
+          hide();
+          message.success('回收成功！');
+          actionRef.current?.reloadAndRest?.();
+        } catch (error) {
+          hide();
+          message.error('回收失败，请重试！')
+        }
+      }
+    })
   }
 
+  const shelvesUp = async (data: ProductListItem | ProductListItem[], shelves: string) => {
+    if (!data || data.length === 0) {
+      message.warning(`请选择要${shelves}的商品！`)
+      return;
+    };
 
-  const addBtn = useMemo(() => {
-    let selectData = selectedRowsState;
-    return (<Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
-      <PlusOutlined />新建
-    </Button>)
-  }, [selectedRowsState])
+    Modal.confirm({
+      title: '提示',
+      icon: <ExclamationCircleOutlined />,
+      content: '是否确认进行上架操作？上架后的上可在“商品列表：已上架”页面可查看',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        let hide = message.loading('正在' + shelves + '中!');
+        let ids = getIds<ProductListItem>(data);
+        try {
+          let res = await onAndOffShelves({ action: shelves, ids });
+          if (res.status === 200 && res.code !== 200) {
+            if (res.code === 412) {
+              notification.error({
+                message: '请注意，您的信息未填写完整，暂不可上架',
+                description: res.msg,
+              })
+              return;
+            }
+            hide();
+            message.error(shelves + '失败，' + res.msg);
+            return;
+          }
 
-  const deleteBtn = useMemo(() => {
-    let selectData = selectedRowsState;
-    return (
-      <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectData, '删除') }}>
-        <DeleteOutlined />删除
-      </Button>
-    )
-  }, [selectedRowsState])
+          hide();
+          message.success(shelves + '成功！');
+          actionRef.current?.reloadAndRest?.();
+        } catch (error) {
+          hide();
+          message.error(shelves + '失败，请重试！')
+        }
+      }
+    });
+  }
 
-  const addedBtn = useMemo(() => {
-    let selectData = selectedRowsState;
-    return (
-      <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectData, '上架') }}>
-        <VerticalAlignTopOutlined />上架
-      </Button>
-    )
-  }, [selectedRowsState])
+  // const gen = () => {
+  //   console.log('|', selectedRowsState)
+  // }
 
-  const downBtn = (
-    <Button ghost type="primary" key="primary" onClick={gen}>
-      <VerticalAlignBottomOutlined />下架
-    </Button>
-  )
+
+  // const addBtn = useMemo(() => {
+  //   let selectData = selectedRowsState;
+  //   return (<Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
+  //     <PlusOutlined />新建
+  //   </Button>)
+  // }, [selectedRowsState])
+
+  // const deleteBtn = useMemo(() => {
+  //   let selectData = selectedRowsState;
+  //   return (
+  //     <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectData, '删除') }}>
+  //       <DeleteOutlined />删除
+  //     </Button>
+  //   )
+  // }, [selectedRowsState])
+
+  // const addedBtn = useMemo(() => {
+  //   let selectData = selectedRowsState;
+  //   return (
+  //     <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectData, '上架') }}>
+  //       <VerticalAlignTopOutlined />上架
+  //     </Button>
+  //   )
+  // }, [selectedRowsState])
+
+  // const downBtn = (
+  //   <Button ghost type="primary" key="primary" onClick={gen}>
+  //     <VerticalAlignBottomOutlined />下架
+  //   </Button>
+  // )
 
   const columns: ProColumns<ProductListItem>[] = [
     {
@@ -208,19 +284,19 @@ const List: React.FC = (props) => {
       width: 300,
       render: ((_, item) => {
         return (
-          <a onClick={() => { setCurrentProduct(item);history.push(`/merchandise/product/list/${item.id}`) }}>{_}</a>
+          <a onClick={() => { setCurrentProduct(item); history.push(`/merchandise/product/list/${item.id}`) }}>{_}</a>
         )
       })
     },
     {
       title: '商品主图',
       dataIndex: 'proLogoImg1',
-      render: (_:any, record:any) => {
+      render: (_: any, record: any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-             src={_ && Array.isArray(_) &&  _[0] && _[0].imgUrl}
+            src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
           />
         )
       },
@@ -252,7 +328,7 @@ const List: React.FC = (props) => {
       dataIndex: 'skuCount',
       search: false,
       render: (_, record) => (
-        <a onClick={() => { setCurrentRow(record);setSKUTableModalVisible(true) }}>{_}</a>
+        <a onClick={() => { setCurrentRow(record); setSKUTableModalVisible(true) }}>{_}</a>
       )
     },
     {
@@ -279,18 +355,19 @@ const List: React.FC = (props) => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
+      width: 200,
       render: (_, record) => {
         let { productStatus } = record;
         return <>
-          <a onClick={() => {setCurrentRow(record);setLogTableModalVisible(true)}}>日志</a>
+          <a onClick={() => { setCurrentRow(record); setLogTableModalVisible(true) }}>日志</a>
           <Divider type="vertical" />
           <a onClick={() => { history.push(`/merchandise/product/edit?id=${record.id}`) }}>编辑</a>
           <Divider type="vertical" />
-          {productStatus === '上架' ? <a onClick={() => updateShelves(record, '下架')}>下架</a> : <a onClick={() => updateShelves(record, '上架')}>上架</a>}
+          {productStatus === '上架' ? <a onClick={() => updateShelves(record, '下架')}>下架</a> : <a onClick={() => shelvesUp(record, '上架')}>上架</a>}
           {
             productStatus === '下架' && <>
               <Divider type="vertical" />
-              <a onClick={() => updateShelves(record, '删除')}>删除</a>
+              <a onClick={() => productRecycle(record)}>删除</a>
             </>
           }
 
@@ -335,17 +412,49 @@ const List: React.FC = (props) => {
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
-         productTab === '下架' && (<Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectedRowsState, '回收') }}>
+          productTab === '下架' && (<Button ghost type="primary" key="primary" onClick={() => {
+
+            if (!Array.isArray(selectedRowsState) || selectedRowsState.length === 0) {
+              message.warning('请选择要删除的商品')
+              return;
+            }
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '确认要将所有选中的商品放入回收站吗？',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                updateShelves(selectedRowsState, '回收')
+              }
+            })
+          }}>
             <DeleteOutlined />删除
           </Button>),
-           (productTab === '下架' ||   productTab === '待上架') &&<Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectedRowsState, '上架') }}>
+          (productTab === '下架' || productTab === '待上架') && <Button ghost type="primary" key="primary" onClick={() => { shelvesUp(selectedRowsState, '上架') }}>
             <VerticalAlignTopOutlined />上架
           </Button>,
-         productTab === '上架' && <Button ghost type="primary" key="primary" onClick={() => { updateShelves(selectedRowsState, '下架') }}>
+          productTab === '上架' && <Button ghost type="primary" key="primary" onClick={() => {
+            if (!Array.isArray(selectedRowsState) || selectedRowsState.length === 0) {
+              message.warning('请选择要下架的商品')
+              return;
+            }
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '确认要将所有选中的商品下架吗？',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                updateShelves(selectedRowsState, '下架')
+              }
+            })
+
+          }}>
             <VerticalAlignBottomOutlined />下架
            </Button>,
-             <Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
-             <PlusOutlined />新建
+          <Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>
+            <PlusOutlined />新建
            </Button>
         ]}
         request={formatRequestListParams(getProductList, { productStatus: productTab })}
@@ -372,7 +481,7 @@ const List: React.FC = (props) => {
                                     项 &nbsp;&nbsp;
                                     <span>
                   {/* 这里可以统计已选项的一些参数 */}
-                                    </span>
+                </span>
               </div>
             }
           >

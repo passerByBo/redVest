@@ -100,25 +100,25 @@ const Thematic: React.FC = () => {
       dataIndex: 'sort',
       valueType: 'textarea',
     },
-    {
-      title: '专题类型',
-      dataIndex: 'specialType',
-      valueType: 'textarea',
-    },
-    {
-      title: '专题类型图片',
-      search: false,
-      dataIndex: 'specialTypeImg',
-      render: (_:any, record:any) => {
-        return (
-          <Image
-            preview={{ mask: <EyeOutlined /> }}
-            width={40}
-            src={_ && _[0].imgUrl}
-          />
-        )
-      }
-    },
+    // {
+    //   title: '专题类型',
+    //   dataIndex: 'specialType',
+    //   valueType: 'textarea',
+    // },
+    // {
+    //   title: '专题类型图片',
+    //   search: false,
+    //   dataIndex: 'specialTypeImg',
+    //   render: (_:any, record:any) => {
+    //     return (
+    //       <Image
+    //         preview={{ mask: <EyeOutlined /> }}
+    //         width={40}
+    //         src={_ && _[0].imgUrl}
+    //       />
+    //     )
+    //   }
+    // },
     {
       title: '操作',
       dataIndex: 'option',

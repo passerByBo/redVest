@@ -12,8 +12,8 @@ import AddForm from './components/AddForm';
 import { formatYAndN } from '@/utils/utils';
 
 const isvalidEnum = {
-  pass: { text: '通过', status: 'Y' },
-  Fail: { text: '不通过', status: 'N' },
+  Y: { text: '通过', status: 'Y' },
+  N: { text: '不通过', status: 'N' },
 };
 
 export interface IBrand {
@@ -48,7 +48,7 @@ const Brand: React.FC = () => {
     {
       title: '商品品牌',
       dataIndex: 'productBrand',
-      render: ((_, item:IBrand) => {
+      render: ((_, item: IBrand) => {
         return (
           <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
         )
@@ -63,7 +63,7 @@ const Brand: React.FC = () => {
       title: '品牌logo',
       dataIndex: 'logo',
       search: false,
-      render: (_:any, record:any) => {
+      render: (_: any, record: any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
@@ -77,7 +77,7 @@ const Brand: React.FC = () => {
       title: '品牌专区大图',
       dataIndex: 'brandImg',
       search: false,
-      render: (_:any, record:any) => {
+      render: (_: any, record: any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
@@ -124,7 +124,7 @@ const Brand: React.FC = () => {
       dataIndex: 'status',
       valueType: 'select',
       valueEnum: isvalidEnum,
-      render: (_,data) => {
+      render: (_, data) => {
         return <span>{formatYAndN((data as any).status)}</span>
       }
     },
@@ -223,13 +223,15 @@ const Brand: React.FC = () => {
       if (res.status === 200 && res.code !== 200) {
         hide();
         message.error('新增失败请重试！');
-        return;
+        return false;
       }
       hide();
       message.success('新增成功');
+
     } catch (error) {
       hide();
       message.error('新增失败请重试！');
+      return false;
     }
 
     handleAddModalVisible(false);
@@ -237,6 +239,7 @@ const Brand: React.FC = () => {
     if (actionRef.current) {
       actionRef.current.reload();
     }
+    return true;
 
   }, [])
 
@@ -255,11 +258,11 @@ const Brand: React.FC = () => {
         ]}
         request={formatRequestListParams(getBrandList)}
         columns={columns}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => {
-        //     setSelectedRows(selectedRows);
-        //   },
-        // }}
+      // rowSelection={{
+      //   onChange: (_, selectedRows) => {
+      //     setSelectedRows(selectedRows);
+      //   },
+      // }}
       >
 
       </ProTable>

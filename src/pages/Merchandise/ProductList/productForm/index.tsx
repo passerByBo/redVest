@@ -25,7 +25,8 @@ const initData = {
   "isBoutique": "Y",
   "commissionSetting": "默认设置",
   "freightSetting": "免费包邮",
-  "productStatus": "上架"
+  "productStatus": "待上架",
+  "sort": 999,
 }
 
 const { SHOW_ALL } = TreeSelect;
@@ -448,16 +449,16 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
         skuName: name,
         propertiesObj,
         skuImg: '',
-        articleNo: 0,
-        salePrice: 0,
-        supplyPrice: 0,
-        marketPrice: 0,
-        inventory: 0,
-        inventoryWarn: 0,
-        weight: 0,
-        volume: 0,
-        firReturnCommiss: 0,
-        secReturnCommiss: 0,
+        articleNo: '',
+        salePrice: '',
+        supplyPrice: '',
+        marketPrice: '',
+        inventory: '',
+        inventoryWarn: '',
+        weight: '',
+        volume: '',
+        firReturnCommiss: '',
+        secReturnCommiss: '',
       }
     })
   }
@@ -532,6 +533,11 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     {
       title: <TableTitle title='库存' callback={(value: string) => { hangleColumnChange(value, 'inventory') }} />,
       dataIndex: 'inventory',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='库存预警值' callback={(value: string) => { hangleColumnChange(value, 'inventoryWarn') }} />,
+      dataIndex: 'inventoryWarn',
       editable: false,
     },
     {
@@ -649,6 +655,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     {
       title: 'SKU属性',
       dataIndex: 'skuName',
+      editable: false,
     },
     {
       title: '商品图片',
@@ -691,6 +698,11 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     {
       title: <TableTitle title='库存' callback={(value: string) => { hangleColumnChange(value, 'inventory') }} />,
       dataIndex: 'inventory',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='库存预警值' callback={(value: string) => { hangleColumnChange(value, 'inventoryWarn') }} />,
+      dataIndex: 'inventoryWarn',
       editable: true,
     },
     {
@@ -1008,10 +1020,11 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
             <Row gutter={16}>
               <Col  {...smallItemLayout}>
                 <Form.Item name="productStatus" label="商品状态">
-                  <Radio.Group onChange={() => { }} value={1}>
+                  <span>待上架</span>
+                  {/* <Radio.Group onChange={() => { }} value={1}>
                     <Radio value={'上架'}>上架</Radio>
                     <Radio value={'下架'}>下架</Radio>
-                  </Radio.Group>
+                  </Radio.Group> */}
                 </Form.Item>
               </Col>
               <Col  {...smallItemLayout}>

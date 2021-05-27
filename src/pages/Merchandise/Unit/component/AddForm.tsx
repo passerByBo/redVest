@@ -29,6 +29,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       onVisibleChange={(visible) => {
         if (!visible) {
           onCancel(false)
+          addForm.resetFields();
         }
       }}
       onFinish={async (data) => {

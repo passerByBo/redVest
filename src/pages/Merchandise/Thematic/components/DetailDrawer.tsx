@@ -97,11 +97,11 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
       key: 'specialDescribe',
       dataIndex: 'specialDescribe',
     },
-    {
-      title: '专题类型',
-      key: 'specialType',
-      dataIndex: 'specialType',
-    },
+    // {
+    //   title: '专题类型',
+    //   key: 'specialType',
+    //   dataIndex: 'specialType',
+    // },
     {
       title: '专题图片',
       key: 'specialNameImg1',
@@ -118,20 +118,20 @@ const DetailDrawer: React.FC<IDetailDrawerProps> = (props) => {
         )
       }
     },
-    {
-      title: '专题组图片',
-      key: 'specialTypeImg',
-      dataIndex: 'specialTypeImg',
-      render: (_) => {
-        return (
-          <Image
-            preview={{ mask: <EyeOutlined /> }}
-            width={80}
-            src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
-          />
-        )
-      }
-    },
+    // {
+    //   title: '专题类型图片',
+    //   key: 'specialTypeImg',
+    //   dataIndex: 'specialTypeImg',
+    //   render: (_) => {
+    //     return (
+    //       <Image
+    //         preview={{ mask: <EyeOutlined /> }}
+    //         width={80}
+    //         src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
+    //       />
+    //     )
+    //   }
+    // },
   ]
 
   const { detailVisible, data, onCancel } = props;

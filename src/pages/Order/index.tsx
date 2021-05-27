@@ -291,11 +291,11 @@ const Order: React.FC = (props) => {
             ]}
             request={formatRequestListParams(orderList)}
             columns={columns}
-            rowSelection={{
-              onChange: (_, selectedRows) => {
-                setSelectedRows(selectedRows);
-              },
-            }}
+          // rowSelection={{
+          //   onChange: (_, selectedRows) => {
+          //     setSelectedRows(selectedRows);
+          //   },
+          // }}
           />
           {selectedRowsState?.length > 0 && (
             <FooterToolbar
@@ -364,6 +364,7 @@ const Order: React.FC = (props) => {
             if (!callbackDetail) {
               callbackDetail = callback;
             }
+            setCurrentRow(currrent);
             setRefundVisible(true)
           }}
         />
@@ -372,13 +373,14 @@ const Order: React.FC = (props) => {
         id={currentRow && currentRow.id}
         code={currentRow && currentRow.orderNo}
         visible={remarkOrderVisible}
-        onFinish={() => {callbackDetail&& callbackDetail();setRemarkOrderVisible(false)}}
+        onFinish={() => { callbackDetail && callbackDetail(); setRemarkOrderVisible(false) }}
         onCancel={() => setRemarkOrderVisible(false)} />
+
       <RefundModel
-        id={currentRow && currentRow.id}
+        orderTotalPrice={currentRow && currentRow.orderTotalPrice }
         code={currentRow && currentRow.orderNo}
         visible={refundVisible}
-        onFinish={() => {callbackDetail&& callbackDetail();setRefundVisible(false)}}
+        onFinish={() => { callbackDetail && callbackDetail(); setRefundVisible(false) }}
         onCancel={() => setRefundVisible(false)} />
     </>
   )
