@@ -93,7 +93,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         console.log(data.id, transactFormData, formData);
         setTransactVisible(false);
         handleUpdateModalVisible();
-        handleAdd({ data.id, ...formData, ...transactFormData });
+        // handleAdd({ data.id, ...formData, ...transactFormData });
     }
 
     function formatCascaderData<T>(arr: T[], tag: boolean = false) {
