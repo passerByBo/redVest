@@ -55,7 +55,7 @@ export async function deleteLabel(id: string, options?: { [key: string]: any }) 
 export async function validLabel(body: any, options?: { [key: string]: any }) {
   return request(`/product/wh/updateStatus`, {
     method: 'POST',
-    params: {
+    data: {
       ...body,
     },
     ...(options || {}),

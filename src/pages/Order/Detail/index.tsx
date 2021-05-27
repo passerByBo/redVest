@@ -121,7 +121,8 @@ const Detail: React.FC<OrderDetailProps> = (props) => {
   const { loading, run } = useRequest(getOrderDetails.bind(null, { orderNo }), {
     manual: true,
     onSuccess: (result, params) => {
-      setOrderDetail(result)
+      setOrderDetail(result);
+      setSelectedProductRows([]);
     }
   })
   useEffect(() => {
@@ -147,7 +148,7 @@ const Detail: React.FC<OrderDetailProps> = (props) => {
 
 
   const handleFinish = useCallback(async (fields: any) => {
-    let ids = selectedProductRows.map((item: any) => item.productId).join(',')
+    let ids = selectedProductRows.map((item: any) => item.id).join(',')
     fields.ids = ids;
     let hide = message.loading('物流信息修改中')
     try {
@@ -205,83 +206,90 @@ const Detail: React.FC<OrderDetailProps> = (props) => {
 
   const { remarkOrder, refund } = props;
 
-  const mobileMenu = (
-    <Menu>
-      <Menu.Item onClick={() => {
-        remarkOrder({ orderNo: orderDetail.orderNo, id: orderDetail.id }, listenerRun);
-      }}>备注订单</Menu.Item>
-      {/* 立即退款需要根据订单状态判断是否存在 */}
-      <Menu.Item>立即退款</Menu.Item>
-    </Menu>
-  )
+  // const mobileMenu = (
+  //   <Menu>
+  //     <Menu.Item onClick={() => {
+  //       remarkOrder({ orderNo: orderDetail.orderNo, id: orderDetail.id }, listenerRun);
+  //     }}>备注订单</Menu.Item>
+  //     {/* 立即退款需要根据订单状态判断是否存在 */}
+  //     <Menu.Item>立即退款</Menu.Item>
+  //   </Menu>
+  // )
 
-  const action = (
-    <RouteContext.Consumer>
-      {
-        ({ isMobile }) => {
-          if (isMobile) {
-            return (
-              <Dropdown.Button
-                type="primary"
-                icon={<DownOutlined />}
-                overlay={mobileMenu}
-                placement="bottomRight"
-                onClick={() => {
-                  if (orderDetail.orderStatus !== '待发货') {
-                    message.error('订单状态为' + orderDetail.orderStatus + '不可以发货呦！')
-                    return;
-                  }
-                  Modal.confirm({
-                    title: '提示',
-                    icon: <ExclamationCircleOutlined />,
-                    content: '确认发货吗？',
-                    okText: '确认',
-                    cancelText: '取消',
-                    onOk() {
-                      handleShip();
-                    },
-                  });
-                }}
-              >
-                去发货
-              </Dropdown.Button>
-            )
-          }
-
-          return (
-            <>
-              <ButtonGroup>
-                <Button onClick={() => {
-                  remarkOrder({ orderNo: orderDetail.orderNo, id: orderDetail.id }, listenerRun);
-                }}
-                >备注订单</Button>
-                <Button onClick={() => { refund('1231123123', listenerRun) }}>立即退款</Button>
-              </ButtonGroup>
-              <Button disabled={orderDetail && orderDetail.orderStatus !== '待发货'} type="primary" onClick={() => {
-                Modal.confirm({
-                  title: '提示',
-                  icon: <ExclamationCircleOutlined />,
-                  content: '确认发货吗？',
-                  okText: '确认',
-                  cancelText: '取消',
-                  onOk() {
-                    handleShip();
-                  },
-                });
-              }}> 去发货</Button>
-            </>
-          )
-        }
-      }
-    </RouteContext.Consumer >
-  )
 
   return (
     <PageContainer
       title={`订单编号：` + orderNo}
       className={styles.pageHeader}
       content={description}
-      extra={action}
+      extra={
+        <RouteContext.Consumer>
+          {
+            ({ isMobile }) => {
+              // if (isMobile) {
+              //   return (
+              //     <Dropdown.Button
+              //       type="primary"
+              //       icon={<DownOutlined />}
+              //       overlay={mobileMenu}
+              //       placement="bottomRight"
+              //       onClick={() => {
+              //         if (orderDetail.orderStatus !== '待发货') {
+              //           message.error('订单状态为' + orderDetail.orderStatus + '不可以发货呦！')
+              //           return;
+              //         }
+              //         Modal.confirm({
+              //           title: '提示',
+              //           icon: <ExclamationCircleOutlined />,
+              //           content: '确认发货吗？',
+              //           okText: '确认',
+              //           cancelText: '取消',
+              //           onOk() {
+              //             handleShip();
+              //           },
+              //         });
+              //       }}
+              //     >
+              //       去发货
+              //     </Dropdown.Button>
+              //   )
+              // }
+
+              return (
+                <>
+                  <ButtonGroup>
+                    <Button onClick={() => {
+                      remarkOrder({ orderNo: orderDetail.orderNo, id: orderDetail.id }, listenerRun);
+                    }}
+                    >备注订单</Button>
+                    {
+                      orderDetail
+                      && (orderDetail.orderStatus === '待收货' || orderDetail.orderStatus === '待发货' || orderDetail.orderStatus === '已完成')
+                      && <Button onClick={() => { refund({ orderNo: orderDetail.orderNo, orderTotalPrice: orderDetail.orderMoneyInfo.orderTotalPrice }, listenerRun) }}>立即退款</Button>
+                    }
+                  </ButtonGroup>
+                  {
+                    orderDetail && orderDetail.orderStatus === '待发货' && orderDetail.shippingAddress && orderDetail.shippingAddress !== ''
+                    && <Button disabled={orderDetail && orderDetail.orderStatus !== '待发货'} type="primary" onClick={() => {
+                      Modal.confirm({
+                        title: '提示',
+                        icon: <ExclamationCircleOutlined />,
+                        content: '确认发货吗？',
+                        okText: '确认',
+                        cancelText: '取消',
+                        onOk() {
+                          handleShip();
+                        },
+                      });
+                    }}> 去发货</Button>
+                  }
+
+                </>
+              )
+            }
+          }
+        </RouteContext.Consumer >
+      }
     // loading={true}
     >
       {
@@ -304,8 +312,8 @@ const Detail: React.FC<OrderDetailProps> = (props) => {
                           title={(orderStatusEnum[orderDetail.orderStatus] as unknown as number) === 1 ? '订单支付中' : '支付订单'}
                           icon={(orderStatusEnum[orderDetail.orderStatus] as unknown as number) === 1 && <LoadingOutlined />} />
                         {/* <Step title="支付订单" description="未支付"/> */}
-                        <Step title="平台发货" description={orderDetail && orderDetail.deliveryTime}/>
-                        <Step title="确认收货" description={orderDetail && orderDetail.shippingDate}/>
+                        <Step title="平台发货" description={orderDetail && orderDetail.deliveryTime} />
+                        <Step title="确认收货" description={orderDetail && orderDetail.shippingDate} />
                       </Steps>
                       <Divider />
 

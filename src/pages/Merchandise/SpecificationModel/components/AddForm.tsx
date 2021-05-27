@@ -132,6 +132,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
           clearData();
           setSpecifiesMap(new Map())
           onCancel(false)
+          addForm.resetFields();
         }
       }}
       onFinish={async (data) => {

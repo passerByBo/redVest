@@ -177,6 +177,8 @@ const Unit: React.FC = () => {
       <ProTable
         actionRef={actionRef}
         rowKey="id"
+        tableAlertOptionRender={false}
+        tableAlertRender={false}
         search={{
           labelWidth: 120,
         }}

@@ -31,10 +31,10 @@ const Label: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<ILabel[]>([]);
 
   const parseBody = (data: ILabel | ILabel[], flag: boolean) => {
-    let body = { ids: '', flag };
+    let body = { ids: '', isValid: flag ? 'Y' : 'N' };
     if (Array.isArray(data)) {
       let idsArr: string[] = [];
-      idsArr = data.map(item=> item.id)
+      idsArr = data.map(item => item.id)
       body.ids = idsArr.join(',')
     } else {
       body.ids = data.id;
@@ -45,6 +45,12 @@ const Label: React.FC = () => {
   const handleValid = useCallback(async (data: ILabel | ILabel[], flag: boolean) => {
     const valid = flag;
     const tap = valid ? '启用' : '禁用'
+
+    if (Array.isArray(data) && data.length === 0) {
+      message.warning(`请选择要${tap}的标签`)
+      return;
+    }
+
     const hide = message.loading(`正在${tap}`);
     try {
       const body = parseBody(data, valid)

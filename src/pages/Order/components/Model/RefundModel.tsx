@@ -4,53 +4,58 @@ import {
   ProFormText,
   ProFormSelect
 } from '@ant-design/pro-form';
+import { Form, message } from 'antd';
+import { refundOrder } from '@/services/order';
 
 export interface RefundModelProps {
-  id?:string;
+  id?: string;
   code?: string;
   visible: boolean;
   onCancel(): void;
   onFinish(): void;
+  orderTotalPrice?: any;
 }
 
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
 
 const RefundModel: React.FC<RefundModelProps> = (props) => {
-  const { visible, onCancel, onFinish, code } = props;
+  const { visible, onCancel, onFinish, code, orderTotalPrice } = props;
+  const [form] = Form.useForm();
+
+  if (code) {
+    form.setFieldsValue({ orderNo: code, orderTotalPrice: orderTotalPrice })
+  }
 
   return (
     <ModalForm
+      form={form}
       width={480}
       visible={visible}
       title="立即退款"
-      onFinish={async () => { await waitTime(2000); onFinish(); }}
+      onFinish={async (fields) => {
+        let hide = message.loading('正在退款中');
+        try {
+          let res = await refundOrder({ orderNo: fields.orderNo })
+          if (res.status === 200 && res.code !== 200) {
+            hide();
+            message.error('退款失败，' + res.msg);
+            return;
+          }
+
+          hide();
+          message.success('退款成功')
+          onFinish();
+        } catch (error) {
+          hide();
+          message.error('退款失败');
+          return;
+        }
+      }}
       modalProps={{
         onCancel: () => onCancel(),
       }}
-
-      initialValues={{
-        code: code
-      }}
     >
-      <ProFormText name="code" label="订单号" disabled={true} />
-      <ProFormSelect
-        fieldProps={{
-          labelInValue: true,
-        }}
-        request={async () => [
-          { label: '不同意退款', value: '0' },
-          { label: '同意退款', value: '1' },
-        ]}
-        name="aaaaa"
-        label="退款审核"
-      />
-      <ProFormText name="sdasd" label="原因描述" />
+      <ProFormText name="orderNo" label="订单号" disabled={true} />
+      <ProFormText name="orderTotalPrice" label="退款金额" disabled={true} />
     </ModalForm>
   )
 }

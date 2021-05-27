@@ -155,8 +155,10 @@ const Recycle: React.FC = () => {
         title: '商品回收站',
       }}>
       <ProTable<ProductListItem, API.PageParams>
+        tableAlertOptionRender={false}
+        tableAlertRender={false}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{ labelWidth: 120 }}
         request={formatRequestListParams(getProductList, { productStatus: '已回收' })}
         columns={columns}
@@ -164,6 +166,7 @@ const Recycle: React.FC = () => {
           onChange: (_, selectedRows) => {
           },
         }}
+
       >
 
       </ProTable>

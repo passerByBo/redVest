@@ -157,6 +157,40 @@ const List: React.FC = (props) => {
     }
   }
 
+  const productRecycle = async (data: ProductListItem | ProductListItem[]) => {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      message.warning('请选择要删除的商品')
+      return;
+    };
+
+    Modal.confirm({
+      title: '提示',
+      icon: <ExclamationCircleOutlined />,
+      content: '是否确认删除商品，删除后的商品可在回收站查看！',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        let hide = message.loading('正在回收中!');
+        let ids = getIds<ProductListItem>(data);
+        try {
+          let res = await onAndOffShelves({ action: '回收', ids });
+          if (res.status === 200 && res.code !== 200) {
+            hide();
+            message.error('回收失败，' + res.msg);
+            return;
+          }
+
+          hide();
+          message.success('回收成功！');
+          actionRef.current?.reloadAndRest?.();
+        } catch (error) {
+          hide();
+          message.error('回收失败，请重试！')
+        }
+      }
+    })
+  }
+
   const shelvesUp = async (data: ProductListItem | ProductListItem[], shelves: string) => {
     if (!data || data.length === 0) {
       message.warning(`请选择要${shelves}的商品！`)
@@ -333,7 +367,7 @@ const List: React.FC = (props) => {
           {
             productStatus === '下架' && <>
               <Divider type="vertical" />
-              <a onClick={() => updateShelves(record, '回收')}>删除</a>
+              <a onClick={() => productRecycle(record)}>删除</a>
             </>
           }
 
@@ -380,7 +414,7 @@ const List: React.FC = (props) => {
         toolBarRender={() => [
           productTab === '下架' && (<Button ghost type="primary" key="primary" onClick={() => {
 
-            if(!Array.isArray(selectedRowsState) || selectedRowsState.length=== 0){
+            if (!Array.isArray(selectedRowsState) || selectedRowsState.length === 0) {
               message.warning('请选择要删除的商品')
               return;
             }
@@ -401,7 +435,7 @@ const List: React.FC = (props) => {
             <VerticalAlignTopOutlined />上架
           </Button>,
           productTab === '上架' && <Button ghost type="primary" key="primary" onClick={() => {
-            if(!Array.isArray(selectedRowsState) || selectedRowsState.length=== 0){
+            if (!Array.isArray(selectedRowsState) || selectedRowsState.length === 0) {
               message.warning('请选择要下架的商品')
               return;
             }
@@ -416,7 +450,7 @@ const List: React.FC = (props) => {
               }
             })
 
-             }}>
+          }}>
             <VerticalAlignBottomOutlined />下架
            </Button>,
           <Button type="primary" key="primary" onClick={() => { history.push(`/merchandise/product/add`) }}>

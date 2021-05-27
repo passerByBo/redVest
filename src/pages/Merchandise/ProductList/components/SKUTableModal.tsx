@@ -93,7 +93,7 @@ const SKUTableModal: React.FC<SKUTableModalProps> = (props) => {
         bordered
         actionRef={actionRef}
         columns={columns}
-        request={formatRequestListParams(getSKUList, { id: id })}
+        request={formatRequestListParams(getSKUList, { spuId: id })}
         rowKey="productNo"
         search={false}
         toolBarRender={false}

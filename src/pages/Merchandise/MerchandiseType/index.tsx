@@ -142,6 +142,7 @@ const MerchandiseType: React.FC = () => {
     try {
       const res = await deleteMerchandiseType(ids);
       if (res.status === 200 && res.code === 200) {
+        //过滤选中的key
         setExpandedRowKeys([...(expandedRowKeys.filter((id) => !ids.includes(id)))])
         hide();
         message.success('删除成功！');
@@ -263,6 +264,8 @@ const MerchandiseType: React.FC = () => {
             }
           }
         }
+        tableAlertOptionRender={false}
+        tableAlertRender={false}
         rowSelection={{
           onChange: (selectedRowKeys, selectedRows) => {
             setSelectedRows(selectedRows)
@@ -309,7 +312,7 @@ const MerchandiseType: React.FC = () => {
 
       <UpdateForm onCancel={handleUpdateCancel}
         onSubmit={handleUpdateSubmit}
-        values={currentRow as any}
+        values={{...(currentRow as any)}}
         updateModalVisible={updateModalVisible} />
 
       { currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => { setShowDetail(false); setCurrentRow(undefined) }} />}

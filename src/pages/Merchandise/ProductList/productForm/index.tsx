@@ -449,16 +449,16 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
         skuName: name,
         propertiesObj,
         skuImg: '',
-        articleNo: 0,
-        salePrice: 0,
-        supplyPrice: 0,
-        marketPrice: 0,
-        inventory: 0,
-        inventoryWarn: 0,
-        weight: 0,
-        volume: 0,
-        firReturnCommiss: 0,
-        secReturnCommiss: 0,
+        articleNo: '',
+        salePrice: '',
+        supplyPrice: '',
+        marketPrice: '',
+        inventory: '',
+        inventoryWarn: '',
+        weight: '',
+        volume: '',
+        firReturnCommiss: '',
+        secReturnCommiss: '',
       }
     })
   }
@@ -533,6 +533,11 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     {
       title: <TableTitle title='库存' callback={(value: string) => { hangleColumnChange(value, 'inventory') }} />,
       dataIndex: 'inventory',
+      editable: false,
+    },
+    {
+      title: <TableTitle title='库存预警值' callback={(value: string) => { hangleColumnChange(value, 'inventoryWarn') }} />,
+      dataIndex: 'inventoryWarn',
       editable: false,
     },
     {
@@ -650,6 +655,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     {
       title: 'SKU属性',
       dataIndex: 'skuName',
+      editable: false,
     },
     {
       title: '商品图片',
@@ -692,6 +698,11 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
     {
       title: <TableTitle title='库存' callback={(value: string) => { hangleColumnChange(value, 'inventory') }} />,
       dataIndex: 'inventory',
+      editable: true,
+    },
+    {
+      title: <TableTitle title='库存预警值' callback={(value: string) => { hangleColumnChange(value, 'inventoryWarn') }} />,
+      dataIndex: 'inventoryWarn',
       editable: true,
     },
     {
