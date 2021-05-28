@@ -83,8 +83,8 @@ const CouponProduction: React.FC = () => {
     </Button>,
     <Button
       type="primary"
-      key="delete" 
-      danger 
+      key="delete"
+      danger
       onClick={() => {
         removeSingleRow(selectedRowsState);
       }}>

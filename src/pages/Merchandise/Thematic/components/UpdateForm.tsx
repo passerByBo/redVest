@@ -115,9 +115,7 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         if (typeof merge.specialNameImg1 !== 'string') {
           merge.specialNameImg1 =  merge.specialNameImg1.map((item: any) => item.id).join(',')
         }
-
         merge.specialGroup = getNameById(merge.specialGroupId);
-
         onSubmit(merge);
       }}
     >

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Input, Modal, Select, DatePicker, Spin, Cascader, message, Radio } from 'antd';
+import { Form, Button, Input, Modal, Select, Spin, Cascader, message, Radio } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import ImagePicker from '@/components/ImagePicker';
 import type { TableListItem } from '../../data.d';
@@ -7,7 +7,10 @@ import { getItemDetail } from '@/services/customer/index';
 import { getProvinceList } from '@/services/user/register';
 import { transactItem } from '@/services/customer/index';
 import { useRequest } from 'umi';
-import moment from 'moment'
+import {
+    ProFormDatePicker,
+} from '@ant-design/pro-form';
+import Moment from 'moment';
 
 interface IOptions {
     value: number;
@@ -29,10 +32,6 @@ export type UpdateFormProps = {
 const { Option } = Select;
 const FormItem = Form.Item;
 
-export type UpdateFormState = {
-    formVals: FormValueType;
-};
-
 const formLayout = {
     labelCol: { span: 7 },
     wrapperCol: { span: 13 },
@@ -43,32 +42,29 @@ const formItemLayout = {
     wrapperCol: { span: 14 },
 };
 
-const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
 /**
  * 添加节点
  */
 const handleAdd = async (fields: any) => {
-    const hide = message.loading('正在添加');
+    const hide = message.loading('正在办理');
     try {
         let res = await transactItem({ ...fields });
         if (res.status === 200 && res.code !== 200) {
             hide();
-            message.error('添加失败!' + res.msg, 15);
+            message.error('办理失败!' + res.msg, 15);
             return false;
         }
         hide();
-        message.success('添加成功');
+        message.success('办理成功');
         return true;
     } catch (error) {
         hide();
-        message.error('添加失败！');
+        message.error('办理失败！');
         return false;
     }
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-
     const {
         onSubmit: handleUpdate,
         onCancel: handleUpdateModalVisible,
@@ -83,27 +79,27 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     const [data, setData] = useState<any>(null);
 
     // 办理
-    const handleTransact = () => {
-        setTransactVisible(true)
-    }
-
     const doTransact = async () => {
         const transactFormData = await transactForm.validateFields();
         const formData = await form.validateFields();
-        console.log(data.id, transactFormData, formData);
+        if (formData.businesslicense && Array.isArray(formData.businesslicense)) {
+            formData.businesslicense = formData.businesslicense.map((item: any) => item.id).join(',');
+        }
+        if (formData.authorizedFile && Array.isArray(formData.authorizedFile)) {
+            formData.authorizedFile = formData.authorizedFile.map((item: any) => item.id).join(',');
+        }
+        if (formData.contaccessory && Array.isArray(formData.contaccessory)) {
+            formData.contaccessory = formData.contaccessory.map((item: any) => item.id).join(',');
+        }
+        formData.id = data.id;
+        console.log(transactFormData, formData);
         setTransactVisible(false);
         handleUpdateModalVisible();
-        // handleAdd({ data.id, ...formData, ...transactFormData });
+        handleAdd({ ...formData, ...transactFormData });
     }
 
-    function formatCascaderData<T>(arr: T[], tag: boolean = false) {
-        if (!arr || !Array.isArray(arr)) return [];
-        return arr.map((item) => {
-            return { ...item, isLeaf: tag }
-        })
-    }
-
-    const handleNext = async () => {
+    // 保存
+    const handleSave = async () => {
         const fieldsValue = { ...await form.validateFields() };
         if (fieldsValue.businesslicense && Array.isArray(fieldsValue.businesslicense)) {
             fieldsValue.businesslicense = fieldsValue.businesslicense.map((item: any) => item.id).join(',');
@@ -114,16 +110,25 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         if (fieldsValue.contaccessory && Array.isArray(fieldsValue.contaccessory)) {
             fieldsValue.contaccessory = fieldsValue.contaccessory.map((item: any) => item.id).join(',');
         }
-        fieldsValue.applydate = fieldsValue.applydate._i;
-        handleUpdate({ values, ...fieldsValue });
+        fieldsValue.applydate = Moment(fieldsValue.applydate._d).format('YYYY-MM-DD');
+        fieldsValue.id = data.id;
+        handleUpdate({ ...fieldsValue });
     };
 
+    // 格式化省市区
+    function formatCascaderData<T>(arr: T[], tag: boolean = false) {
+        if (!arr || !Array.isArray(arr)) return [];
+        return arr.map((item) => {
+            return { ...item, isLeaf: tag }
+        })
+    }
+
+    // 加载省市区
     const loadDivisionsData = async (selectedOptions: any) => {
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
         try {
             const res = await getProvinceList({ pNo: targetOption.value });
-            console.log('xxxxx', res)
             if (res.status === 200 && res.code === 200) {
                 targetOption.children = formatCascaderData<IOptions>([...res.data], targetOption.value.length >= 4);
                 targetOption.loading = false;
@@ -144,10 +149,10 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                     values.type === "草稿"
                     &&
                     <>
-                        <Button type="primary" onClick={() => handleNext()}>
+                        <Button type="primary" onClick={() => { handleSave() }}>
                             保存
                         </Button>
-                        <Button htmlType="button" onClick={handleTransact}>
+                        <Button htmlType="button" onClick={() => setTransactVisible(true)}>
                             办理
                         </Button>
                     </>
@@ -162,7 +167,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             if (result) {
                 form.setFieldsValue({
                     ...result,
-                    applydate: moment(result.applydate, 'YYYY-MM-DD')
+                    // applydate: moment(result.applydate, 'YYYY-MM-DD')
                 });
                 setData(result);
             } else {
@@ -184,11 +189,9 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
 
     useEffect(() => {
         if (updateModalVisible) {
-            console.log('请求进来了')
             run();
         }
     }, [updateModalVisible])
-
 
     return (
         <Modal
@@ -200,7 +203,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             footer={renderFooter()}
             onCancel={() => { handleUpdateModalVisible(); form.resetFields() }}
         >
-            <Spin indicator={antIcon} spinning={loading} style={{ textAlign: "center", marginLeft: 380 }} />
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} style={{ textAlign: "center", marginLeft: 380 }} />
             {
                 !loading
                 &&
@@ -220,7 +223,8 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                         >
                             <Input placeholder="请输入单据编号" allowClear disabled />
                         </FormItem>
-                        <FormItem
+                        <ProFormDatePicker fieldProps={{ format: 'YYYY-MM-DD' }} required placeholder={"选择申请时间"} width="md" name="applydate" label="申请时间" />
+                        {/* <FormItem
                             label="申请时间"
                             name="applydate"
                             rules={[
@@ -234,7 +238,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                                 style={{ width: '100%' }}
                                 placeholder="选择发布时间"
                             />
-                        </FormItem>
+                        </FormItem> */}
 
                         <FormItem
                             label="企业名称"

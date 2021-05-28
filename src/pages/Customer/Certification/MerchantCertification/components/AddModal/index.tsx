@@ -3,6 +3,9 @@ import { Modal, Input, Form, Select, DatePicker, message, Button, Radio, Cascade
 import { getProvinceList } from '@/services/user/register';
 import { transactItem } from '@/services/customer/index';
 import ImagePicker from '@/components/ImagePicker';
+import {
+    ProFormDatePicker,
+} from '@ant-design/pro-form';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -181,21 +184,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     <Input placeholder="请输入单据编号" disabled />
                 </FormItem>
 
-                <FormItem
-                    label="申请时间"
-                    name="applydate"
-                    rules={[
-                        {
-                            required: true
-                        },
-                    ]}
-                >
-                    <DatePicker
-                        style={{ width: '100%' }}
-                        format={"YYYY-MM-DD"}
-                        placeholder="选择发布时间"
-                    />
-                </FormItem>
+                <ProFormDatePicker required placeholder={"选择申请时间"} width="md" name="applydate" label="申请时间" />
 
                 <FormItem
                     label="企业名称"

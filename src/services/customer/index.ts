@@ -32,7 +32,7 @@ export async function getRegiseperInfoList(
     });
 }
 
-// 获取商家认证管理列表
+// 商家认证管理列表
 export async function getMerchantCertificateList(
     params: {
         current?: number;
@@ -48,7 +48,7 @@ export async function getMerchantCertificateList(
 }
 
 /**
- * 新建
+ * 商家认证管理新建&更新
  */
 export async function updateItem(params: any) {
     return request('/customer/shopInfo/insert', {
@@ -60,7 +60,7 @@ export async function updateItem(params: any) {
 }
 
 /**
- * 办理
+ * 商家认证管理办理
  */
 export async function transactItem(params: any) {
     return request('/customer/shopInfo/handle', {
@@ -72,7 +72,7 @@ export async function transactItem(params: any) {
 }
 
 /**
- * 删除
+ * 商家认证管理删除
  */
 export async function removeItem(params: { ids: string }) {
     return request(`/customer/shopInfo/${params.ids}`, {
@@ -81,7 +81,7 @@ export async function removeItem(params: { ids: string }) {
 }
 
 /**
- * 获取详情
+ * 商家认证管理获取详情
  */
 export async function getItemDetail(
     params: { [key: string]: unknown },

@@ -1,20 +1,18 @@
 import React, { useState, useRef } from 'react';
+import { message, Button, Popconfirm } from 'antd';
+import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import ProTable from '@ant-design/pro-table';
-import { message, Button, Popconfirm } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-
-import FlowStep from './components/FlowStep';
+// import FlowStep from './components/FlowStep';
 import AddModal from './components/AddModal';
 import UpdateModal from './components/UpdateModal';
-
 import { getMerchantCertificateList, updateItem, removeItem } from '@/services/customer/index';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import type { TableListItem, TableListParams } from './data';
 
 /**
- * 添加节点
+ * 商家认证管理主表添加节点
  */
 const handleAdd = async (fields: TableListParams) => {
     const hide = message.loading('正在添加');
@@ -22,7 +20,7 @@ const handleAdd = async (fields: TableListParams) => {
         let res = await updateItem({ ...fields });
         if (res.status === 200 && res.code !== 200) {
             hide();
-            message.error('添加失败!' + res.msg, 15);
+            message.error('添加失败!' + res.msg, 10);
             return false;
         }
         hide();
@@ -36,16 +34,15 @@ const handleAdd = async (fields: TableListParams) => {
 };
 
 /**
- * 更新节点
+ * 商家认证管理主表更新节点
  */
 const handleUpdate = async (fields: TableListParams) => {
     const hide = message.loading('正在更新');
     try {
-        console.log(fields);
         let res = await updateItem({ ...fields });
         if (res.status === 200 && res.code !== 200) {
             hide();
-            message.error('更新失败!' + res.msg, 15);
+            message.error('更新失败!' + res.msg, 10);
             return false;
         }
         hide();
@@ -59,14 +56,19 @@ const handleUpdate = async (fields: TableListParams) => {
 };
 
 /**
- * 删除节点
+ * 商家认证管理主表删除节点
  */
 const handleRemove = async (selectedRows: TableListItem[]) => {
     const hide = message.loading('正在删除');
     try {
-        await removeItem({
+        let res = await removeItem({
             ids: selectedRows.map((row) => row.id).join(','),
         });
+        if (res.status === 200 && res.code !== 200) {
+            hide();
+            message.error('删除失败!' + res.msg, 10);
+            return false;
+        }
         hide();
         message.success('删除成功');
         return true;
@@ -78,43 +80,58 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 };
 
 const MerchantCertification: React.FC = () => {
-    const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
-    const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-    const [flowStepVisible, setFlowStepVisible] = useState<boolean>(false);
-
     const [formValues, setFormValues] = useState({});
-    const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
     const [statusKey, setStatusKey] = useState<string>('代办');
-    const [btnIndex, setBtnIndex] = useState<number>(0);
+    const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
+    const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
+    const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+    // const [flowStepVisible, setFlowStepVisible] = useState<boolean>(false);
+    // const [btnIndex, setBtnIndex] = useState<number>(0);
     const actionRef = useRef<ActionType>();
 
+    // tab切换
     const onTabChange = (key: string) => {
         setStatusKey(key);
         actionRef.current?.reloadAndRest?.();
     };
 
-    const confirmAdd = async (newData: TableListParams) => {
-        setAddModalVisible(false);
-        let res = await handleAdd(newData);
-        res && actionRef.current?.reloadAndRest?.();
+    // 主表新建
+    const addNewItem = async (newData: TableListParams) => {
+        const res = await handleAdd(newData);
+        if (res) {
+            setAddModalVisible(false);
+            actionRef.current?.reloadAndRest?.();
+        }
+
     };
 
-    const onBtnClick = (item: number) => {
-        setBtnIndex(item);
-        setFlowStepVisible(true);
-    };
-
-    const onCancel = () => {
-        setFlowStepVisible(false);
-    };
-
-    // 删除
-    const removeSingleRow = async (selectedRows: TableListItem[]) => {
-        let res = await handleRemove(selectedRows)
-        setSelectedRows([]);
-        res && actionRef.current?.reloadAndRest?.();
+    // 主表删除
+    const removeItems = async (selectedRows: TableListItem[]) => {
+        const res = await handleRemove(selectedRows)
+        if (res) {
+            setSelectedRows([]);
+            actionRef.current?.reloadAndRest?.();
+        }
     }
 
+    // 主表更新
+    const updateItems = async (value: any) => {
+        const res = await handleUpdate(value);
+        if (res) {
+            setUpdateModalVisible(false);
+            setFormValues({});
+            actionRef.current?.reloadAndRest?.();
+        }
+    }
+
+    // const onBtnClick = (item: number) => {
+    //     setBtnIndex(item);
+    //     setFlowStepVisible(true);
+    // };
+
+    // const onCancel = () => {
+    //     setFlowStepVisible(false);
+    // };
     const columns: ProColumns<TableListItem>[] = [
         {
             title: '序号',
@@ -181,6 +198,7 @@ const MerchantCertification: React.FC = () => {
                 ]}
                 onTabChange={onTabChange}
             >
+                {/* 主表 */}
                 <ProTable
                     headerTitle="商家认证管理"
                     actionRef={actionRef}
@@ -203,7 +221,7 @@ const MerchantCertification: React.FC = () => {
                         <Popconfirm
                             placement="topRight"
                             title={'确定要删除吗？'}
-                            onConfirm={() => { removeSingleRow(selectedRowsState); }}
+                            onConfirm={() => { removeItems(selectedRowsState); }}
                             okText="确认"
                             cancelText="取消"
                         >
@@ -219,29 +237,20 @@ const MerchantCertification: React.FC = () => {
                     }}
                 />
             </PageContainer>
+            {/* 新建 */}
             <AddModal
                 visible={addModalVisible}
-                onFinish={confirmAdd}
+                onFinish={addNewItem}
                 onCancel={() => setAddModalVisible(false)}
             />
+            {/* 详情 */}
             <UpdateModal
-                onSubmit={async (value) => {
-                    const success = await handleUpdate(value);
-                    if (success) {
-                        setUpdateModalVisible(false);
-                        setFormValues({});
-                        if (actionRef.current) {
-                            actionRef.current.reload();
-                        }
-                    }
-                }}
-                onCancel={() => {
-                    setUpdateModalVisible(false);
-                }}
-                updateModalVisible={updateModalVisible}
                 values={formValues}
+                updateModalVisible={updateModalVisible}
+                onSubmit={updateItems}
+                onCancel={() => setUpdateModalVisible(false)}
             />
-            <FlowStep visible={flowStepVisible} onCancel={onCancel} btnIndex={btnIndex} />
+            {/* <FlowStep visible={flowStepVisible} onCancel={onCancel} btnIndex={btnIndex} /> */}
         </>
     )
 }
