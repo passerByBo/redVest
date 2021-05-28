@@ -7,11 +7,11 @@ import { Button, message, Space, Switch } from 'antd';
 import ProTable from '@ant-design/pro-table';
 
 import formatRequestListParams from '@/utils/formatRequestListParams';
-import { getSpecModelList, addSpecModel, deleteSpecMode, updateSpecMode, disableModel } from '@/services/merchandise/model';
+import { getSpecModelList, addSpecModel, deleteSpecMode, updateSpecMode, disableModel, exportSpecificationModel } from '@/services/merchandise/model';
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
-import DetailDrawer from './components/DetailDrawer';
 import { formatYAndN } from '@/utils/utils';
+import Export from '@/components/Export';
 
 export interface ISpecationModel {
   id?: string;
@@ -224,6 +224,7 @@ const SpecificationModel: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
+          <Export request={exportSpecificationModel}/>,
           <Button onClick={() => { handleValid(selectedRowsState, true) }}>
             <PlusOutlined /> 启用
          </Button>,

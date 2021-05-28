@@ -61,7 +61,7 @@ export async function deleteThematicGroup(id: string, options?: { [key: string]:
 }
 
 export async function exportThematicGroup(
-  params: { id: string },
+  params: { [key: string]: any },
   options?: { [key: string]: any },
 ) {
   return request('/product/specialGroup/export', {

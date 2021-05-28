@@ -4,12 +4,13 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Modal, Popconfirm, Space } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { addMerchandiseType, deleteMerchandiseType, getMerchandiseTypeList, updateMerchandiseType } from '@/services/merchandise/merchandiseType'
+import { addMerchandiseType, deleteMerchandiseType, exportMerchandiseType, getMerchandiseTypeList, updateMerchandiseType } from '@/services/merchandise/merchandiseType'
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { formatYAndN } from '@/utils/utils';
+import Export from '@/components/Export';
 
 export interface IMerchandiseType {
   id: string;
@@ -278,6 +279,7 @@ const MerchandiseType: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
+          <Export request={exportMerchandiseType}/>,
           <Button key="unfold" onClick={() => { handleUnfold() }}>
             <MenuUnfoldOutlined />
             全部展开

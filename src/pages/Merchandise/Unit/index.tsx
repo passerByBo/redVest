@@ -8,7 +8,8 @@ import formatRequestListParams from '@/utils/formatRequestListParams';
 import AddForm from './component/AddForm';
 import UpdateForm from './component/UpdateForm';
 import DetailDrawer from './component/DetailDrawer';
-import { addUnit, deleteUnit, getUnitList, updateUnit } from '@/services/merchandise/unit';
+import { addUnit, deleteUnit, exportUnit, getUnitList, updateUnit } from '@/services/merchandise/unit';
+import Export from '@/components/Export';
 
 export interface IUnit {
   id: string;
@@ -183,8 +184,7 @@ const Unit: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-
-
+          <Export request={exportUnit} />,
           <Popconfirm
             placement="topRight"
             title={'确定要删除选中的所有单位' + '吗？'}

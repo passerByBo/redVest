@@ -5,11 +5,12 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import formatRequestListParams from '@/utils/formatRequestListParams';
-import { addThematic, deleteThematic,  getThematicList, updateThematic } from '@/services/merchandise/thematic';
+import { addThematic, deleteThematic,  exportThematic,  getThematicList, updateThematic } from '@/services/merchandise/thematic';
 import UpdateForm from './components/UpdateForm'
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
 import { formatYAndN } from '@/utils/utils';
+import Export from '@/components/Export';
 export type ProductListItem = {
   id?: string;
   specialGroupId?: string;
@@ -238,6 +239,7 @@ const Thematic: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
+          <Export request={exportThematic}/>,
           <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>
             <PlusOutlined />新建
                     </Button>

@@ -4,11 +4,12 @@ import { Button, Modal, Upload, message } from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { goShip, orderList } from '@/services/order';
+import { exportOrder, goShip, orderList } from '@/services/order';
 import { history, useModel } from 'umi';
 import Detail from './Detail';
 import { RemarkOrderModel, RefundModel } from './components/Model'
 import formatRequestListParams from '@/utils/formatRequestListParams';
+import Export from '@/components/Export';
 
 const { Dragger } = Upload;
 //订单数据类型
@@ -270,15 +271,7 @@ const Order: React.FC = (props) => {
               labelWidth: 120,
             }}
             toolBarRender={() => [
-              <Button
-                type="primary"
-                key="primary"
-                onClick={() => {
-
-                }}
-              >
-                <ExportOutlined /> 导出
-            </Button>,
+              <Export request={exportOrder}/>,
               <Button
                 type="primary"
                 key="primary"

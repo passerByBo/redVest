@@ -55,3 +55,14 @@ export async function deleteMerchandiseType(id:string,options?: { [key: string]:
   });
 }
 
+export async function exportMerchandiseType(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/type/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
+

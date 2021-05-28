@@ -61,3 +61,14 @@ export async function validLabel(body: any, options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
+
+export async function exportLabel(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/wh/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}

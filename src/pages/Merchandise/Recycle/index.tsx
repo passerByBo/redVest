@@ -3,10 +3,11 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Image, Divider, Popconfirm, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { deleteRecycle, getProductList, resetRecycle } from '@/services/merchandise/product';
+import { deleteRecycle, exportProduct, getProductList, resetRecycle } from '@/services/merchandise/product';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { EyeOutlined } from '@ant-design/icons';
 import { getIds } from '@/utils/utils';
+import Export from '@/components/Export';
 type ProductListItem = {
   id: string,
   shopname: string,
@@ -155,6 +156,9 @@ const Recycle: React.FC = () => {
         title: '商品回收站',
       }}>
       <ProTable<ProductListItem, API.PageParams>
+        toolBarRender={() => [
+          <Export request={exportProduct.bind(null,{ productStatus: '已回收' })}/>,
+        ]}
         tableAlertOptionRender={false}
         tableAlertRender={false}
         actionRef={actionRef}

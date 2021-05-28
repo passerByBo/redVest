@@ -3,11 +3,12 @@ import { ExportOutlined, PlusOutlined, StopOutlined, UpCircleOutlined } from '@a
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { Button, Divider, message } from 'antd';
-import { addLabel, deleteLabel, getLabelList, updateLabel, validLabel } from '@/services/merchandise/label';
+import { addLabel, deleteLabel, exportLabel, getLabelList, updateLabel, validLabel } from '@/services/merchandise/label';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import AddForm from './component/AddForm';
 import UpdateForm from './component/UpdateForm';
 import { formatYAndN } from '@/utils/utils';
+import Export from '@/components/Export';
 
 export interface ILabel {
   id: string;
@@ -207,13 +208,7 @@ const Label: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          <Button
-            key="primary"
-            onClick={() => {
-            }}
-          >
-            <ExportOutlined /> 导出
-          </Button>,
+          <Export request={exportLabel}/>,
           <Button
             key="primary1"
             onClick={() => {

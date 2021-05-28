@@ -55,3 +55,15 @@ export async function deleteThematic(id:string,options?: { [key: string]: any })
   });
 }
 
+export async function exportThematic(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/special/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
+
+

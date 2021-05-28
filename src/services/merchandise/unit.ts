@@ -42,3 +42,15 @@ export async function deleteUnit(id: string, options?: { [key: string]: any }) {
   });
 }
 
+export async function exportUnit(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/unit/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
+
+

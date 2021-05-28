@@ -2,10 +2,10 @@ import { PlusOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, De
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Image, Divider, Modal, notification } from 'antd';
+import { Button, message, Image, Divider, Modal, notification, FormInstance } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import type { FormValueType } from '../components/UpdateForm';
-import { getProductList, onAndOffShelves } from '@/services/merchandise/product';
+import { exportProduct, getProductList, onAndOffShelves } from '@/services/merchandise/product';
 import { SKUTip, SPUTip } from '../tips';
 
 import LogTableModal from '../components/LogTableModal';
@@ -14,6 +14,7 @@ import { history, useModel } from 'umi';
 import 'braft-editor/dist/index.css';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { getIds } from '@/utils/utils';
+import Export from '@/components/Export';
 /**
  * 添加节点
  *
@@ -105,6 +106,9 @@ const handleRemove = async (selectedRows: ProductListItem[]) => {
 };
 
 const List: React.FC = (props) => {
+
+  const formRef = useRef<FormInstance>();
+
   /** 新建窗口的弹窗 */
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /** 分布更新窗口的弹窗 */
@@ -410,8 +414,10 @@ const List: React.FC = (props) => {
       <ProTable<ProductListItem, API.PageParams>
         actionRef={actionRef}
         rowKey="id"
+        formRef={formRef}
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
+          <Export request={exportProduct.bind(null, { ...(formRef.current?.getFieldsValue() || {}), productStatus: productTab })} />,
           productTab === '下架' && (<Button ghost type="primary" key="primary" onClick={() => {
 
             if (!Array.isArray(selectedRowsState) || selectedRowsState.length === 0) {

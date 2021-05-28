@@ -78,10 +78,21 @@ export async function updateDeliveryInfo(body: any, options?: { [key: string]: a
   });
 }
 
-export async function refundOrder(body?:{[key:string]: any}, options?: { [key: string]: any }){
+export async function refundOrder(body?: { [key: string]: any }, options?: { [key: string]: any }) {
   return request('/order/refundOrder', {
     method: 'POST',
     data: { ...body },
+    ...(options || {}),
+  });
+}
+
+export async function exportOrder(
+  params?: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/order/cancel/export', {
+    method: 'GET',
+    params: { ...params },
     ...(options || {}),
   });
 }

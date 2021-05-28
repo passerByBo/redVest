@@ -64,3 +64,15 @@ export async function disableModel(body?:any,options?: { [key: string]: any }){
     ...(options || {}),
   });
 }
+
+export async function exportSpecificationModel(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/specModel/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
+

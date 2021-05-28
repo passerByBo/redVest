@@ -1,12 +1,12 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, Form, Input, InputNumber, Modal, Space } from 'antd';
-import React, { useRef, useState } from 'react';
+import ProTable, { ActionType } from '@ant-design/pro-table';
+import { Button } from 'antd';
+import React, { useRef } from 'react';
 import { SaveOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import formatRequestListParams from '@/utils/formatRequestListParams';
-import { getSKUList } from '@/services/sku-ledger';
-import ProForm, { ModalForm } from '@ant-design/pro-form';
+import { getSKUList, skuOrderExport } from '@/services/sku-ledger';
+import Export from '@/components/Export';
 const List: React.FC = (props) => {
   const actionRef = useRef<ActionType>();
 
@@ -123,9 +123,7 @@ const List: React.FC = (props) => {
             search={{ labelWidth: 120 }}
             request={formatRequestListParams(getSKUList)}
             toolBarRender={() => [
-              <Button type="primary" key="primary" onClick={() => { }}>
-                <SaveOutlined />保存
-              </Button>
+              <Export request={skuOrderExport} />
             ]}
             columns={columns}
             rowSelection={{

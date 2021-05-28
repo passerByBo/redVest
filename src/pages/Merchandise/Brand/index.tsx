@@ -4,12 +4,13 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { addBrand, deleteBrand, getBrandList, updateBrand } from '@/services/merchandise/product';
+import { addBrand, deleteBrand, exportBrand, getBrandList, updateBrand } from '@/services/merchandise/product';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import DetailDrawer from './components/DetailDrawer';
 import UpdateForm from './components/UpdateForm';
 import AddForm from './components/AddForm';
 import { formatYAndN } from '@/utils/utils';
+import Export from '@/components/Export';
 
 const isvalidEnum = {
   Y: { text: '通过', status: 'Y' },
@@ -252,6 +253,7 @@ const Brand: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
+          <Export request={exportBrand}/>,
           <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>
             <PlusOutlined />新建
                     </Button>

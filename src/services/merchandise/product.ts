@@ -80,6 +80,18 @@ export async function getProductDetail(
   });
 }
 
+export async function exportProduct(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  console.log('params',params)
+  return request('/product/info/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
+
 export async function submitForm(body: { [key: string]: any }, options?: { [key: string]: any }) {
   return request('/product/info', {
     method: 'POST',
@@ -118,6 +130,17 @@ export async function getProductTypeList(
 }
 
 /** 品牌类型列表 */
+export async function exportBrand(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/brand/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
+
 export async function getBrandList(
   params: { [key: string]: unknown },
   options?: { [key: string]: any },
