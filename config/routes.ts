@@ -251,15 +251,15 @@ export default [
         name: '卡券管理',
         icon: 'table',
         routes: [
-          {
-            path: 'marketing/coupon/package-maintenance',
-            name: '卡券套餐管理',
-            icon: 'table',
-            component: './Marketing/Coupon/PackageMaintenance',
-          },
+          // {
+          //   path: 'marketing/coupon/package-maintenance',
+          //   name: '卡券套餐管理',
+          //   icon: 'table',
+          //   component: './Marketing/Coupon/PackageMaintenance',
+          // },
           {
             path: 'marketing/coupon/coupon-production',
-            name: '卡券制作管理',
+            name: '卡券管理',
             icon: 'table',
             component: './Marketing/Coupon/CouponProduction',
           },

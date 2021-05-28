@@ -1,23 +1,6 @@
 import { request } from 'umi';
 
 /**
- * 查询列表-卡券制作
- */
-export async function getArticleSortList(
-    params: {
-        pageSize?: number;
-        pageNum?: number;
-    },
-) {
-    return request('/marketing/consumerCoupon/list', {
-        method: 'get',
-        params: {
-            ...params,
-        }
-    });
-}
-
-/**
  * 查询列表-消费券使用范围列表
  */
 export async function getCounponRangeList(
@@ -73,9 +56,26 @@ export async function addCounponRangeList(body: any) {
 }
 
 /**
- * 新建
+ * 查询列表-卡券管理
  */
-export async function addArticleSortList(body: any) {
+export async function getArticleSortList(
+    params: {
+        pageSize?: number;
+        pageNum?: number;
+    },
+) {
+    return request('/marketing/consumerCoupon/list', {
+        method: 'get',
+        params: {
+            ...params,
+        }
+    });
+}
+
+/**
+ * 卡券管理新建&更新
+ */
+export async function updateItem(body: any) {
     return request('/marketing/consumerCoupon', {
         method: 'post',
         data: {
@@ -85,23 +85,11 @@ export async function addArticleSortList(body: any) {
 }
 
 /**
- * 删除
+ * 卡券管理删除
  */
-export async function removeRule(params: { ids: string }) {
+export async function removeItem(params: { ids: string }) {
     return request(`/marketing/consumerCoupon/${params.ids}`, {
         method: 'delete',
-    });
-}
-
-/**
- * 更新
- */
-export async function updateRule(params: any) {
-    return request('/marketing/consumerCoupon', {
-        method: 'put',
-        data: {
-            ...params,
-        },
     });
 }
 
