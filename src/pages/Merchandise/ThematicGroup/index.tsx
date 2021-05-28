@@ -12,11 +12,12 @@ import ProForm, {
   ProFormSwitch,
   ProFormDigit
 } from '@ant-design/pro-form';
-import { getThematicGroupList, addThematicGroup, editThematicGroup, getThematicGroupDetail, deleteThematicGroup } from '@/services/merchandise/thematicGroup';
+import { getThematicGroupList, addThematicGroup, editThematicGroup, getThematicGroupDetail, deleteThematicGroup, exportThematicGroup } from '@/services/merchandise/thematicGroup';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import ImagePicker from '@/components/ImagePicker';
 import { formatYAndN } from '@/utils/utils';
+import Export from '@/components/Export';
 type ThematicGroupListItem = {
   id: string,
   isValid: string | boolean,
@@ -317,6 +318,7 @@ const ThematicGroup: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
+          <Export request={exportThematicGroup}/>,
           <Button type="primary" key="primary" onClick={() => { handleModalVisible(true) }}>
             <PlusOutlined />新建
                     </Button>

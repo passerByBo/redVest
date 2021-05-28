@@ -33,7 +33,7 @@ export async function addThematicGroup(body, options?: { [key: string]: any }) {
  * 编辑专题组
  *
  *  */
- export async function editThematicGroup(body, options?: { [key: string]: any }) {
+export async function editThematicGroup(body, options?: { [key: string]: any }) {
   return request('/product/specialGroup', {
     method: 'PUT',
     data: {
@@ -43,18 +43,30 @@ export async function addThematicGroup(body, options?: { [key: string]: any }) {
   });
 }
 
-export async function getThematicGroupDetail(params:{id:string},options?: { [key: string]: any }){
+export async function getThematicGroupDetail(
+  params: { id: string },
+  options?: { [key: string]: any },
+) {
   return request(`/product/specialGroup/${params.id}`, {
     method: 'GET',
     ...(options || {}),
   });
 }
 
-
-export async function deleteThematicGroup(id:string,options?: { [key: string]: any }){
+export async function deleteThematicGroup(id: string, options?: { [key: string]: any }) {
   return request(`/product/specialGroup/${id}`, {
     method: 'DELETE',
     ...(options || {}),
   });
 }
 
+export async function exportThematicGroup(
+  params: { id: string },
+  options?: { [key: string]: any },
+) {
+  return request('/product/specialGroup/export', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
