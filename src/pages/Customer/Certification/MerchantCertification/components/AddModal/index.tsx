@@ -125,7 +125,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         targetOption.loading = true;
         try {
             const res = await getProvinceList({ pNo: targetOption.value });
-            console.log('YYYYYYYYYYYYYYYYYYYYYYYYYYYY', res)
             if (res.status === 200 && res.code === 200) {
                 targetOption.children = formatCascaderData<IOptions>([...res.data], targetOption.value.length >= 4);
                 targetOption.loading = false;

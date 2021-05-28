@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Input, Form, Select, Radio, Card, Button, DatePicker, message } from 'antd';
+import { Modal, Input, Form, Select, Radio, Card, Button, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import type { ActionType } from '@ant-design/pro-table';
 import { PlusOutlined } from '@ant-design/icons';
+import { ProFormDatePicker } from '@ant-design/pro-form';
 import { nanoid } from 'nanoid'
 
 import { getCounponRangeList, addCounponRangeList, getCounponRangeListAdded, removeCounponRangeList, handletransact } from '@/services/marketing/couponProduction';
@@ -13,8 +14,8 @@ const FormItem = Form.Item;
 
 export interface AddModalProps {
     visible: boolean;
-    onCancel(): void;
-    onFinish: Function;
+    closeAddModal: Function;
+    addNewItem: Function;
 }
 
 type CounponRangeListTable = {
@@ -28,7 +29,6 @@ type CounponRangeListTable = {
 }
 
 const initData = {
-    "billno": '20110' + Math.round(Math.random() + 1),
     "bindid": nanoid(),
     "applyman": "admin",
     "applymanid": "1",
@@ -99,24 +99,31 @@ const handleRemove = async (fields: CounponRangeListTable[]) => {
     }
 };
 
+const formItemLayout = {
+    labelCol: { span: 6, offset: 1 },
+    wrapperCol: { span: 14 },
+};
+
+const nowTime = new Date();
+const timePoint = nowTime.getFullYear() + "" + (nowTime.getMonth() + 1) + nowTime.getDay();
+function getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
+}
+
+
 const AddCouponModal: React.FC<AddModalProps> = (props) => {
     const [form] = Form.useForm();
     const [transactForm] = Form.useForm();
-    const { visible, onCancel, onFinish } = props;
-    const [productVisible, setProductVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
+    const { visible, closeAddModal, addNewItem } = props;
+    const [productVisible, setProductVisible] = useState<boolean>(false);
     const [transactVisible, setTransactVisible] = useState<boolean>(false);
 
+    // 保存
     const handleFinish = async () => {
         const values = await form.validateFields();
-        console.log(values);
-        // onFinish(values);
+        addNewItem(values);
     }
-
-    const formItemLayout = {
-        labelCol: { span: 6, offset: 1 },
-        wrapperCol: { span: 14 },
-    };
 
     const useData = async (useData: any) => {
         const fields = { ...useData }
@@ -136,7 +143,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
         const values2 = await form.validateFields();
         let result = await handleTransact({ ...values1, ...values2 })
         setTransactVisible(false)
-        onCancel();
+        closeAddModal();
         result && actionRef.current?.reloadAndRest?.();
     }
 
@@ -186,7 +193,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
         if (visible) {
             form.setFieldsValue({
                 bindid: nanoid(),
-                billno: '20110' + Math.round(Math.random() + 1),
+                billno: `RZ-` + timePoint + getRandomInt(9) + getRandomInt(9) + getRandomInt(9) + getRandomInt(9) + getRandomInt(9),
             });
         }
     }, [visible])
@@ -197,21 +204,18 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
             visible={visible}
             centered
             footer={[
-                <Button key="back" onClick={onCancel}>
-                    取消
+                <Button key="submit" type="primary" onClick={handleFinish}>
+                    保存
                 </Button>,
-                // <Button key="submit" type="primary" onClick={() => handleFinish()}>
-                //     保存
-                // </Button>,
                 <Button
                     type="primary"
                     onClick={() => { setTransactVisible(true) }}
                 >
-                    办理
+                    发布
                 </Button>,
             ]}
             onOk={() => handleFinish()}
-            onCancel={onCancel}
+            onCancel={() => closeAddModal()}
             width={800}
         >
             <Card title="基本信息" style={{ width: '100%', marginBottom: 26 }}>
@@ -248,16 +252,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                         <Input placeholder="请输入创建人" allowClear />
                     </FormItem>
 
-                    <FormItem
-                        label="创建时间"
-                        name="applyDate"
-                    >
-                        <DatePicker
-                            showTime
-                            format="YYYY-MM-DD HH:mm:ss"
-                            placeholder="选择发布时间"
-                        />
-                    </FormItem>
+                    <ProFormDatePicker required placeholder={"选择发布时间"} width="md" name="applyDate" label="创建时间" />
 
                     <FormItem
                         label="使用类型"
@@ -268,19 +263,9 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                         </Select>
                     </FormItem>
 
-                    <FormItem
-                        label="有效起始日期"
-                        name="startDate"
-                    >
-                        <DatePicker />
-                    </FormItem>
+                    <ProFormDatePicker required placeholder={"选择有效起始日期"} width="md" name="startDate" label="有效起始日期" />
 
-                    <FormItem
-                        label="有效截止日期"
-                        name="endDate"
-                    >
-                        <DatePicker />
-                    </FormItem>
+                    <ProFormDatePicker required placeholder={"选择有效截止日期"} width="md" name="endDate" label="有效截止日期" />
 
                     <FormItem
                         label="卡券名称"
