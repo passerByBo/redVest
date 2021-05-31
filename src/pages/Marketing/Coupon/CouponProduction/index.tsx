@@ -170,10 +170,7 @@ const CouponProduction: React.FC = () => {
     </Popconfirm>,
     <Export request={exportExcel} />,
   ] : [
-    <Button key="export" onClick={() => { }}>
-      <ExportOutlined />
-      导出
-    </Button>
+    <Export request={exportExcel} />
   ];
 
   const columns: ProColumns<TableListItem>[] = [
