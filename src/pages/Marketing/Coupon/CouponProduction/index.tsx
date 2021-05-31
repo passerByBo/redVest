@@ -5,10 +5,12 @@ import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import AddCouponModal from './components/AddCouponModal';
+import UpdateModal from './components/UpdateModal';
 
 import type { TableListItem } from './data.d';
-import { getArticleSortList, updateItem, removeItem } from '@/services/marketing/couponProduction';
+import { getArticleSortList, updateItem, removeItem, exportExcel } from '@/services/marketing/couponProduction';
 import formatRequestListParams from '@/utils/formatRequestListParams';
+import Export from '@/components/Export';
 
 /**
  * 卡券管理主表添加节点
@@ -79,8 +81,10 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 };
 
 const CouponProduction: React.FC = () => {
+  const [formValues, setFormValues] = useState({});
   const [statusKey, setStatusKey] = useState<string>('未生效');
   const [addCouponModalVisible, setAddCouponModalVisible] = useState<boolean>(false);
+  const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
   const actionRef = useRef<ActionType>();
 
@@ -106,9 +110,9 @@ const CouponProduction: React.FC = () => {
   const updateItems = async (value: any) => {
     const res = await handleUpdate(value);
     if (res) {
-      // setUpdateModalVisible(false);
-      // setFormValues({});
-      // actionRef.current?.reloadAndRest?.();
+      setUpdateModalVisible(false);
+      setFormValues({});
+      actionRef.current?.reloadAndRest?.();
     }
   }
 
@@ -138,10 +142,7 @@ const CouponProduction: React.FC = () => {
     >
       <Button type="primary" danger><DeleteOutlined />删除</Button>
     </Popconfirm>,
-    <Button key="export" onClick={() => { }}>
-      <ExportOutlined />
-      导出
-    </Button>,
+    <Export request={exportExcel} />,
   ] : [
     <Button key="export" onClick={() => { }}>
       <ExportOutlined />
@@ -218,10 +219,20 @@ const CouponProduction: React.FC = () => {
       valueType: 'textarea',
     },
     {
+      title: '关联id',
+      dataIndex: 'bindid',
+      valueType: 'textarea',
+      search: false,
+    },
+    {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [<a onClick={() => { }}>编辑</a>],
+      render: (_, item) => [<a onClick={() => {
+        setUpdateModalVisible(true);
+        console.log('编辑', item.bindid);
+        setFormValues({ id: item.id, type: statusKey, bindid: item.bindid });
+      }}>编辑</a>],
     },
   ];
   return (
@@ -260,6 +271,12 @@ const CouponProduction: React.FC = () => {
         visible={addCouponModalVisible}
         closeAddModal={() => setAddCouponModalVisible(false)}
         addNewItem={addNewItem}
+      />
+      <UpdateModal
+        values={formValues}
+        updateModalVisible={updateModalVisible}
+        onSubmit={updateItems}
+        closeUpdateModal={() => setUpdateModalVisible(false)}
       />
     </PageContainer>
   );

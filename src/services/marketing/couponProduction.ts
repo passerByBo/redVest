@@ -104,3 +104,28 @@ export async function handletransact(body: any) {
         }
     });
 }
+
+/**
+ * 卡券管理主表
+ */
+export async function getItemDetail(
+    params: { [key: string]: unknown },
+    options?: { [key: string]: unknown },
+) {
+    return request(`/marketing/consumerCoupon/${params.id}`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+//导出
+export async function exportExcel(
+    params: { id: string },
+    options?: { [key: string]: any },
+) {
+    return request('/product/specialGroup/export', {
+        method: 'GET',
+        params: { ...params },
+        ...(options || {}),
+    });
+}

@@ -1,22 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Input, Form, Select, Radio, Card, Button, message } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
+import { Form, Button, Input, Modal, Select, Spin, message, Radio, Card } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import type { ActionType } from '@ant-design/pro-table';
 import { PlusOutlined } from '@ant-design/icons';
-import { ProFormDatePicker } from '@ant-design/pro-form';
-import { nanoid } from 'nanoid'
-
-import { getCounponRangeList, addCounponRangeList, getCounponRangeListAdded, removeCounponRangeList, handletransact } from '@/services/marketing/couponProduction';
+import type { TableListItem } from '../../data';
+import { transactItem } from '@/services/customer/index';
+import { useRequest } from 'umi';
+import {
+    ProFormDatePicker,
+} from '@ant-design/pro-form';
+import Moment from 'moment';
+import { getCounponRangeList, addCounponRangeList, getCounponRangeListAdded, removeCounponRangeList, handletransact, getItemDetail } from '@/services/marketing/couponProduction';
 import formatRequestListParams from '@/utils/formatRequestListParams';
-
-const { Option } = Select;
-const FormItem = Form.Item;
-
-export interface AddModalProps {
-    visible: boolean;
-    closeAddModal: Function;
-    addNewItem: Function;
-}
 
 type CounponRangeListTable = {
     id: string,
@@ -28,52 +23,48 @@ type CounponRangeListTable = {
     refTablename: string,
 }
 
-const initData = {
-    "applyman": "admin",
-    "applymanid": "1",
-    "useType": "公开",
-    "cardName": "满1000元兑换券",
-    "exceedMoney": 1000,
-    "cardMoney": 200,
-    "cardCount": 10,
-    "totalMoneyLower": 2000,
-    "totalMoneyCapitals": "贰仟元整"
-}
+export type FormValueType = {
+    articleName?: string;
+    desc?: string;
+} & Partial<TableListItem>;
 
-/**
- * 添加节点
- *
- * @param fields
- */
-const handleAdd = async (fields: any) => {
-    const hide = message.loading('正在添加');
-    try {
-        await addCounponRangeList({ ...fields });
-        hide();
-        message.success('添加成功');
-        return true;
-    } catch (error) {
-        hide();
-        message.error('添加失败！');
-        return false;
-    }
+export type UpdateFormProps = {
+    closeUpdateModal: Function;
+    onSubmit: (values: FormValueType) => void;
+    updateModalVisible: boolean;
+    values: any;
+};
+const { Option } = Select;
+const FormItem = Form.Item;
+
+const formLayout = {
+    labelCol: { span: 7 },
+    wrapperCol: { span: 13 },
+};
+
+const formItemLayout = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 14 },
 };
 
 /**
  * 添加节点
- *
- * @param fields
  */
-const handleTransact = async (fields: any) => {
-    const hide = message.loading('正在添加');
+const handleAdd = async (fields: any) => {
+    const hide = message.loading('正在办理');
     try {
-        await handletransact({ ...fields });
+        let res = await transactItem({ ...fields });
+        if (res.status === 200 && res.code !== 200) {
+            hide();
+            message.error('办理失败!' + res.msg, 15);
+            return false;
+        }
         hide();
-        message.success('添加成功');
+        message.success('办理成功');
         return true;
     } catch (error) {
         hide();
-        message.error('添加失败！');
+        message.error('办理失败！');
         return false;
     }
 };
@@ -98,73 +89,115 @@ const handleRemove = async (fields: CounponRangeListTable[]) => {
     }
 };
 
-const formItemLayout = {
-    labelCol: { span: 6, offset: 1 },
-    wrapperCol: { span: 14 },
-};
+const UpdateModal: React.FC<UpdateFormProps> = (props) => {
+    const {
+        onSubmit: handleUpdate,
+        closeUpdateModal,
+        updateModalVisible,
+        values,
+    } = props;
 
-const nowTime = new Date();
-const timePoint = nowTime.getFullYear() + "" + (nowTime.getMonth() + 1) + nowTime.getDay();
-function getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
-}
+    console.log(values.bindid);
 
-
-const AddCouponModal: React.FC<AddModalProps> = (props) => {
+    const actionRef = useRef<ActionType>();
     const [form] = Form.useForm();
     const [transactForm] = Form.useForm();
-    const actionRef = useRef<ActionType>();
-    const { visible, closeAddModal, addNewItem } = props;
     const [productVisible, setProductVisible] = useState<boolean>(false);
     const [transactVisible, setTransactVisible] = useState<boolean>(false);
-    const [currentBindid, setCurrentBindid] = useState<string>("");
-
-    // 保存
-    const handleFinish = async () => {
-        const values = await form.validateFields();
-        addNewItem(values);
-    }
-
-    const useData = async (useData: any) => {
-        const fields = { ...useData }
-        fields.bindid = form.getFieldValue("bindid");
-        let result = await handleAdd(fields)
-        result && actionRef.current?.reloadAndRest?.();
-        setProductVisible(false);
-    };
+    const [data, setData] = useState<any>(null);
 
     const deleteData = async (useData: CounponRangeListTable[]) => {
         let result = await handleRemove(useData)
         result && actionRef.current?.reloadAndRest?.();
     };
 
-    const doTransact = async () => {
-        const values1 = await transactForm.validateFields();
-        const values2 = await form.validateFields();
-        let result = await handleTransact({ ...values1, ...values2 })
-        setTransactVisible(false)
-        closeAddModal();
+    const useData = async (useData: any) => {
+        const fields = { ...useData }
+        fields.bindid = '111';
+        let result = await handleAdd(fields)
         result && actionRef.current?.reloadAndRest?.();
+        setProductVisible(false);
+    };
+
+    // 办理
+    const doTransact = async () => {
+        const transactFormData = await transactForm.validateFields();
+        const formData = await form.validateFields();
+        if (formData.businesslicense && Array.isArray(formData.businesslicense)) {
+            formData.businesslicense = formData.businesslicense.map((item: any) => item.id).join(',');
+        }
+        if (formData.authorizedFile && Array.isArray(formData.authorizedFile)) {
+            formData.authorizedFile = formData.authorizedFile.map((item: any) => item.id).join(',');
+        }
+        if (formData.contaccessory && Array.isArray(formData.contaccessory)) {
+            formData.contaccessory = formData.contaccessory.map((item: any) => item.id).join(',');
+        }
+        formData.id = data.id;
+        console.log(transactFormData, formData);
+        setTransactVisible(false);
+        // handleUpdateModalVisible();
+        handleAdd({ ...formData, ...transactFormData });
     }
 
-    const columnsSelectTable = [
-        {
-            title: '专题组名称',
-            dataIndex: 'rangeType',
-        },
-        {
-            title: '专题名称',
-            dataIndex: 'rangeName',
-        },
-        {
-            title: '操作',
-            dataIndex: 'option',
-            valueType: 'option',
-            render: (_: any, record: any) => [
-                <a onClick={() => { useData(record) }}>使用</a>
-            ],
-        },
-    ];
+    // 保存
+    const handleSave = async () => {
+        const fieldsValue = { ...await form.validateFields() };
+        if (fieldsValue.businesslicense && Array.isArray(fieldsValue.businesslicense)) {
+            fieldsValue.businesslicense = fieldsValue.businesslicense.map((item: any) => item.id).join(',');
+        }
+        if (fieldsValue.authorizedFile && Array.isArray(fieldsValue.authorizedFile)) {
+            fieldsValue.authorizedFile = fieldsValue.authorizedFile.map((item: any) => item.id).join(',');
+        }
+        if (fieldsValue.contaccessory && Array.isArray(fieldsValue.contaccessory)) {
+            fieldsValue.contaccessory = fieldsValue.contaccessory.map((item: any) => item.id).join(',');
+        }
+        fieldsValue.applydate = Moment(fieldsValue.applydate._d).format('YYYY-MM-DD');
+        fieldsValue.id = data.id;
+        handleUpdate({ ...fieldsValue });
+    };
+
+
+    const renderFooter = () => {
+        return (
+            <>
+                <Button onClick={() => closeUpdateModal()}>取消</Button>
+                {
+                    values.type === "草稿"
+                    &&
+                    <>
+                        <Button type="primary" onClick={() => { handleSave() }}>
+                            保存
+                        </Button>
+                        <Button htmlType="button" onClick={() => setTransactVisible(true)}>
+                            办理
+                        </Button>
+                    </>
+                }
+            </>
+        );
+    };
+
+    const { loading, run } = useRequest(getItemDetail.bind(null, { id: values.id }), {
+        manual: true,
+        onSuccess: (result) => {
+            console.log(1);
+            if (result) {
+                form.setFieldsValue({
+                    ...result,
+                });
+                setData(result);
+            } else {
+                message.error('详细信息加载失败！')
+            }
+
+        }
+    })
+
+    useEffect(() => {
+        if (updateModalVisible) {
+            run();
+        }
+    }, [updateModalVisible])
 
     const columns = [
         {
@@ -189,24 +222,33 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
         },
     ];
 
-    useEffect(() => {
-        if (visible) {
-            const currBinid = nanoid();
-            form.setFieldsValue({
-                bindid: currBinid,
-                billno: `RZ-` + timePoint + getRandomInt(9) + getRandomInt(9) + getRandomInt(9) + getRandomInt(9) + getRandomInt(9),
-            });
-            setCurrentBindid(currBinid);
-        }
-    }, [visible])
+    const columnsSelectTable = [
+        {
+            title: '专题组名称',
+            dataIndex: 'rangeType',
+        },
+        {
+            title: '专题名称',
+            dataIndex: 'rangeName',
+        },
+        {
+            title: '操作',
+            dataIndex: 'option',
+            valueType: 'option',
+            render: (_: any, record: any) => [
+                <a onClick={() => { useData(record) }}>使用</a>
+            ],
+        },
+    ];
 
     return (
         <Modal
             title="卡券制作"
-            visible={visible}
+            visible={updateModalVisible}
+            destroyOnClose
             centered
             footer={[
-                <Button key="submit" type="primary" onClick={handleFinish}>
+                <Button key="submit" type="primary" onClick={() => { }}>
                     保存
                 </Button>,
                 <Button
@@ -216,8 +258,8 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                     发布
                 </Button>,
             ]}
-            onOk={() => handleFinish()}
-            onCancel={() => { closeAddModal(); actionRef.current?.reloadAndRest?.(); }}
+            // onOk={() => handleFinish()}
+            onCancel={() => { closeUpdateModal(); values.bindid = "" }}
             width={800}
         >
             <Card title="基本信息" style={{ width: '100%', marginBottom: 26 }}>
@@ -225,7 +267,6 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                     {...formItemLayout}
                     hideRequiredMark
                     form={form}
-                    initialValues={initData}
                 >
                     <FormItem
                         label="单据编号"
@@ -242,6 +283,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                     <FormItem
                         label="关联id"
                         name="bindid"
+                        hidden
                     >
                         <Input />
                     </FormItem>
@@ -327,7 +369,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                         </Button>
                     ]}
                     search={false}
-                    request={formatRequestListParams(getCounponRangeListAdded, { bindid: currentBindid })}
+                    request={formatRequestListParams(getCounponRangeListAdded, { bindid: values.bindid })}
                     columns={columns}
                 />
             </Card>
@@ -371,7 +413,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                 </Form>
             </Modal>
         </Modal>
-    )
-}
+    );
+};
 
-export default AddCouponModal;
+export default UpdateModal;

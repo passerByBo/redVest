@@ -11,6 +11,7 @@ export type TableListItem = {
     endDate: string;
     applyman: string;
     applyDate: string;
+    bindid: string;
 };
 
 export type TableListParams = {
