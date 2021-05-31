@@ -1,5 +1,6 @@
-import React from 'react';
-import { Modal, Input, Form, Select, DatePicker } from 'antd';
+import React, { useEffect } from 'react';
+import { Modal, Input, Form, Select } from 'antd';
+import { ProFormDatePicker } from '@ant-design/pro-form';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -15,15 +16,24 @@ const AddModal: React.FC<AddModalProps> = (props) => {
     const [form] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
 
+    const formItemLayout = {
+        labelCol: { span: 6, offset: 1 },
+        wrapperCol: { span: 14 },
+    };
+
+
     const handleFinish = async () => {
         const values = await form.validateFields();
         onFinish(values);
     }
 
-    const formItemLayout = {
-        labelCol: { span: 6, offset: 1 },
-        wrapperCol: { span: 14 },
-    };
+    useEffect(() => {
+        if (visible) {
+            form.setFieldsValue({
+                isShow: "是"
+            });
+        }
+    }, [visible])
 
     return (
         <Modal
@@ -36,7 +46,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         >
             <Form
                 {...formItemLayout}
-                hideRequiredMark
                 form={form}
                 name="basic"
             >
@@ -88,8 +97,8 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     ]}
                 >
                     <Select>
-                        <Option value="0">是</Option>
-                        <Option value="1">否</Option>
+                        <Option value="是">是</Option>
+                        <Option value="否">否</Option>
                     </Select>
                 </FormItem>
 
@@ -100,18 +109,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     <Input placeholder="请输入作者名称" allowClear />
                 </FormItem>
 
-                <FormItem
-                    label="发布时间"
-                    name="releaseDate"
-                    rules={[{ required: true, message: '请选择开始时间！' }]}
-                >
-                    <DatePicker
-                        style={{ width: '100%' }}
-                        showTime
-                        format="YYYY-MM-DD HH:mm:ss"
-                        placeholder="选择发布时间"
-                    />
-                </FormItem>
+                <ProFormDatePicker required placeholder={"选择发布时间"} width="md" name="releaseDate" label="发布时间" />
             </Form>
         </Modal>
     )

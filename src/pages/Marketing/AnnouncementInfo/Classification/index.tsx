@@ -37,9 +37,7 @@ const handleUpdate = async (fields: FormValueType) => {
     const hide = message.loading('正在更新');
     try {
         await updateRule({
-            type: fields.type,
-            journalismDescribe: fields.journalismDescribe,
-            id: fields.id,
+            ...fields
         });
         hide();
         message.success('更新成功');
@@ -78,16 +76,20 @@ const Classification: React.FC = () => {
     const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
     const actionRef = useRef<ActionType>();
 
-    const confirmAdd = (newData: TableListItem) => {
-        setAddModalVisible(false);
-        handleAdd(newData);
-        actionRef.current?.reloadAndRest?.();
+    const confirmAdd = async (newData: TableListItem) => {
+        const res = await handleAdd(newData);
+        if (res) {
+            setAddModalVisible(false);
+            actionRef.current?.reloadAndRest?.();
+        }
     };
 
-    const removeSingleRow = (selectedRows: TableListItem[]) => {
-        handleRemove(selectedRows)
-        setSelectedRows([]);
-        actionRef.current?.reloadAndRest?.();
+    const removeSingleRow = async (selectedRows: TableListItem[]) => {
+        const res = await handleRemove(selectedRows)
+        if (res) {
+            setSelectedRows([]);
+            actionRef.current?.reloadAndRest?.();
+        }
     }
 
     const columns: ProColumns<TableListItem>[] = [
@@ -181,14 +183,13 @@ const Classification: React.FC = () => {
                         </div>
                     }
                 >
-                    <Button
+                    <Button danger
                         onClick={() => {
                             removeSingleRow(selectedRowsState);
                         }}
                     >
                         批量删除
                     </Button>
-                    <Button type="primary">批量审批</Button>
                 </FooterToolbar>
             )}
             <AddModal

@@ -1,6 +1,9 @@
 import React from 'react';
-import { Form, Button, Input, Modal } from 'antd';
+import { Form, Button, Input, Modal, Select } from 'antd';
 import type { TableListItem } from '../../data.d';
+
+const FormItem = Form.Item;
+const { Option } = Select;
 
 export type FormValueType = {
     articleName?: string;
@@ -13,7 +16,6 @@ export type UpdateFormProps = {
     updateModalVisible: boolean;
     values: Partial<TableListItem>;
 };
-const FormItem = Form.Item;
 
 export type UpdateFormState = {
     formVals: FormValueType;
@@ -25,6 +27,7 @@ const formLayout = {
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
+    const [form] = Form.useForm();
     const {
         onSubmit: handleUpdate,
         onCancel: handleUpdateModalVisible,
@@ -32,21 +35,18 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         values,
     } = props;
 
-    const itemKey = { id: values.id };
-
-    const [form] = Form.useForm();
-
-    const handleNext = async () => {
-        const fieldsValue = await form.validateFields();
-        handleUpdate({ ...itemKey, ...fieldsValue });
+    const handleSave = async () => {
+        const fieldsValue = { ... await form.validateFields() };
+        fieldsValue.id = values.id
+        handleUpdate(fieldsValue);
     };
 
     const renderFooter = () => {
         return (
             <>
                 <Button onClick={() => handleUpdateModalVisible(false, values)}>取消</Button>
-                <Button type="primary" onClick={() => handleNext()}>
-                    下一步
+                <Button type="primary" onClick={() => handleSave()}>
+                    保存
                 </Button>
             </>
         );
@@ -66,8 +66,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                 {...formLayout}
                 form={form}
                 initialValues={{
-                    type: values.type,
-                    journalismDescribe: values.journalismDescribe,
+                    ...values
                 }}
             >
                 <FormItem
@@ -75,18 +74,50 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                     name="type"
                     rules={[
                         {
-                            required: true, message: '请输入规则名称！'
+                            required: true
                         },
                     ]}
                 >
                     <Input placeholder="请输入分类名称" allowClear />
                 </FormItem>
                 <FormItem
+                    label="上级分类名称"
+                    name="parentType"
+                >
+                    <Input placeholder="请输入上级分类名称" allowClear />
+                </FormItem>
+                <FormItem
+                    label="级别"
+                    name="typeLevel"
+                >
+                    <Input placeholder="请输入级别" allowClear />
+                </FormItem>
+                <FormItem
                     label="描述"
                     name="journalismDescribe"
-                    rules={[{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }]}
                 >
                     <Input.TextArea rows={4} placeholder="请输入描述内容" />
+                </FormItem>
+                <FormItem
+                    label="排序"
+                    name="sort"
+                >
+                    <Input placeholder="请输入排序" allowClear />
+                </FormItem>
+                <FormItem
+                    label="关键字"
+                    name="keyword"
+                >
+                    <Input placeholder="请输入关键字" allowClear />
+                </FormItem>
+                <FormItem
+                    label="是否在导航栏显示"
+                    name="isRecommend"
+                >
+                    <Select>
+                        <Option value="是">是</Option>
+                        <Option value="否">否</Option>
+                    </Select>
                 </FormItem>
             </Form>
         </Modal>

@@ -1,6 +1,10 @@
 import React from 'react';
-import { Form, Button, Input, Modal } from 'antd';
+import { Form, Button, Input, Modal, Select } from 'antd';
+import { ProFormDatePicker } from '@ant-design/pro-form';
 import type { TableListItem } from '../../data.d';
+
+const FormItem = Form.Item;
+const { Option } = Select;
 
 export type FormValueType = {
     type?: string;
@@ -13,7 +17,6 @@ export type UpdateFormProps = {
     updateModalVisible: boolean;
     values: Partial<TableListItem>;
 };
-const FormItem = Form.Item;
 
 export type UpdateFormState = {
     formVals: FormValueType;
@@ -25,6 +28,7 @@ const formLayout = {
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
+    const [form] = Form.useForm();
     const {
         onSubmit: handleUpdate,
         onCancel: handleUpdateModalVisible,
@@ -32,21 +36,20 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         values,
     } = props;
 
-    const itemKey = { id: values.id };
+    console.log(values);
 
-    const [form] = Form.useForm();
-
-    const handleNext = async () => {
-        const fieldsValue = await form.validateFields();
-        handleUpdate({ ...itemKey, ...fieldsValue });
+    const handleSave = async () => {
+        const fieldsValue = { ... await form.validateFields() };
+        fieldsValue.id = values.id
+        handleUpdate(fieldsValue);
     };
 
     const renderFooter = () => {
         return (
             <>
                 <Button onClick={() => handleUpdateModalVisible(false, values)}>取消</Button>
-                <Button type="primary" onClick={() => handleNext()}>
-                    下一步
+                <Button type="primary" onClick={() => handleSave()}>
+                    保存
                 </Button>
             </>
         );
@@ -66,8 +69,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                 {...formLayout}
                 form={form}
                 initialValues={{
-                    type: values.type,
-                    title: values.title,
+                    ...values
                 }}
             >
                 <FormItem
@@ -75,19 +77,62 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                     name="type"
                     rules={[
                         {
-                            required: true, message: '请输入规则名称！'
+                            required: true
                         },
                     ]}
                 >
-                    <Input placeholder="请输入分类名称" allowClear />
+                    <Input placeholder="请输入文章分类名称" allowClear />
                 </FormItem>
+
                 <FormItem
                     label="文章标题"
                     name="title"
-                    rules={[{ required: true, message: '请输入文章标题！', min: 5 }]}
+                    rules={[
+                        {
+                            required: true
+                        },
+                    ]}
                 >
-                    <Input.TextArea rows={4} placeholder="请输入文章标题！" />
+                    <Input placeholder="请输入文章标题" allowClear />
                 </FormItem>
+
+                <FormItem
+                    label="文章重要性"
+                    name="isRecommend"
+                >
+                    <Input placeholder="请选择文章重要性" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="外部链接"
+                    name="urladdress"
+                >
+                    <Input placeholder="请输入外部链接" allowClear />
+                </FormItem>
+
+                <FormItem
+                    label="是否展示"
+                    name="isShow"
+                    rules={[
+                        {
+                            required: true
+                        },
+                    ]}
+                >
+                    <Select>
+                        <Option value="是">是</Option>
+                        <Option value="否">否</Option>
+                    </Select>
+                </FormItem>
+
+                <FormItem
+                    label="作者"
+                    name="author"
+                >
+                    <Input placeholder="请输入作者名称" allowClear />
+                </FormItem>
+
+                <ProFormDatePicker required placeholder={"选择发布时间"} width="md" name="releaseDate" label="发布时间" />
             </Form>
         </Modal>
     );

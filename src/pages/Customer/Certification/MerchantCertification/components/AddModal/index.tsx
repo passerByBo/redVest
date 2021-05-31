@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Input, Form, Select, DatePicker, message, Button, Radio, Cascader } from 'antd';
+import { Modal, Input, Form, Select, message, Button, Radio, Cascader } from 'antd';
 import { getProvinceList } from '@/services/user/register';
 import { transactItem } from '@/services/customer/index';
 import ImagePicker from '@/components/ImagePicker';
@@ -29,29 +29,29 @@ const nowTime = new Date();
 const timePoint = nowTime.getFullYear() + "" + (nowTime.getMonth() + 1) + nowTime.getDay();
 
 const initData = {
-    "compName": "汇安居(北京)信息科技有限公司1",
+    // "compName": "汇安居(北京)信息科技有限公司1",
     "companytype": "供方",
-    "mainBusiness": "技术推广；经济贸易咨询；市场调查；承办展览展示；会议服务；家庭劳务服务；销售家用电器、电子产品、五金交电、建筑材料、机械设备、专用设备、汽车配件；维修家用电器；装卸服务；搬运服务；仓储服务；分批包装；配送服务；维修家具；软件开发；专业承包。",
-    "companyregnum": "911101120" + getRandomInt(9) + getRandomInt(9) + "609815N",
-    "inprovinces": "北京市",
-    "incities": "北京市",
-    "region": ["11", "1101", "110103"],
-    "selfSupport": "是",
+    // "mainBusiness": "技术推广；经济贸易咨询；市场调查；承办展览展示；会议服务；家庭劳务服务；销售家用电器、电子产品、五金交电、建筑材料、机械设备、专用设备、汽车配件；维修家用电器；装卸服务；搬运服务；仓储服务；分批包装；配送服务；维修家具；软件开发；专业承包。",
+    // "companyregnum": "911101120" + getRandomInt(9) + getRandomInt(9) + "609815N",
+    // "inprovinces": "北京市",
+    // "incities": "北京市",
+    // "region": ["11", "1101", "110103"],
+    // "selfSupport": "是",
     "nameAgent": "北京代理",
-    "adressOffice": "北京市通州区物流基地兴贸二街16号581室",
-    "businesslicense": "红背心fg_logo.png",
-    "companyprofile": "红背心成立于2014年，是汇安居（北京）信息科技有限公司打造的一个为全国家居电商提供专业的仓储、配送、安装、维修以及售后服务一体化的服务平台。红背心以“专注服务，安全高效”为品牌理念，为商家提供一站式售后解决方案，帮助商家为消费者提供高标准的家具送装服务体验。同时结合互联网应用技术实现全供应链的全程节点管控和信息管理同步，为商家提供全链数据和信息支持，进一步降低商家物流、售后服务成本。也为全国师傅提供行业内标准化、规范化的事业平台。",
-    "shopname": "红背心自营商城" + getRandomInt(999),
-    "shopmobile": "176001330" + getRandomInt(9) + getRandomInt(9),
-    "authorizedFile": "红背心fg_logo.png",
-    "authorizedUsername": "红背心自营店长",
-    "authorizedUserTel": "152101885" + getRandomInt(9) + getRandomInt(9),
-    "authorizedUserMail": "jianghua@hongbeixin.com",
-    "officeTel": "152101408" + getRandomInt(9) + getRandomInt(9),
-    "contaccessory": "红背心fg_logo.png",
-    "bankDeposit": "招商银行",
-    "accountName": "科技信息公司" + getRandomInt(999),
-    "bankAccount": "621010101010101010",
+    // "adressOffice": "北京市通州区物流基地兴贸二街16号581室",
+    // "businesslicense": "红背心fg_logo.png",
+    // "companyprofile": "红背心成立于2014年，是汇安居（北京）信息科技有限公司打造的一个为全国家居电商提供专业的仓储、配送、安装、维修以及售后服务一体化的服务平台。红背心以“专注服务，安全高效”为品牌理念，为商家提供一站式售后解决方案，帮助商家为消费者提供高标准的家具送装服务体验。同时结合互联网应用技术实现全供应链的全程节点管控和信息管理同步，为商家提供全链数据和信息支持，进一步降低商家物流、售后服务成本。也为全国师傅提供行业内标准化、规范化的事业平台。",
+    // "shopname": "红背心自营商城" + getRandomInt(999),
+    // "shopmobile": "176001330" + getRandomInt(9) + getRandomInt(9),
+    // "authorizedFile": "红背心fg_logo.png",
+    // "authorizedUsername": "红背心自营店长",
+    // "authorizedUserTel": "152101885" + getRandomInt(9) + getRandomInt(9),
+    // "authorizedUserMail": "jianghua@hongbeixin.com",
+    // "officeTel": "152101408" + getRandomInt(9) + getRandomInt(9),
+    // "contaccessory": "红背心fg_logo.png",
+    // "bankDeposit": "招商银行",
+    // "accountName": "科技信息公司" + getRandomInt(999),
+    // "bankAccount": "621010101010101010",
     "settlementtype": "按周结算"
 }
 
@@ -168,7 +168,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
             <Form
                 {...formItemLayout}
                 form={form}
-                // initialValues={initData}
                 onFinish={handleFinish}
             >
                 <FormItem

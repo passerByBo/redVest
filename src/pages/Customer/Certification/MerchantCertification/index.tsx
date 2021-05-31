@@ -81,7 +81,7 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 
 const MerchantCertification: React.FC = () => {
     const [formValues, setFormValues] = useState({});
-    const [statusKey, setStatusKey] = useState<string>('代办');
+    const [statusKey, setStatusKey] = useState<string>('草稿');
     const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
     const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
@@ -184,16 +184,16 @@ const MerchantCertification: React.FC = () => {
                 }}
                 tabList={[
                     {
+                        tab: '草稿',
+                        key: '草稿',
+                    },
+                    {
                         tab: '代办',
                         key: '代办',
                     },
                     {
                         tab: '已办',
                         key: '已办',
-                    },
-                    {
-                        tab: '草稿',
-                        key: '草稿',
                     }
                 ]}
                 onTabChange={onTabChange}

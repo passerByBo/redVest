@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Input, Form, Select } from 'antd';
 
 const { Option } = Select;
@@ -10,29 +10,27 @@ export interface AddModalProps {
     onFinish: (values: any) => void;
 }
 
-const waitTime = (time: number = 100) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(true);
-        }, time);
-    });
-};
-
 const AddModal: React.FC<AddModalProps> = (props) => {
-
     const [form] = Form.useForm();
     const { visible, onCancel, onFinish } = props;
-
-    const handleFinish = async () => {
-        await waitTime(2000);
-        const values = await form.validateFields();
-        onFinish(values);
-    }
 
     const formItemLayout = {
         labelCol: { span: 6, offset: 1 },
         wrapperCol: { span: 14 },
     };
+
+    const handleFinish = async () => {
+        const values = await form.validateFields();
+        onFinish(values);
+    }
+
+    useEffect(() => {
+        if (visible) {
+            form.setFieldsValue({
+                isRecommend: "是"
+            });
+        }
+    }, [visible])
 
     return (
         <Modal
@@ -45,7 +43,6 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         >
             <Form
                 {...formItemLayout}
-                hideRequiredMark
                 form={form}
             >
                 <FormItem
@@ -94,8 +91,8 @@ const AddModal: React.FC<AddModalProps> = (props) => {
                     name="isRecommend"
                 >
                     <Select>
-                        <Option value="0">是</Option>
-                        <Option value="1">否</Option>
+                        <Option value="是">是</Option>
+                        <Option value="否">否</Option>
                     </Select>
                 </FormItem>
             </Form>
