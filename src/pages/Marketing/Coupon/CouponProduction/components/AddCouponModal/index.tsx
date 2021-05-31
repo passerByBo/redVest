@@ -176,10 +176,6 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
             dataIndex: 'rangeName',
         },
         {
-            title: '备注',
-            dataIndex: 'refTablename',
-        },
-        {
             title: '操作',
             dataIndex: 'option',
             valueType: 'option',
@@ -243,7 +239,7 @@ const AddCouponModal: React.FC<AddModalProps> = (props) => {
                         label="关联id"
                         name="bindid"
                     >
-                        <Input />
+                        <Input disabled />
                     </FormItem>
 
                     <FormItem

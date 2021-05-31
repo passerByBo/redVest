@@ -8,7 +8,7 @@ import AddCouponModal from './components/AddCouponModal';
 import UpdateModal from './components/UpdateModal';
 
 import type { TableListItem } from './data.d';
-import { getArticleSortList, updateItem, removeItem, exportExcel } from '@/services/marketing/couponProduction';
+import { getArticleSortList, updateItem, removeItem, exportExcel, handletransact } from '@/services/marketing/couponProduction';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import Export from '@/components/Export';
 
@@ -80,6 +80,23 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
   }
 };
 
+/**
+ * 发布
+ */
+const handleTransact = async (fields: any) => {
+  const hide = message.loading('正在添加');
+  try {
+    await handletransact({ ...fields });
+    hide();
+    message.success('添加成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('添加失败！');
+    return false;
+  }
+};
+
 const CouponProduction: React.FC = () => {
   const [formValues, setFormValues] = useState({});
   const [statusKey, setStatusKey] = useState<string>('未生效');
@@ -109,6 +126,16 @@ const CouponProduction: React.FC = () => {
   // 主表更新
   const updateItems = async (value: any) => {
     const res = await handleUpdate(value);
+    if (res) {
+      setUpdateModalVisible(false);
+      setFormValues({});
+      actionRef.current?.reloadAndRest?.();
+    }
+  }
+
+  //发布
+  const publicItem = async (value: any) => {
+    const res = await handleTransact(value);
     if (res) {
       setUpdateModalVisible(false);
       setFormValues({});
@@ -230,7 +257,6 @@ const CouponProduction: React.FC = () => {
       valueType: 'option',
       render: (_, item) => [<a onClick={() => {
         setUpdateModalVisible(true);
-        console.log('编辑', item.bindid);
         setFormValues({ id: item.id, type: statusKey, bindid: item.bindid });
       }}>编辑</a>],
     },
@@ -276,6 +302,7 @@ const CouponProduction: React.FC = () => {
         values={formValues}
         updateModalVisible={updateModalVisible}
         onSubmit={updateItems}
+        publicItem={publicItem}
         closeUpdateModal={() => setUpdateModalVisible(false)}
       />
     </PageContainer>
