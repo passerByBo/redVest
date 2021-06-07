@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { ImportOutlined, ExportOutlined, InboxOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Modal, Upload, message } from 'antd';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
+import { ImportOutlined, InboxOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Modal, Upload, message, FormInstance } from 'antd';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { exportOrder, goShip, orderList } from '@/services/order';
@@ -40,49 +40,45 @@ export interface OrderListItem {
 ['待付款', '待发货', '待收货', '已完成', '已关闭'];
 
 const orderStatusEnum = {
-  '-0': {
-    text: '全部',
-    value: 0
-  },
-  '0': {
+  // '-0': {
+  //   text: '全部',
+  //   value: 0
+  // },
+  '待付款': {
     text: '待付款',
-    value: 1,
+    value: '待付款',
     status: 'Warning'
   },
-  '1': {
+  '待发货': {
     text: '待发货',
-    value: 2,
-    status: 'Error'
+    value: '待发货',
   },
-  '2': {
+  '待收货': {
     text: '待收货',
-    value: 3,
-    status: 'Default'
+    value:  '待收货'
   },
-  '3': {
+  '已完成': {
     text: '已完成',
-    value: 4,
-    status: 'Success'
+    value: '已完成'
   },
-  '4': {
+  '已关闭': {
     text: '已关闭',
-    value: 5,
-    status: 'Processing'
+    value: '已关闭'
   },
 }
 
 const payStatusEnum = {
-  '1': {
+  '待付款': {
     text: '待付款',
-    value: '1',
+    value: '待付款',
   },
-  '2': {
+  '已退款/退款审核中': {
     text: '已退款/退款审核中',
-    value: '2',
+    value: '审核中',
   },
-  '3': {
+  '已退款': {
     text: '已退款',
-    value: '3',
+    value: '已退款',
   },
 }
 
@@ -90,10 +86,7 @@ const payStatusEnum = {
 let callbackDetail: Function | null = null;
 
 const Order: React.FC = (props) => {
-
-  const { children } = props;
-  console.log(children)
-
+  const formRef = useRef<FormInstance>();
   //导入快递单号状态
   const [importVisible, setImportVisible] = useState(false); RefundModel
 
@@ -101,7 +94,7 @@ const Order: React.FC = (props) => {
   const [refundVisible, setRefundVisible] = useState(false);
 
   //查看订单详情
-  const [selectedRowsState, setSelectedRows] = useState<OrderListItem[]>([]);
+  // const [selectedRowsState, setSelectedRows] = useState<OrderListItem[]>([]);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<OrderListItem>();
 
@@ -233,8 +226,8 @@ const Order: React.FC = (props) => {
     name: 'file',
     multiple: false,
     action: '',
-    onChange(info) {
-      console.log('info', info)
+    onChange(info:any) {
+
     }
   }
 
@@ -267,11 +260,13 @@ const Order: React.FC = (props) => {
             headerTitle="订单列表"
             actionRef={actionRef}
             rowKey="id"
+            formRef={formRef}
             search={{
               labelWidth: 120,
             }}
             toolBarRender={() => [
-              <Export request={exportOrder}/>,
+              <Export request={exportOrder.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })}/>,
+              // <Export request={exportOrder.bind(null, {orderStatus: '待发货'})}>待发货订单导出</Export>,
               <Button
                 type="primary"
                 key="primary"
@@ -290,7 +285,7 @@ const Order: React.FC = (props) => {
           //   },
           // }}
           />
-          {selectedRowsState?.length > 0 && (
+          {/* {selectedRowsState?.length > 0 && (
             <FooterToolbar
               extra={
                 <div>
@@ -318,7 +313,7 @@ const Order: React.FC = (props) => {
             </Button>
               <Button type="primary">批量审批</Button>
             </FooterToolbar>
-          )}
+          )} */}
 
           <Modal
             title="快递单号批量导入"

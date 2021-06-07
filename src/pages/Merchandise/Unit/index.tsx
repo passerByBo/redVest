@@ -1,13 +1,12 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { DeleteOutlined, ExportOutlined, PlusOutlined, StopOutlined, UpCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined,PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, Divider, message, Popconfirm } from 'antd';
+import { Button, Divider, FormInstance, message, Popconfirm } from 'antd';
 
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import AddForm from './component/AddForm';
 import UpdateForm from './component/UpdateForm';
-import DetailDrawer from './component/DetailDrawer';
 import { addUnit, deleteUnit, exportUnit, getUnitList, updateUnit } from '@/services/merchandise/unit';
 import Export from '@/components/Export';
 
@@ -19,7 +18,7 @@ export interface IUnit {
 
 
 const Unit: React.FC = () => {
-
+  const formRef = useRef<FormInstance>();
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   //新增窗口
@@ -183,8 +182,9 @@ const Unit: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
+        formRef={formRef}
         toolBarRender={() => [
-          <Export request={exportUnit} />,
+          <Export request={exportUnit.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })} />,
           <Popconfirm
             placement="topRight"
             title={'确定要删除选中的所有单位' + '吗？'}

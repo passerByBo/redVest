@@ -117,7 +117,7 @@ const Register: React.FC = () => {
   };
 
   const submit = async (fields: any) => {
-    fields.region = fields.region.pop();
+    // fields.region = fields.region.pop();
 
 
     // fields.contaccessory = 'https://img2.baidu.com/it/u=507575223,907330772&fm=26&fmt=auto&gp=0.jpg';

@@ -2,7 +2,7 @@ import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Image, Popconfirm } from 'antd';
+import { Button, message, Image, Popconfirm, FormInstance } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { addBrand, deleteBrand, exportBrand, getBrandList, updateBrand } from '@/services/merchandise/product';
 import formatRequestListParams from '@/utils/formatRequestListParams';
@@ -33,6 +33,7 @@ export interface IBrand {
 
 
 const Brand: React.FC = () => {
+  const formRef = useRef<FormInstance>();
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   //新增窗口
@@ -251,9 +252,10 @@ const Brand: React.FC = () => {
       <ProTable
         actionRef={actionRef}
         rowKey="id"
+        formRef={formRef}
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
-          <Export request={exportBrand}/>,
+          <Export request={exportBrand.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })}/>,
           <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>
             <PlusOutlined />新建
                     </Button>

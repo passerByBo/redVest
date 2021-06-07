@@ -2,7 +2,7 @@ import { DeleteOutlined, ExclamationCircleOutlined, MenuFoldOutlined, MenuUnfold
 import React, { useState, useRef, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Modal, Popconfirm, Space } from 'antd';
+import { Button, FormInstance, message, Modal, Popconfirm, Space } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { addMerchandiseType, deleteMerchandiseType, exportMerchandiseType, getMerchandiseTypeList, updateMerchandiseType } from '@/services/merchandise/merchandiseType'
 import UpdateForm from './components/UpdateForm';
@@ -25,11 +25,17 @@ export interface IMerchandiseType {
   typeDescribe: string;
 }
 
+const isvalidEnum = {
+  Y: { text: '是', status: 'Y' },
+  N: { text: '否', status: 'N' },
+};
+
 
 //保存当前页面的数据
 let loadData:IMerchandiseType[] = [];
 
 const MerchandiseType: React.FC = () => {
+  const formRef = useRef<FormInstance>();
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   //新增窗口
@@ -74,7 +80,8 @@ const MerchandiseType: React.FC = () => {
     {
       title: '是否有效',
       dataIndex: 'isValid',
-      valueType: 'textarea',
+      valueType: 'select',
+      valueEnum: isvalidEnum,
       render: (_,data) => {
         return <span>{formatYAndN((data as any).isValid)}</span>
       }
@@ -278,8 +285,9 @@ const MerchandiseType: React.FC = () => {
         actionRef={actionRef}
         rowKey="id"
         search={{ labelWidth: 120 }}
+        formRef={formRef}
         toolBarRender={() => [
-          <Export request={exportMerchandiseType}/>,
+          <Export request={exportMerchandiseType.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })}/>,
           <Button key="unfold" onClick={() => { handleUnfold() }}>
             <MenuUnfoldOutlined />
             全部展开

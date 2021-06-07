@@ -27,7 +27,7 @@ const Export: React.FC<IDownload> = (props) => {
     manual: true,
     onSuccess: (result) => {
       if (result) {
-        let name  = result;
+        let name = result;
         let baseUrl = `/prod-api/common/download?fileName=${name}&delete=false`
         download(baseUrl, name);
       } else {
@@ -41,7 +41,7 @@ const Export: React.FC<IDownload> = (props) => {
 
 
   return (
-    <Button onClick={() => run()} loading={loading} {...others} icon={<ExportOutlined />}>导出</Button>
+    <Button onClick={() => run()} loading={loading} {...others} icon={<ExportOutlined />}>{props.children ? props.children : '导出'}</Button>
   )
 }
 

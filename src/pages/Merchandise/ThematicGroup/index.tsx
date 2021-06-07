@@ -2,7 +2,7 @@ import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, Drawer, Form, message, Popconfirm, Upload, Image } from 'antd';
+import { Button, Drawer, Form, message, Popconfirm, Upload, Image, FormInstance } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import ProForm, {
   ModalForm,
@@ -113,7 +113,7 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
 const ThematicGroup: React.FC = () => {
 
   const [updateForm] = Form.useForm();
-
+  const formRef = useRef<FormInstance>();
   /** 新建窗口的弹窗 */
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /** 分布更新窗口的弹窗 */
@@ -315,10 +315,11 @@ const ThematicGroup: React.FC = () => {
     <PageContainer>
       <ProTable<ThematicGroupListItem>
         actionRef={actionRef}
+        formRef={formRef}
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
-          <Export request={exportThematicGroup}/>,
+          <Export request={exportThematicGroup.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })} />,
           <Button type="primary" key="primary" onClick={() => { handleModalVisible(true) }}>
             <PlusOutlined />新建
                     </Button>

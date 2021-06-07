@@ -19,7 +19,7 @@ export interface ILabel {
 
 
 const Label: React.FC = () => {
-
+  const formRef = useRef<FormInstance>();
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   //新增窗口
@@ -202,13 +202,14 @@ const Label: React.FC = () => {
         title: '标签管理',
       }}>
       <ProTable
+       formRef={formRef}
         actionRef={actionRef}
         rowKey="id"
         search={{
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          <Export request={exportLabel}/>,
+          <Export request={exportLabel.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })}/>,
           <Button
             key="primary1"
             onClick={() => {

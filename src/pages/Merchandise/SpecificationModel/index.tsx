@@ -2,7 +2,7 @@ import { ExportOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useCallback, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, message, Space, Switch } from 'antd';
+import { Button, FormInstance, message, Space, Switch } from 'antd';
 // import AddFormModal from './components/AddFormModal'
 import ProTable from '@ant-design/pro-table';
 
@@ -26,6 +26,7 @@ export interface ISpecationModel {
 
 
 const SpecificationModel: React.FC = () => {
+  const formRef = useRef<FormInstance>();
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   //新增窗口
@@ -218,13 +219,14 @@ const SpecificationModel: React.FC = () => {
       }}>
       <ProTable
         actionRef={actionRef}
+        formRef={formRef}
         rowKey='id'
         request={formatRequestListParams(getSpecModelList)}
         search={{
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          <Export request={exportSpecificationModel}/>,
+          <Export request={exportSpecificationModel.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })}/>,
           <Button onClick={() => { handleValid(selectedRowsState, true) }}>
             <PlusOutlined /> 启用
          </Button>,
