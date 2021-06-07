@@ -2,7 +2,7 @@ import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useCallback } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Button, message, Image, Popconfirm } from 'antd';
+import { Button, message, Image, Popconfirm, FormInstance } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 import { addThematic, deleteThematic,  exportThematic,  getThematicList, updateThematic } from '@/services/merchandise/thematic';
@@ -26,7 +26,7 @@ export type ProductListItem = {
 };
 
 const Thematic: React.FC = () => {
-
+  const formRef = useRef<FormInstance>();
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   //新增窗口
@@ -236,10 +236,11 @@ const Thematic: React.FC = () => {
     <PageContainer>
       <ProTable<ProductListItem>
         actionRef={actionRef}
+        formRef={formRef}
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
-          <Export request={exportThematic}/>,
+          <Export request={exportThematic.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })}/>,
           <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>
             <PlusOutlined />新建
                     </Button>

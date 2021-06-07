@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Image, Divider, Popconfirm, message } from 'antd';
+import { Image, Divider, Popconfirm, message, FormInstance } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { deleteRecycle, exportProduct, getProductList, resetRecycle } from '@/services/merchandise/product';
 import formatRequestListParams from '@/utils/formatRequestListParams';
@@ -24,6 +24,7 @@ type ProductListItem = {
 }
 
 const Recycle: React.FC = () => {
+  const formRef = useRef<FormInstance>();
   const actionRef = useRef<ActionType>();
 
   const resetProduct = async (data: ProductListItem | ProductListItem[]) => {
@@ -79,12 +80,12 @@ const Recycle: React.FC = () => {
       title: '商品图片',
       dataIndex: 'imgUrl',
       search: false,
-      render: (_:any, record:any) => {
+      render: (_: any, record: any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-             src={_ && Array.isArray(_) &&  _[0] && _[0].imgUrl}
+            src={_ && Array.isArray(_) && _[0] && _[0].imgUrl}
           />
         )
       },
@@ -157,8 +158,9 @@ const Recycle: React.FC = () => {
       }}>
       <ProTable<ProductListItem, API.PageParams>
         toolBarRender={() => [
-          <Export request={exportProduct.bind(null,{ productStatus: '已回收' })}/>,
+          <Export request={exportProduct.bind(null, { ...(formRef.current?.getFieldsValue() || {}), productStatus: '已回收' })} />,
         ]}
+        formRef={formRef}
         tableAlertOptionRender={false}
         tableAlertRender={false}
         actionRef={actionRef}
