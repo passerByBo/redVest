@@ -188,8 +188,8 @@ const MerchantCertification: React.FC = () => {
                         key: '草稿',
                     },
                     {
-                        tab: '代办',
-                        key: '代办',
+                        tab: '待办',
+                        key: '待办',
                     },
                     {
                         tab: '已办',

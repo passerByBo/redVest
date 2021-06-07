@@ -151,11 +151,18 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                     <>
                         <Button type="primary" onClick={() => { handleSave() }}>
                             保存
-                        </Button>
-                        <Button htmlType="button" onClick={() => setTransactVisible(true)}>
+                            </Button>
+                        <Button type="primary" onClick={() => setTransactVisible(true)}>
                             办理
-                        </Button>
+                            </Button>
                     </>
+                }
+                {
+                    values.type === "待办"
+                    &&
+                    <Button type="primary" onClick={() => setTransactVisible(true)}>
+                        办理
+                    </Button>
                 }
             </>
         );
