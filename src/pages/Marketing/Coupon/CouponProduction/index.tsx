@@ -285,7 +285,7 @@ const CouponProduction: React.FC = () => {
         toolbar={{ actions: toolBarRenderList }}
         request={formatRequestListParams(getArticleSortList, { cardStatus: statusKey })}
         columns={columns}
-        rowSelection={{
+        rowSelection={{ 
           onChange: (_, selectedRows) => setSelectedRows(selectedRows),
         }}
       />
