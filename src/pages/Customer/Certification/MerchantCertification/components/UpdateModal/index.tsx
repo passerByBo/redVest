@@ -28,6 +28,7 @@ export type UpdateFormProps = {
     onSubmit: (values: FormValueType) => void;
     updateModalVisible: boolean;
     values: any;
+    doRefresh: () => void;
 };
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -70,6 +71,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         onCancel: handleUpdateModalVisible,
         updateModalVisible,
         values,
+        doRefresh
     } = props;
 
     const [form] = Form.useForm();
@@ -96,6 +98,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         setTransactVisible(false);
         handleUpdateModalVisible();
         handleAdd({ ...formData, ...transactFormData });
+        doRefresh();
     }
 
     // 保存

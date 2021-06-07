@@ -102,7 +102,6 @@ const MerchantCertification: React.FC = () => {
             setAddModalVisible(false);
             actionRef.current?.reloadAndRest?.();
         }
-
     };
 
     // 主表删除
@@ -124,6 +123,11 @@ const MerchantCertification: React.FC = () => {
         }
     }
 
+    //刷新主表
+    const doRefresh = () => {
+        console.log("doRefresh")
+        actionRef.current?.reloadAndRest?.();
+    }
     // const onBtnClick = (item: number) => {
     //     setBtnIndex(item);
     //     setFlowStepVisible(true);
@@ -242,12 +246,14 @@ const MerchantCertification: React.FC = () => {
                 visible={addModalVisible}
                 onFinish={addNewItem}
                 onCancel={() => setAddModalVisible(false)}
+                doRefresh={doRefresh}
             />
             {/* 详情 */}
             <UpdateModal
                 values={formValues}
                 updateModalVisible={updateModalVisible}
                 onSubmit={updateItems}
+                doRefresh={doRefresh}
                 onCancel={() => setUpdateModalVisible(false)}
             />
             {/* <FlowStep visible={flowStepVisible} onCancel={onCancel} btnIndex={btnIndex} /> */}

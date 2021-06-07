@@ -13,6 +13,7 @@ const FormItem = Form.Item;
 export interface AddModalProps {
     visible: boolean;
     onCancel: () => void;
+    doRefresh: () => void;
     onFinish: (values: any) => void;
 }
 
@@ -96,7 +97,7 @@ const handleAdd = async (fields: any) => {
 const AddModal: React.FC<AddModalProps> = (props) => {
     const [form] = Form.useForm();
     const [transactForm] = Form.useForm();
-    const { visible, onCancel, onFinish } = props;
+    const { visible, onCancel, onFinish, doRefresh } = props;
     const [transactVisible, setTransactVisible] = useState<boolean>(false);
     const [chinaDivisionsOptions, setChinaDivisionsOptions] = useState<IOptions[]>([]);
 
@@ -118,6 +119,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
         setTransactVisible(false);
         onCancel();
         handleAdd({ ...formData, ...transactFormData });
+        doRefresh();
     }
 
     const loadDivisionsData = async (selectedOptions: any) => {
