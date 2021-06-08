@@ -7,7 +7,7 @@ import ProForm, {
 } from '@ant-design/pro-form';
 
 import { Form, Input, Card } from 'antd';
-
+import ImagePicker from '@/components/ImagePicker';
 import ProductTable from './ProductList';
 
 export type FormValueType = {
@@ -34,15 +34,14 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addForm] = Form.useForm();
   const { addModalVisible, onSubmit, onCancel } = props;
   const [tableVisible, setTableVisible] = useState<boolean>(false);
+  const [data, setData] = useState<any>(null);
   const onSearch = () => { setTableVisible(!tableVisible) };
 
   const useData = (useData: any) => {
     console.log(useData);
+    setData(useData);
     addForm.setFieldsValue({
-      specialName: useData.specialName,
-      specialDescribe: useData.specialDescribe,
-      isValid: useData.isValid,
-      sort: useData.sort
+      ...useData
     });
     setTableVisible(false);
   };
@@ -58,27 +57,11 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
           onCancel(false)
         }
       }}
-      onFinish={async (data) => {
+      onFinish={async () => {
+        console.log("data--->", data);
         const fields = { ...data }
-        if (fields.isRecommend === true) {
-          fields.isRecommend = 'Y';
-        } else {
-          fields.isRecommend = 'N';
-        }
-        if (fields.isShow === true) {
-          fields.isShow = 'Y';
-        } else {
-          fields.isShow = 'N';
-        }
-        if (fields.isvalid === true) {
-          fields.isvalid = 'Y';
-        } else {
-          fields.isvalid = 'N';
-        }
-        if (fields.status === true) {
-          fields.status = 'Y';
-        } else {
-          fields.status = 'N';
+        if (data.specialNameImg1 && Array.isArray(data.specialNameImg1)) {
+          data.specialNameImg1 = data.specialNameImg1.map((item: any) => item.imgUrl).join(',');
         }
         onSubmit(fields);
       }}
@@ -89,16 +72,17 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         </Form.Item>
       </ProForm.Group>
 
-      {/* 缺少图片选择器 */}
-
       <ProForm.Group>
         <ProFormTextArea width="md" name="specialDescribe" label="专题描述" placeholder="请输入专题描述" />
       </ProForm.Group>
 
       <ProForm.Group>
-        <ProFormSwitch name="isValid" label="是否有效" />
+        <ImagePicker initData={data && data.specialNameImg1} limit={1}></ImagePicker>
       </ProForm.Group>
 
+      <ProForm.Group>
+        <ProFormSwitch name="isValid" label="是否有效" />
+      </ProForm.Group>
 
       <ProForm.Group>
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />

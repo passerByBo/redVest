@@ -164,7 +164,7 @@ const AddModal: React.FC<AddModalProps> = (props) => {
             visible={visible}
             centered
             footer={null}
-            onCancel={onCancel}
+            onCancel={() => { form.resetFields(); onCancel() }}
             width={900}
         >
             <Form

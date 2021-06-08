@@ -3,6 +3,8 @@ import ProTable from '@ant-design/pro-table';
 import type { ProColumns } from '@ant-design/pro-table';
 import { getProductList } from '@/services/merchandise/product';
 import formatRequestListParams from '@/utils/formatRequestListParams';
+import { Image } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
 
 export type UpdateFormProps = {
     useData: (values: any) => void;
@@ -31,9 +33,21 @@ const ProductTable: React.FC<UpdateFormProps> = (props) => {
             valueType: 'textarea',
         },
         {
-            title: '商品ID',
-            dataIndex: 'id',
-            valueType: 'textarea',
+            title: '专题图片',
+            search: false,
+            dataIndex: 'proLogoImg1',
+            render: (_: any, record: any) => {
+                return (
+                    _.map((item: any) => {
+                        return <Image
+                            preview={{ mask: <EyeOutlined /> }}
+                            width={40}
+                            src={item.imgUrl}
+                        />
+                    })
+
+                )
+            }
         },
         {
             title: '商品品牌',

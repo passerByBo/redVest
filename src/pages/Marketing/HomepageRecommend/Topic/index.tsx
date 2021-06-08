@@ -61,7 +61,7 @@ const Brand: React.FC = () => {
                     <Image
                         preview={{ mask: <EyeOutlined /> }}
                         width={40}
-                        src={_ as string}
+                        src={_ && _[0].imgUrl}
                     />
                 )
             }
@@ -194,11 +194,11 @@ const Brand: React.FC = () => {
                 ]}
                 request={formatRequestListParams(getTopicList)}
                 columns={columns}
-                // rowSelection={{
-                //     onChange: (_, selectedRows) => {
-                //         setSelectedRows(selectedRows);
-                //     },
-                // }}
+            // rowSelection={{
+            //     onChange: (_, selectedRows) => {
+            //         setSelectedRows(selectedRows);
+            //     },
+            // }}
             >
             </ProTable>
 

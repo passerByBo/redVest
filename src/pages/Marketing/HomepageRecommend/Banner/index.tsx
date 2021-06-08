@@ -1,6 +1,6 @@
 import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef, useCallback } from 'react';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm } from 'antd';
 import ProTable from '@ant-design/pro-table';
@@ -35,8 +35,6 @@ const Brand: React.FC = () => {
     const actionRef = useRef<ActionType>();
     //编辑和新增选择的数据都保存在这里
     const [currentRow, setCurrentRow] = useState<IBrand | null>(null);
-    const [selectedRowsState, setSelectedRows] = useState<IBrand[]>([]);
-
 
     const columns: ProColumns<IBrand>[] = [
         {
@@ -51,14 +49,14 @@ const Brand: React.FC = () => {
         },
         {
             title: '专题图片',
-            dataIndex: 'logo',
+            dataIndex: 'specialImg',
             search: false,
             render: (_, record) => {
                 return (
                     <Image
                         preview={{ mask: <EyeOutlined /> }}
                         width={40}
-                        src={_ as string}
+                        src={_ && _[0].imgUrl}
                     />
                 )
             }
@@ -195,11 +193,11 @@ const Brand: React.FC = () => {
                 ]}
                 request={formatRequestListParams(getBannerList)}
                 columns={columns}
-                // rowSelection={{
-                //     onChange: (_, selectedRows) => {
-                //         setSelectedRows(selectedRows);
-                //     },
-                // }}
+            // rowSelection={{
+            //     onChange: (_, selectedRows) => {
+            //         setSelectedRows(selectedRows);
+            //     },
+            // }}
             >
 
             </ProTable>

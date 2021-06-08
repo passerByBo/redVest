@@ -7,7 +7,7 @@ import ProForm, {
 } from '@ant-design/pro-form';
 
 import { Form, Input, Card } from 'antd';
-
+import ImagePicker from '@/components/ImagePicker';
 import ProductTable from './ProductList';
 
 export type FormValueType = {
@@ -34,14 +34,15 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const [addForm] = Form.useForm();
   const { addModalVisible, onSubmit, onCancel } = props;
   const [tableVisible, setTableVisible] = useState<boolean>(false);
+  const [data, setData] = useState<any>(null);
   const onSearch = () => { setTableVisible(!tableVisible) };
 
   const useData = (useData: any) => {
-    console.log(useData);
+    console.log("useData", useData);
+    setData(useData);
     addForm.setFieldsValue({
       specialName: useData.productName,
-      type: useData.typeName,
-      proLogoImg1: useData.proLogoImg1,
+      type: useData.typeName
     });
     setTableVisible(false);
   };
@@ -49,35 +50,23 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   return (
     <ModalForm
       form={addForm}
-      title={'新增品牌'}
+      title={'轮播精选信息'}
       visible={addModalVisible}
       onVisibleChange={(visible) => {
         if (!visible) {
-          onCancel(false)
+          addForm.resetFields();
+          setData(null);
+          onCancel(false);
         }
       }}
-      onFinish={async (data) => {
+      onFinish={async () => {
+        console.log("data--->", data);
         const fields = { ...data }
-        if (fields.isRecommend === true) {
-          fields.isRecommend = 'Y';
-        } else {
-          fields.isRecommend = 'N';
+        if (data.proLogoImg1 && Array.isArray(data.proLogoImg1)) {
+          data.proLogoImg1 = data.proLogoImg1.map((item: any) => item.imgUrl).join(',');
         }
-        if (fields.isShow === true) {
-          fields.isShow = 'Y';
-        } else {
-          fields.isShow = 'N';
-        }
-        if (fields.isvalid === true) {
-          fields.isvalid = 'Y';
-        } else {
-          fields.isvalid = 'N';
-        }
-        if (fields.status === true) {
-          fields.status = 'Y';
-        } else {
-          fields.status = 'N';
-        }
+        addForm.resetFields();
+        setData(null);
         onSubmit(fields);
       }}
     >
@@ -87,7 +76,9 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         </Form.Item>
       </ProForm.Group>
 
-      {/* 缺少图片选择器 */}
+      <ProForm.Group>
+        <ImagePicker initData={data && data.proLogoImg1} limit={1}></ImagePicker>
+      </ProForm.Group>
 
       <ProForm.Group>
         <ProFormText width="md" name="type" label="类型" placeholder="请输入类型" />
@@ -105,7 +96,6 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         <Card><ProductTable useData={useData} /></Card>
       }
     </ModalForm >
-
   );
 });
 
