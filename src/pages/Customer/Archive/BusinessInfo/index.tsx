@@ -6,8 +6,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProDescriptions from '@ant-design/pro-descriptions';
-
-import { getList, getDetail, getMerchantList, getOrderList } from '@/services/customer/merchantInfo';
+import Export from '@/components/Export';
+import { getList, getDetail, getMerchantList, getOrderList, exportExcel } from '@/services/customer/merchantInfo';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 type ThematicGroupListItem = {
@@ -250,9 +250,7 @@ const BusinessInfo: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={() => { }}>
-            <ExportOutlined /> 导出
-          </Button>,
+          <Export request={exportExcel} />
         ]}
         request={formatRequestListParams(getList, { status: statusKey })}
         columns={columns}

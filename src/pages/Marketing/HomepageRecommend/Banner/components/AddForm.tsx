@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProForm, {
   ProFormText,
   ModalForm,
@@ -35,6 +35,11 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
   const { addModalVisible, onSubmit, onCancel } = props;
   const [tableVisible, setTableVisible] = useState<boolean>(false);
   const [data, setData] = useState<any>(null);
+
+  // useEffect(() => {
+  //   addForm.setFieldsValue({ isValid: "否" });
+  // }, [])
+
   const onSearch = () => { setTableVisible(!tableVisible) };
 
   const useData = (useData: any) => {
@@ -59,15 +64,14 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
           onCancel(false);
         }
       }}
-      onFinish={async () => {
-        console.log("data--->", data);
-        const fields = { ...data }
+      onFinish={async (formData) => {
+        console.log("data--->", data.proLogoImg1);
         if (data.proLogoImg1 && Array.isArray(data.proLogoImg1)) {
-          data.proLogoImg1 = data.proLogoImg1.map((item: any) => item.imgUrl).join(',');
+          formData.specialImg = data.proLogoImg1.map((item: any) => item.id).join(',');
         }
-        addForm.resetFields();
-        setData(null);
-        onSubmit(fields);
+        console.log("formData--->", formData);
+        formData.isValid ? formData.isValid : formData.isValid = "false";
+        onSubmit(formData);
       }}
     >
       <ProForm.Group>

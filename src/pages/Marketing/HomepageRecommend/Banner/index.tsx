@@ -51,13 +51,16 @@ const Brand: React.FC = () => {
             title: '专题图片',
             dataIndex: 'specialImg',
             search: false,
-            render: (_, record) => {
+            render: (_: any, record: any) => {
                 return (
-                    <Image
-                        preview={{ mask: <EyeOutlined /> }}
-                        width={40}
-                        src={_ && _[0].imgUrl}
-                    />
+                    _.map((item: any) => {
+                        return <Image
+                            preview={{ mask: <EyeOutlined /> }}
+                            width={40}
+                            src={item.imgUrl}
+                        />
+                    })
+
                 )
             }
         },

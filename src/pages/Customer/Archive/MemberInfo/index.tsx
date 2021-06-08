@@ -1,15 +1,9 @@
 import React, { useRef } from 'react';
-import { ExportOutlined } from '@ant-design/icons';
-import { EllipsisOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProCard from '@ant-design/pro-card';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/rule';
-
-import type { TableListItem } from './data.d';
-import { getList } from '@/services/customer/memberInfo';
+import Export from '@/components/Export';
+import { getList, exportExcel } from '@/services/customer/memberInfo';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 const MemberInfo: React.FC = () => {
@@ -93,9 +87,7 @@ const MemberInfo: React.FC = () => {
           defaultCollapsed: false,
         }}
         toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={() => { }}>
-            <ExportOutlined /> 导出
-          </Button>,
+          <Export request={exportExcel} />
         ]}
         request={formatRequestListParams(getList)}
         columns={columns}

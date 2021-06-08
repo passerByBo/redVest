@@ -33,11 +33,14 @@ const ProductTable: React.FC<UpdateFormProps> = (props) => {
             dataIndex: 'specialNameImg1',
             render: (_: any, record: any) => {
                 return (
-                    <Image
-                        preview={{ mask: <EyeOutlined /> }}
-                        width={40}
-                        src={_ && _[0].imgUrl}
-                    />
+                    _.map((item: any) => {
+                        return <Image
+                            preview={{ mask: <EyeOutlined /> }}
+                            width={40}
+                            src={item.imgUrl}
+                        />
+                    })
+
                 )
             }
         },

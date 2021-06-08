@@ -51,3 +51,15 @@ export async function getOrderList(
         }
     });
 }
+
+//导出
+export async function exportExcel(
+    params: { id: string },
+    options?: { [key: string]: any },
+) {
+    return request('/customer/shopInfo/export', {
+        method: 'GET',
+        params: { ...params },
+        ...(options || {}),
+    });
+}

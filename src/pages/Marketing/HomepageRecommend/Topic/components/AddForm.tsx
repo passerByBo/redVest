@@ -57,13 +57,13 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
           onCancel(false)
         }
       }}
-      onFinish={async () => {
-        console.log("data--->", data);
-        const fields = { ...data }
-        if (data.specialNameImg1 && Array.isArray(data.specialNameImg1)) {
-          data.specialNameImg1 = data.specialNameImg1.map((item: any) => item.imgUrl).join(',');
+      onFinish={async (formData) => {
+        if (data.specialImg && Array.isArray(data.specialImg)) {
+          formData.specialImg = data.specialImg.map((item: any) => item.id).join(',');
         }
-        onSubmit(fields);
+        console.log("data--->", data);
+        console.log("formData--->", formData);
+        onSubmit(formData);
       }}
     >
       <ProForm.Group>

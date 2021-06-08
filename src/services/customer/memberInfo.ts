@@ -16,3 +16,15 @@ export async function getList(
         }
     });
 }
+
+//导出
+export async function exportExcel(
+    params: { id: string },
+    options?: { [key: string]: any },
+) {
+    return request('/customer/regisepersion/export', {
+        method: 'GET',
+        params: { ...params },
+        ...(options || {}),
+    });
+}

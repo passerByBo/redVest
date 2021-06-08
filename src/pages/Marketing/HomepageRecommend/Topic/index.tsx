@@ -34,8 +34,6 @@ const Brand: React.FC = () => {
     const actionRef = useRef<ActionType>();
     //编辑和新增选择的数据都保存在这里
     const [currentRow, setCurrentRow] = useState<IBrand | null>(null);
-    const [selectedRowsState, setSelectedRows] = useState<IBrand[]>([]);
-
 
     const columns: ProColumns<IBrand>[] = [
         {
@@ -56,13 +54,16 @@ const Brand: React.FC = () => {
             title: '专题图片',
             dataIndex: 'specialImg',
             search: false,
-            render: (_, record) => {
+            render: (_: any, record: any) => {
                 return (
-                    <Image
-                        preview={{ mask: <EyeOutlined /> }}
-                        width={40}
-                        src={_ && _[0].imgUrl}
-                    />
+                    _.map((item: any) => {
+                        return <Image
+                            preview={{ mask: <EyeOutlined /> }}
+                            width={40}
+                            src={item.imgUrl}
+                        />
+                    })
+
                 )
             }
         },
