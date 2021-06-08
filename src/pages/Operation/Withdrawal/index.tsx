@@ -6,8 +6,8 @@ import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 
 import UpdateForm from './components/UpdateForm'
-
-import { getWithdrawList, updateWithdrawList } from '@/services/operation/index';
+import Export from '@/components/Export';
+import { getWithdrawList, updateWithdrawList, exportExcelWithdrawList } from '@/services/operation/index';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 type TableListType = {
@@ -129,14 +129,7 @@ const Withdrawal: React.FC<TableListType> = () => {
         actionRef={actionRef}
         rowKey="id"
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-            }}
-          >
-            <ExportOutlined /> 导出
-          </Button>,
+          <Export request={exportExcelWithdrawList} />
         ]}
         request={formatRequestListParams(getWithdrawList)}
         columns={columns}

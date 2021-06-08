@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { ExportOutlined } from '@ant-design/icons';
 import { Button, Switch, message, Form, Popconfirm } from 'antd';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -8,8 +7,8 @@ import ProForm, {
     ModalForm,
     ProFormText,
 } from '@ant-design/pro-form'
-
-import { getExpressList, updateExpressList, removeExpressList } from '@/services/operation/index';
+import Export from '@/components/Export';
+import { getExpressList, updateExpressList, removeExpressList, exportExcelExpress } from '@/services/operation/index';
 import formatRequestListParams from '@/utils/formatRequestListParams';
 
 type TableListType = {
@@ -150,14 +149,7 @@ const ExpressModel: React.FC<TableListType> = () => {
                 actionRef={actionRef}
                 rowKey="id"
                 toolBarRender={() => [
-                    <Button
-                        type="primary"
-                        key="primary"
-                        onClick={() => {
-                        }}
-                    >
-                        <ExportOutlined />导出
-                    </Button>,
+                    <Export request={exportExcelExpress} />
                 ]}
                 request={formatRequestListParams(getExpressList)}
                 columns={columns}

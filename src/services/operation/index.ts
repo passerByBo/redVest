@@ -67,6 +67,30 @@ export async function updateWithdrawList(params: any) {
     });
 }
 
+//导出
+export async function exportExcelWithdrawList(
+    params: { id: string },
+    options?: { [key: string]: any },
+) {
+    return request('/operations/extractApply/export', {
+        method: 'GET',
+        params: { ...params },
+        ...(options || {}),
+    });
+}
+
+//导出
+export async function exportExcelExpress(
+    params: { id: string },
+    options?: { [key: string]: any },
+) {
+    return request('/operations/expressTemplate/export', {
+        method: 'GET',
+        params: { ...params },
+        ...(options || {}),
+    });
+}
+
 /**
  * 快递模板-列表
  */
