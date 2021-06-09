@@ -889,7 +889,7 @@ const ProductForm: React.FC<IProductFormProps> = (props) => {
                   rules={[{ required: true, message: '请选择商品封面主图' }]}
                   extra="建议图片大小不超过250kb"
                 >
-                  <ImagePicker selectedBack={(pictures: any) => { proLogoImg1 = pictures }} initData={initProRotationImg} limit={5} />
+                  <ImagePicker selectedBack={(pictures: any) => { proLogoImg1 = pictures }} initData={initProRotationImg} limit={1} />
                 </Form.Item>
               </Col>
             </Row>
