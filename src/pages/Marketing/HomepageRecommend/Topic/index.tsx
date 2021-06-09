@@ -63,7 +63,6 @@ const Brand: React.FC = () => {
                             src={item.imgUrl}
                         />
                     })
-
                 )
             }
         },
