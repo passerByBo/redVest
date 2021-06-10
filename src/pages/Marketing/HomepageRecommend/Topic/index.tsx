@@ -39,11 +39,12 @@ const Brand: React.FC = () => {
         {
             title: '专题名称',
             dataIndex: 'specialName',
-            render: ((_, item: IBrand) => {
-                return (
-                    <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
-                )
-            })
+            valueType: 'textarea',
+            // render: ((_, item: IBrand) => {
+            //     return (
+            //         <a onClick={() => { setCurrentRow(item); setShowDetail(true) }}>{_}</a>
+            //     )
+            // })
         },
         {
             title: '专题描述',
