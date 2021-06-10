@@ -36,7 +36,7 @@ export type UpdateFormProps = {
   values: FormValueType | null;
 };
 
-//奇葩又要存id 又需要上传名称  后台真鸡儿
+//奇葩又要存id 又需要上传名称
 let thematicGroup: any[] = [];
 
 const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {

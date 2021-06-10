@@ -92,7 +92,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
           fields.isValid = 'N';
         }
 
-        fields.specialGroup =getNameById( fields.specialGroupId);
+        fields.specialGroup = getNameById(fields.specialGroupId);
         onSubmit(fields);
       }}
     >
@@ -131,6 +131,8 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         <ProFormDigit width="md" name="sort" label="排序" placeholder="请输入排序" />
         <ProFormSwitch rules={[{ required: true, message: '请选择是否有效!' }]} name="isValid" label="是否有效" />
       </ProForm.Group>
+
+
 
     </ModalForm >
 
