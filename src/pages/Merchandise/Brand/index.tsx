@@ -48,7 +48,7 @@ const Brand: React.FC = () => {
 
   const columns: ProColumns<IBrand>[] = [
     {
-      title: '商品品牌',
+      title: '品牌名称',
       dataIndex: 'productBrand',
       render: ((_, item: IBrand) => {
         return (

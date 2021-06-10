@@ -41,7 +41,6 @@ export async function getThematicDetail(
   params: { [key: string]: unknown },
   options?: { [key: string]: unknown },
 ) {
-  console.log('params', params)
   return request(`/product/special/${params.id}`, {
     method: 'GET',
     ...(options || {}),
@@ -65,5 +64,30 @@ export async function exportThematic(
     ...(options || {}),
   });
 }
+
+export async function getProductListByThematic(
+  params: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/special/productList', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
+
+
+export async function updateProductList(
+  body: { [key: string]: any },
+  options?: { [key: string]: any },
+) {
+  return request('/product/special/updateProductList', {
+    method: 'POST',
+    data: { ...body },
+    ...(options || {}),
+  });
+}
+
+
 
 

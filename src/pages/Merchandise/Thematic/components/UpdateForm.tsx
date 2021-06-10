@@ -1,17 +1,13 @@
-import React, { useEffect } from 'react';
-import { Form, message, Modal } from 'antd';
+import React from 'react';
+import { Form, message } from 'antd';
 import ProForm, {
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
-  StepsForm,
-  ProFormRadio,
-  ProFormDateTimePicker,
   ModalForm,
   ProFormSwitch,
   ProFormDigit,
 } from '@ant-design/pro-form';
-import { useIntl } from 'umi';
 import { getThematicGroupList } from '@/services/merchandise/thematicGroup';
 import ImagePicker from '@/components/ImagePicker';
 
@@ -144,7 +140,7 @@ const UpdateForm: React.FC<UpdateFormProps> = React.memo((props) => {
         <ImagePicker initData={values && values.specialNameImg1} limit={1} />
       </Form.Item>
       <ProForm.Group>
-        <ProFormTextArea width="xl" label="专题组描述" name="specialDescribe" placeholder="请输入专题组描述" />
+        <ProFormTextArea width="xl" label="专题描述" name="specialDescribe" placeholder="请输入专题描述" />
       </ProForm.Group>
 
 

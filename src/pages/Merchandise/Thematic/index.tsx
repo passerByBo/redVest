@@ -5,12 +5,13 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, message, Image, Popconfirm, FormInstance } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import formatRequestListParams from '@/utils/formatRequestListParams';
-import { addThematic, deleteThematic,  exportThematic,  getThematicList, updateThematic } from '@/services/merchandise/thematic';
+import { addThematic, deleteThematic, exportThematic, getThematicList, updateThematic } from '@/services/merchandise/thematic';
 import UpdateForm from './components/UpdateForm'
 import AddForm from './components/AddForm';
 import DetailDrawer from './components/DetailDrawer';
 import { formatYAndN } from '@/utils/utils';
 import Export from '@/components/Export';
+import { history } from 'umi'
 export type ProductListItem = {
   id?: string;
   specialGroupId?: string;
@@ -25,7 +26,7 @@ export type ProductListItem = {
   specialTypeImg?: string;
 };
 
-const Thematic: React.FC = () => {
+const Thematic: React.FC<any> = (props) => {
   const formRef = useRef<FormInstance>();
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
@@ -82,15 +83,15 @@ const Thematic: React.FC = () => {
       dataIndex: 'specialDescribe',
     },
     {
-      title: '专题名称图片',
+      title: '专题图片',
       search: false,
       dataIndex: 'specialNameImg1',
-      render: (_:any, record:any) => {
+      render: (_: any, record: any) => {
         return (
           <Image
             preview={{ mask: <EyeOutlined /> }}
             width={40}
-            src={_ && _[0].imgUrl}
+            src={_ && _[0] && _[0].imgUrl}
           />
         )
       }
@@ -143,11 +144,8 @@ const Thematic: React.FC = () => {
           okText="确认"
           cancelText="取消"
         >
-          <a
-            key="delete"
-          >
-            删除
-                </a>
+          <a key="delete"> 删除 </a>
+          <a key="associate" onClick={() => history.push(`/merchandise/thematic/associate-products?id=${record.id}`)}> 关联商品</a>
         </Popconfirm>
 
       ],
@@ -231,27 +229,30 @@ const Thematic: React.FC = () => {
   }, [])
 
 
+  let local = '/merchandise/thematic/associate-products';
+  let { location: { pathname } } = history;
+
 
   return (
-    <PageContainer>
+    local !== pathname ? <PageContainer>
       <ProTable<ProductListItem>
         actionRef={actionRef}
         formRef={formRef}
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
-          <Export request={exportThematic.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })}/>,
+          <Export request={exportThematic.bind(null, { ...(formRef.current?.getFieldsValue() || {}) })} />,
           <Button type="primary" key="primary" onClick={() => { handleAddModalVisible(true) }}>
             <PlusOutlined />新建
                     </Button>
         ]}
         request={formatRequestListParams(getThematicList)}
         columns={columns}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => {
-        //     setSelectedRows(selectedRows);
-        //   },
-        // }}
+      // rowSelection={{
+      //   onChange: (_, selectedRows) => {
+      //     setSelectedRows(selectedRows);
+      //   },
+      // }}
       >
 
       </ProTable>
@@ -298,7 +299,7 @@ const Thematic: React.FC = () => {
         updateModalVisible={updateModalVisible} />
 
       {currentRow && <DetailDrawer detailVisible={showDetail} data={currentRow} onCancel={() => setShowDetail(false)} />}
-    </PageContainer>
+    </PageContainer> : props.children
   )
 }
 

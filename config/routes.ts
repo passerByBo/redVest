@@ -50,6 +50,14 @@ export default [
         path: '/merchandise/thematic',
         name: '专题管理',
         component: './Merchandise/Thematic',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/merchandise/thematic/associate-products',
+            name: '关联商品',
+            component: './Merchandise/Thematic/AssociateProducts',
+          },
+        ],
       },
       {
         path: '/merchandise/brand',
@@ -90,7 +98,7 @@ export default [
             path: '/merchandise/product/list/:id',
             name: '商品详情',
             component: './Merchandise/ProductList/productDetail',
-          }
+          },
         ],
       },
       {
@@ -138,7 +146,7 @@ export default [
     routes: [
       {
         path: '/sku',
-        redirect: '/sku/list'
+        redirect: '/sku/list',
       },
       {
         path: '/sku/list',
@@ -154,10 +162,10 @@ export default [
             path: '/sku/list/checklist',
             name: '出库清单',
             component: './SKULedger/OutStockCount',
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   },
   {
     //客户管理
@@ -281,12 +289,13 @@ export default [
             name: '轮播精选管理',
             icon: 'table',
             component: './Marketing/HomepageRecommend/Banner',
-          }, {
+          },
+          {
             path: 'marketing/recommend/product',
             name: '产品推荐管理',
             icon: 'table',
             component: './Marketing/HomepageRecommend/Product',
-          }
+          },
         ],
       },
     ],

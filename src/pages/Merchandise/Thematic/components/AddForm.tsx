@@ -123,7 +123,7 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
       </Form.Item>
 
       <ProForm.Group>
-        <ProFormTextArea width="xl" label="专题组描述" name="specialDescribe" placeholder="请输入专题组描述" />
+        <ProFormTextArea width="xl" label="专题描述" name="specialDescribe" placeholder="请输入专题描述" />
       </ProForm.Group>
 
 
