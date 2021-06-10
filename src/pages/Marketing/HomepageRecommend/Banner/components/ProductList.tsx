@@ -45,7 +45,11 @@ const ProductTable: React.FC<UpdateFormProps> = (props) => {
                             src={item.imgUrl}
                         />
                     })
-
+                    //     <Image
+                    //     preview={{ mask: <EyeOutlined /> }}
+                    //     width={40}
+                    //     src={_.length !== 0 ? _[0].imgUrl : ""}
+                    // />
                 )
             }
         },

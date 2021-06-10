@@ -58,8 +58,8 @@ const AddForm: React.FC<UpdateFormProps> = React.memo((props) => {
         }
       }}
       onFinish={async (formData) => {
-        if (data.specialImg && Array.isArray(data.specialImg)) {
-          formData.specialImg = data.specialImg.map((item: any) => item.id).join(',');
+        if (data.specialNameImg1 && Array.isArray(data.specialNameImg1)) {
+          formData.specialImg = data.specialNameImg1.map((item: any) => item.id).join(',');
         }
         console.log("data--->", data);
         console.log("formData--->", formData);
